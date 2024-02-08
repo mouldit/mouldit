@@ -27,9 +27,11 @@ All these actions represent either a query or a mutation. Queries are all action
 <h5>Concept</h5>
 <p>
  This is the resource that will be fetched. In your edgeQL schema it is coded as follows:
- ```
+ 
+```
  print
- ```
+```
+
 </p>
 <h5>Filter</h5>
 <p>
