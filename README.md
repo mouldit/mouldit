@@ -41,7 +41,7 @@ All these actions represent either a query or a mutation. Queries are all action
     link filmography := .<actors[is Content];
   }
 ```
-In the example above Account en Person are concepts.
+In the example above <i>Account</i> en <i>Person</i> are concepts.
 </p>
 <h5>Filter</h5>
 <p>
