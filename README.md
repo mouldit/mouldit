@@ -8,7 +8,7 @@
  <li>Get one</li>
  <li>Get all</li>
  <li>Add one to list</li>
- <li>Remove one to list</li>
+ <li>Remove one from list</li>
 </ul>
 All these actions represent either a query or a mutation. 
 </p>
