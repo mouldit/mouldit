@@ -29,9 +29,19 @@ All these actions represent either a query or a mutation. Queries are all action
  This is the resource that will be fetched. In your edgeQL schema it is coded as follows:
  
 ```
- print
-```
+  type Account {
+    required username: str {
+      constraint exclusive;
+    };
+    multi watchlist: Content;
+  }
 
+  type Person {
+    required name: str;
+    link filmography := .<actors[is Content];
+  }
+```
+In the example above Account en Person are concepts.
 </p>
 <h5>Filter</h5>
 <p>
