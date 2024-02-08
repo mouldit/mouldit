@@ -45,7 +45,7 @@ In the example above <i>Account</i> en <i>Person</i> are concepts.
 </p>
 <h5>Filter</h5>
 <p>
- 
+ Here you can configure at which conditions fetched records need to apply by specififying the values of the different fields within a record.
 </p>
 <h5>Field configurations</h5>
 <p>
