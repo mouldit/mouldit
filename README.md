@@ -56,7 +56,7 @@ In the example above <i>Account</i> en <i>Person</i> are concepts.
  For a calculated field you specify its name, and its type, for instance a boolean. For Mouldit to know how to calculate its value, you have to specify the type of calculation you want to perform. At the moment there are only two calculations. Of course a lot more will be added in the future, according to the gradual approach as explained in the section below. The current types are:
  <ul>
   <li>Checking for equality</li>
-  <li>Counting the number of fetch records of a particular query</li>
+  <li>Counting the number of fetched records of a particular query</li>
  </ul>
 </p>
 <h4>Mutations</h4>
