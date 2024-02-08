@@ -12,7 +12,7 @@ Mouldit only works with an edgeDB project. It will use the types that can be fou
  <li>Add one to list</li>
  <li>Remove one from list</li>
 </ul>
-All these actions represent either a query or a mutation. Queries are all actions that starts with 'Get'. All the others are mutations.
+All these actions represent either a query or a mutation. Queries are all actions that starts with 'Get'.
 </p>
 <h4>Queries</h4>
 <p>A query represents a get request. A query has five parts you can configure:
