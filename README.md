@@ -3,7 +3,7 @@
 <h2>The Mouldit CLI</h2>
 <p>With the CLI you can configure actions and UI components that will trigger these actions. When you have ended the steps in the CLI, Mouldit will generate you application based on this configuration as well as on the database schema you have manually added to your project.</p>
 <h3>Database schema</h3>
-
+Mouldit only works with an edgeDB project. It will use the types that can be found in your edgeQL schema to determine all possible server actions. Here you can find information on how to create an edgeDB project and the neceassry schema. Hereafter you can find an example on how such a schema and the CLI work together to create your application.
 <h3>Server actions</h3>
 <p>These type of actions represent all rest API endpoints that a client can send a request to. Each server action represents one rest API. At the moment the following type of actions are possible:
 <ul>
