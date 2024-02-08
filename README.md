@@ -49,6 +49,10 @@ In the example above <i>Account</i> en <i>Person</i> are concepts.
 </p>
 <h5>Field configurations</h5>
 <p>
+ You can specify wich fields to include or exclude, how to transform the value of a specific field before sending it to the client or add a calculated field. When prompted to enter fields to include/exclude you type their names separated by comma's. Transforming values is a feature that will be added later. 
+</p>
+<h6>Calculated field</h6>
+<p>
  
 </p>
 <h4>Mutations</h4>
