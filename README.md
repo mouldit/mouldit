@@ -5,7 +5,7 @@
 <h3>Database schema</h3>
 Mouldit only works with an edgeDB project. It will use the types that can be found in your edgeQL schema to determine all possible server actions. <a href="https://www.edgedb.com">Here</a> you can find information on how to create an edgeDB project and the neceassry schema. <a href="https://www.mouldit.io">Here</a> you can find an example on how such a schema and the CLI work together to create your application.
 <h3>Server actions</h3>
-<p>These type of actions represent all rest API endpoints that a client can send a request to. Each server action represents one rest API. At the moment the following type of actions are possible:
+<p>These type of actions represent all rest API endpoints that a client can send a request to. Each server action represents one rest API. At the moment the following type of actions are possible (a lot more will be added in the future!):
 <ul>
  <li>Get one</li>
  <li>Get all</li>
