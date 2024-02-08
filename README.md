@@ -21,13 +21,14 @@ All these actions represent either a query or a mutation.
  <li>transform fieldvalue(s)</li>
  <li>calculated (sub)field(s)</li>
 </ul>
+</p>
 <h5>Concept</h5>
 <p></p>
 <h5>Filter</h5>
 <p></p>
 <h5>Field configurations</h5>
 <p></p>
-</p>
+
 <h4>Mutation</h4>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
