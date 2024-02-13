@@ -101,6 +101,8 @@ module default {
  <li>We now configure our query. Since we are pretending there is only one user and this user has username 'Pol' we will fetch the watchlist of this user. First we will select the type of query <i>GET ONE</i>.</li>
  <li>Then we select as concept <i>watchlist</i></li>
  <li> Next we choose Y for filter and select <i>username</i> and type <i>Pol</i>.</li>
+ <li>Next we select <i>Current record</i> for the second parameter of the calculation <i>Count all records</i></li>
+ <li>As a last step we have to enter the second parameter for our root calculation. We select as a type <i>Number</i> and for the value we type <i>1</i></li>
 </ol>
 </p>
 <h2>Gradual approach</h2>
