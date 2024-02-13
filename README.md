@@ -27,6 +27,7 @@ All these actions represent either a query or a mutation. Queries are all action
 <h5>Concept</h5>
 <p>
  This is the resource that will be fetched. In your edgeQL schema it is coded as follows:
+ 
 ```
   type Account {
     required username: str {
@@ -40,6 +41,7 @@ All these actions represent either a query or a mutation. Queries are all action
     link filmography := .<actors[is Content];
   }
 ```
+
 In the example above <i>Account</i> en <i>Person</i> are concepts. You can instead of typing a specific concept also type <i>this</i>. That is how you can refer to the current record when your query is part of a calculation (see below).
 </p>
 <h5>Filter</h5>
