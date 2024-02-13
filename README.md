@@ -65,6 +65,7 @@ A mutation accepts a concept, a filter and a return query action as configuratio
 <h2>Example</h2>
 <p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year.
 We therefore start with the following schema:</p>
+
 ```
 module default {
 
