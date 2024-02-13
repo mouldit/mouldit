@@ -63,23 +63,22 @@ In the example above <i>Account</i> en <i>Person</i> are concepts. You can inste
 <h4>Mutations</h4>
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
 <h2>Example</h2>
-<p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year.
+<p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year. In each card component we want a button to add the movie to our watchlist or if it's already added we want to have a remove button that let's us remove the movie from our watchlist.
 We therefore start with the following schema:</p>
 
 ```
 module default {
 
-  type Person {
-    required name: str;
-    link filmography := .<actors[is Content];
+  type Account {
+    required username: str {
+      constraint exclusive;
+    };
+    multi watchlist: Content;
   }
 
   type Movie{
     required title: str;
     release_year: int32;
-    multi actors: Person {
-          character_name: str;
-    };
   }
   
 };
@@ -88,6 +87,11 @@ module default {
 <p>When we start the CLI (<i>how?</i>) it will ask for all the queries and mutations you want for each of the concepts in this schema. First it will ask if we want queries and mutations for the Person concept. Since we only want the frontend to show all movies, we enter N. Then we press enter as to confirm we do want queries and mutations for the Movie concept.</p>
 <p>Next we are asked if we want all standard queries and mutations (<i>which are?</i>). We type N since we only want one specific query and two specific mutations.</p>
 <p>Then we can enter the specific queries we want. We select GET ALL, since we need all movies in our frontend.</p>
-<p>Now we can configure our GET ALL query. </p>
+<p>Now we can configure our GET ALL query. 
+<ol>
+ <li>It will ask if we want a filter. We just enter here since the default is No and we want all movies not a selection of movies.</li>
+ <li>Next it will ask us whether we want certain fields excluded (1) or included (2). We type 1 to exclude the actors</li>
+</ol>
+</p>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
