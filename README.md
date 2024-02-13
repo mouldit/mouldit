@@ -62,7 +62,7 @@ In the example above <i>Account</i> en <i>Person</i> are concepts. You can inste
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
 <h2>Example</h2>
 <p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year.
-We therefore start with the following schema:
+We therefore start with the following schema:</p>
 ```
 module default {
 
@@ -81,7 +81,7 @@ module default {
   
 };
 ```
-</p>
+
 <p>When we start the CLI it will ask for all the queries and mutations you want for each of the concepts in this schema. First it will ask if we want queries and mutations for the Person concept. Since we only want the frontend to show all movies, we enter N. Then we press enter as to confirm we do want queries and mutations for the Movie concept.</p>
 <p></p>
 
