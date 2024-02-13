@@ -27,7 +27,6 @@ All these actions represent either a query or a mutation. Queries are all action
 <h5>Concept</h5>
 <p>
  This is the resource that will be fetched. In your edgeQL schema it is coded as follows:
- 
 ```
   type Account {
     required username: str {
@@ -62,8 +61,8 @@ In the example above <i>Account</i> en <i>Person</i> are concepts. You can inste
 <h4>Mutations</h4>
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
 <h2>Example</h2>
-We start with the following schema:
-
+<p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year.
+We therefore start with the following schema:
 ```
 module default {
 
@@ -82,6 +81,9 @@ module default {
   
 };
 ```
+</p>
+<p>When we start the CLI it will ask for all the queries and mutations you want for each of the concepts in this schema. First it will ask if we want queries and mutations for the Person concept. Since we only want the frontend to show all movies, we enter N. Then we press enter as to confirm we do want queries and mutations for the Movie concept.</p>
+<p></p>
 
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
