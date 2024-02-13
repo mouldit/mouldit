@@ -108,6 +108,13 @@ module default {
 </p>
 <p>The result of this configuration is a rest API in the backend that will return all movies with as an extra field a boolean which indicates if it is in the list of the account with username <i>Pol</i>. Next the CLI will ask you how the frontend needs to be setup that make use of this action. </p>
 <h5>Frontend configuration</h5>
+<p>Frontend configuration has tree main parts:
+<ul>
+ <li>General configuration</li>
+ <li>Configuration that connects serveractions with frontend components</li>
+ <li>Configuration that connects useractions with frontend components</li>
+</ul>
+</p>
 Each time a serveraction was configured the CLI will ask you whether you need frontend configuration for this. Since we do we type Y.
 <ol>
  <li></li>
