@@ -85,8 +85,9 @@ module default {
 };
 ```
 
-<p>When we start the CLI it will ask for all the queries and mutations you want for each of the concepts in this schema. First it will ask if we want queries and mutations for the Person concept. Since we only want the frontend to show all movies, we enter N. Then we press enter as to confirm we do want queries and mutations for the Movie concept.</p>
-<p></p>
-
+<p>When we start the CLI (<i>how?</i>) it will ask for all the queries and mutations you want for each of the concepts in this schema. First it will ask if we want queries and mutations for the Person concept. Since we only want the frontend to show all movies, we enter N. Then we press enter as to confirm we do want queries and mutations for the Movie concept.</p>
+<p>Next we are asked if we want all standard queries and mutations (<i>which are?</i>). We type N since we only want one specific query and two specific mutations.</p>
+<p>Then we can enter the specific queries we want. We select GET ALL, since we need all movies in our frontend.</p>
+<p>Now we can configure our GET ALL query. </p>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
