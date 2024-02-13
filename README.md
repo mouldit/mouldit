@@ -116,7 +116,7 @@ module default {
 </ul>
 </p>
 <ol>
- <li>The CLI starts with general configuration be selecting the type of menu you would want. For now there is only one option so we select this option:<i>Menubar</i></li>
+ <li>The CLI starts with general configuration be selecting the type of menu you would want. For now there is only one option so we select this option: <i>Menubar</i></li>
 <li>Next it ask to connect this component with all main concepts from our schema. We type N, since we only want a menu item for the movie concept.</li>
 <li>Then we can select all concepts we do want a menu item for. We select <i>Movie</i></li>
 </ol>
