@@ -84,6 +84,7 @@ module default {
 };
 ```
 
+<h5>Server action configuration</h5>
 <p>When we start the CLI (<i>how?</i>) it will ask for all the queries and mutations you want for each of the concepts in this schema. First it will ask if we want queries and mutations for the Person concept. Since we only want the frontend to show all movies, we enter N. Then we press enter as to confirm we do want queries and mutations for the Movie concept.</p>
 <p>Next we are asked if we want all standard queries and mutations (<i>which are?</i>). We type N since we only want one specific query and two specific mutations.</p>
 <p>Then we can enter the specific queries we want. We select GET ALL, since we need all movies in our frontend.</p>
@@ -105,5 +106,11 @@ module default {
  <li>As a last step we have to enter the second parameter for our root calculation. We select as a type <i>Number</i> and for the value we type <i>1</i></li>
 </ol>
 </p>
+<p>The result of this configuration is a rest API in the backend that will return all movies with as an extra field a boolean which indicates if it is in the list of the account with username <i>Pol</i>. Next the CLI will ask you how the frontend needs to be setup that make use of this action. </p>
+<h5>Frontend configuration</h5>
+Each time a serveraction was configured the CLI will ask you whether you need frontend configuration for this. Since we do we type Y.
+<ol>
+ <li></li>
+</ol>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
