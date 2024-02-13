@@ -115,9 +115,11 @@ module default {
  <li>Configuration that connects useractions with frontend components</li>
 </ul>
 </p>
-<p>The CLI starts with general configuration be selecting the type of menu you would want. For now there is only one option so we select this option:<i>Menubar</i></p>
-<p>Next it ask to connect this component with all main concepts from our schema. We type N, since we only want a menu item for the movie concept.</p>
-<p>Then we can select all concepts we do want a menu item for. We select <i>Movie</i></p>
+<ol>
+ <li>The CLI starts with general configuration be selecting the type of menu you would want. For now there is only one option so we select this option:<i>Menubar</i></li>
+<li>Next it ask to connect this component with all main concepts from our schema. We type N, since we only want a menu item for the movie concept.</li>
+<li>Then we can select all concepts we do want a menu item for. We select <i>Movie</i></li>
+</ol>
 <p>That is all for general configuration. (<i>What other general configuration could be useful?</i></p>
 <p>Next  it will ask for connecting frontend with serveractions.
 Each time a serveraction was configured the CLI will ask you whether you need frontend configuration for this. Since we do we type Y.</p>
