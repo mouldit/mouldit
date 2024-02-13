@@ -63,6 +63,7 @@ In the example above <i>Account</i> en <i>Person</i> are concepts. You can inste
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
 <h2>Example</h2>
 We start with the following schema:
+
 ```
 module default {
 
@@ -80,7 +81,7 @@ module default {
   }
   
 };
-
 ```
+
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
