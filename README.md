@@ -3,7 +3,7 @@
 <h2>The Mouldit CLI</h2>
 <p>With the CLI you can configure actions and UI components that will trigger these actions. When you have ended the steps in the CLI, Mouldit will generate you application based on this configuration as well as on the database schema you have manually added to your project.</p>
 <h3>Database schema</h3>
-Mouldit only works with an edgeDB project. It will use the types that can be found in your edgeQL schema to determine all possible server actions. <a href="https://www.edgedb.com">Here</a> you can find information on how to create an edgeDB project and the necessary schema. <a href="https://www.mouldit.io">Here</a> you can find an example on how such a schema and the CLI work together to create your application.
+Mouldit only works with an edgeDB project. It will use the types that can be found in your edgeQL schema to determine all possible server actions. <a href="https://www.edgedb.com">Here</a> you can find information on how to create an edgeDB project and the necessary schema.
 <h3>Server actions</h3>
 <p>These type of actions represent all rest API endpoints that a client can send a request to. Each server action represents one rest API. At the moment the following type of actions are possible (a lot more will be added in the future!):
 <ul>
@@ -61,5 +61,26 @@ In the example above <i>Account</i> en <i>Person</i> are concepts. You can inste
 </p>
 <h4>Mutations</h4>
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
+<h2>Example</h2>
+We start with the following schema:
+```
+module default {
+
+  type Person {
+    required name: str;
+    link filmography := .<actors[is Content];
+  }
+
+  type Movie{
+    required title: str;
+    release_year: int32;
+    multi actors: Person {
+          character_name: str;
+    };
+  }
+  
+};
+
+```
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
