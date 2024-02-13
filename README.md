@@ -90,7 +90,8 @@ module default {
 <p>Now we can configure our GET ALL query. 
 <ol>
  <li>It will ask if we want a filter. We just enter here since the default is No and we want all movies not a selection of movies.</li>
- <li>Next it will ask us whether we want certain fields excluded (1) or included (2). We type 1 to exclude the actors</li>
+ <li>Next it will ask us whether we want certain fields excluded (1) or included (2). We enter here since we want all field of our Movie concept.</li>
+ <li>At last it will ask us wether we need calculated fields. We type Y since we do. We need a calculated field that tells the frontend whether a movie is in my watchlist or not. The type of this calculated field will therefore be a boolean. Based on this boolean value the frontend will then either show a button to add the movie to my watchlist or a button to remove the movie from my list.</li>
 </ol>
 </p>
 <h2>Gradual approach</h2>
