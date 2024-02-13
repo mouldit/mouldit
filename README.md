@@ -114,6 +114,7 @@ module default {
  <li>Configuration that connects serveractions with frontend components</li>
  <li>Configuration that connects useractions with frontend components</li>
 </ul>
+It's important to understand that we can configure frontend components differently according to screensize. But we don't have to. All components have default behaviour that makes them look good on anyt screen. Only when you need custom layout and style depending on the screensize you can do this. Configuring UI components for different screensizes is handled after the general configuration of each component. (<i>How?</i>)
 </p>
 <ol>
  <li>The CLI starts with general configuration be selecting the type of menu you would want. For now there is only one option so we select this option: <i>Menubar</i></li>
@@ -123,8 +124,10 @@ module default {
 <p>That is all for general configuration. (<i>What other general configuration could be useful?</i></p>
 <p>Next  it will ask for connecting frontend with serveractions.
 Each time a serveraction was configured the CLI will ask you whether you need frontend configuration for this. Since we do we type Y.</p>
+<p>A serveraction has a result. Configuring the connection of a serveraction to the UI is equivalent with telling what to do with the result of this action in the frontend.</p>
 <ol>
- <li></li>
+ <li>The result of our previously configured action will be an array of movies, with a special property <i>isInList</i>. (<i>How a bad request has to be configured?</i>) Therefore the CLI will ask to select the component we want to use to render this list of movies. We select <i>Cards</i> which is a list of cards, one card component for each movie.</li>
+ <li>Next, since it is a list of cards it will ask us how to configure such a card. It starts with asking which fields need to be connected with which component properties. For the <i>title</i> field we select the <i>title</i> render property. For the <i>release_year</i> field we select the <i>subtitle</i> render property.</li>
 </ol>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of actions will get bigger as well as the level of detail to which you can configure these actions. What the frontend concerns, there it will be the amount of UI components and their level of customization.</p>
