@@ -94,7 +94,7 @@ module default {
  <li>At last it will ask us whether we need calculated fields. We type Y since we do. We need a calculated field that tells the frontend whether a movie is in my watchlist or not. The type of this calculated field will therefore be a boolean. Based on this boolean value the frontend will then either show a button to add the movie to my watchlist or a button to remove the movie from my list.</li>
  <li>Next we have to give the name of our calculated field. We type <i>isInList</i></li>
  <li>Next we have to select the type of the field. We select <i>Boolean</i></li>
- <li>Next we have to select out root calculation. We select <i>Check for equality</i></li>
+ <li>Next we have to select our root calculation. We select <i>Check for equality</i></li>
  <li>Next we have to enter the two parameters this calculation expects. First we have to give the type. For the first parameter we select <i>Calculation</i></li>
  <li>Next we have to give the details of the calculation from the previous step. First we need to select the type of calculation. We select <i>Count all records</i></li>
  <li>Just as with our root calculation we need to specify the parameters. For the first parameter we select <i>Query</i>. We want to check how many movie records in our watchlist have the same id as the current movie in our fetched list of movies. </li>
