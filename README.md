@@ -92,6 +92,15 @@ module default {
  <li>It will ask if we want a filter. We just enter here since the default is No and we want all movies not a selection of movies.</li>
  <li>Next it will ask us whether we want certain fields excluded (1) or included (2). We enter here since we want all field of our Movie concept.</li>
  <li>At last it will ask us wether we need calculated fields. We type Y since we do. We need a calculated field that tells the frontend whether a movie is in my watchlist or not. The type of this calculated field will therefore be a boolean. Based on this boolean value the frontend will then either show a button to add the movie to my watchlist or a button to remove the movie from my list.</li>
+ <li>Next we have to give the name of our calculated field. We type <i>isInList</i></li>
+ <li>Next we have to select the type of the field. We select <i>Boolean</i></li>
+ <li>Next we have to select out root calculation. We select <i>Check for equality</i></li>
+ <li>Next we have to enter the two parameters this calculation expects. First we have to give the type. For the first parameter we select <i>Calculation</i></li>
+ <li>Next we have to give the details of the calculation from the previous step. First we need to select the type of calculation. We select <i>Count all records</i></li>
+ <li>Just as with our root calculation we need to specify the parameters. For the first parameter we select <i>Query</i>. We want to check how many movie records in our watchlist have the same id as the current movie in our fetched list of movies. </li>
+ <li>We now configure our query. Since we are pretending there is only one user and this user has username 'Pol' we will fetch the watchlist of this user. First we will select the type of query <i>GET ONE</i>.</li>
+ <li>Then we select as concept <i>watchlist</i></li>
+ <li> Next we choose Y for filter and select <i>username</i> and type <i>Pol</i>.</li>
 </ol>
 </p>
 <h2>Gradual approach</h2>
