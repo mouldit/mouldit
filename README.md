@@ -82,11 +82,11 @@ All you can do here is stating whether you want a filter on the data. The CLI wi
 <p>
  You can specify wich fields to include or exclude. When prompted to enter fields to include/exclude you select each field that is appropriate. You can either include or exclude, never both.
 </p>
-<h6>Override field(s)</h6>
+<h5>Override field(s)</h5>
 <p>
  This option is for when you want to perform additional manipulations on one or more fieldvalues. You select the field and select a new type. If the transformed value will be of the same type as the fieldvalue than you don't have to configure anything.
 </p>
-<h6>Calculated field(s)</h6>
+<h5>Calculated field(s)</h5>
 <p>
  When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't you will have to calculate it's value manually in the rest API when it is generated.
 </p>
