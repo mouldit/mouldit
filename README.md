@@ -100,7 +100,7 @@ Configuring concept and filter happens exactly the same as for a query. But some
 // TODO Configuring validation
 // TODO Configuring data manipulation on the frontend.
 // TODO Configuring extra crudaction beside the infered actions
-//
+// TODO Configuring error handling
 
 
 <h2>Example</h2>
