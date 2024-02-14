@@ -40,15 +40,9 @@ For now the generated API's will be <i>Express.js</i> based Rest API's. In the f
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of (crud)actions will get bigger as well as the level of detail to which you can configure these actions. For the frontend configuration the set of UI components will get bigger over time as well as the level of detail you can go to customize their appearance and behaviour.</p>
 <h3>Database schema</h3>
 Mouldit only works with an edgeDB project. It will use the types that can be found in your edgeQL schema to determine all possible server actions. <a href="https://www.edgedb.com">Here</a> you can find information on how to create an edgeDB project and the necessary schema.
-<h3>Server actions</h3>
-<p>These type of actions represent all rest API endpoints that a client can send a request to. Each server action represents one rest API. At the moment the following type of actions are possible (a lot more will be added in the future!):
-<ul>
- <li>Get one</li>
- <li>Get all</li>
- <li>Add one to list</li>
- <li>Remove one from list</li>
-</ul>
-All these actions represent either a query or a mutation. Queries are all actions that starts with 'Get'.
+<h3>Crudactions</h3>
+<p>These type of actions represent all rest API endpoints that a client can send a request to. Each crudaction represents one rest API.
+All these actions represent either a query or a mutation. Queries are all actions that starts with 'Get' (see list above).
 </p>
 <h4>Queries</h4>
 <p>A query represents a get request. A query has five parts you can configure:
