@@ -3,8 +3,7 @@
 <h2>The Mouldit CLI</h2>
 <p>With the CLI you can configure the backend as well as the frontend of your application. When you have ended the steps in the CLI, Mouldit will generate you application based on this configuration as well as on the database schema you have manually added to your project (see the section about Database schema for more details).</p>
 <h2>Principle</h2>
-<p>Via the Mouldit CLI you can configure your crud actions as well as the entire frontend of your application. The CLI will infer all possible crudactions from your schema, or as for now at least all implemented actions (see list below). The configuration of such an action is explained in detail below. After all actions are configured the Mouldit CLI will guide you through the configuration of the frontend. This configuration consists of two parts. First you specify general things about your frontend, like navigation and pages. Then you will configure all UI components and their behaviour, which include triggering the above mentioned crudactions and dealing with their results. The frontend of course is optional, since it's perfectly possible you want API endpoints and expose them to external clients only. At the end the CLI will generate rest API's based on the configuration of your crudactions and a frontend if you have configured one.</p>
-<p>This is the list of configurable crudactions:
+<p>Via the Mouldit CLI you can configure your crud actions as well as the entire frontend of your application. The CLI will infer all possible crudactions from your schema, or as for now at least all implemented actions. This is the list of configurable crudactions:
 <ul>
  <li>Insert One</li>
  <li>Insert Many</li>
@@ -21,10 +20,9 @@
  <li>Add Many To List</li>
  <li>Remove Many From List</li>
  <li>Clear List</li>
-</ul>
-In the future a few more will be added, making it possible to reduce the need for custom development even further.
-</p>
-
+</ul> 
+The configuration of each crudaction is explained in detail below. In the future a few more will be added, making it possible to reduce the need for custom development even further. </p>
+<p>After all actions are configured the Mouldit CLI will guide you through the configuration of the frontend. This configuration consists of two parts. First you specify general things about your frontend, like navigation and pages. Then you will configure all UI components and their behaviour, which include triggering the above mentioned crudactions and dealing with their results. The frontend of course is optional, since it's perfectly possible you want API endpoints and expose them to external clients only. At the end the CLI will generate rest API's based on the configuration of your crudactions and a frontend if you have configured one.</p>
 <h3>Rest API's</h3>
 For now the generated API's will be <i>Express.js</i> based Rest API's. In the future it will be possible to opt for <i>Nest.js</i> based Rest API's as well. In some cases you might want to refine them yourself. This is typically the case when you deal with calculated fields, or nested queries. You will have to write edgeQL based queries for that and this is usually more convenient to do this yourself than via the CLI. Of course in the future these usecases will be possible through configuration alone, but even then you still might want to do it manually. In any case Mouldit will always leave you the choice.
 <h3>UI component library</h3>
