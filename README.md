@@ -94,10 +94,12 @@ All you can do here is stating whether you want a filter on the data. The CLI wi
 
 <h4>Mutations</h4>
 Configuring concept and filter happens exactly the same as for a query. But sometimes you want to mutate a specific field. For the action to know what field you use the include option and then select the concerning field. You can not use the override and calculated field(s) options with a mutation. There is one extra option though. You will have to configure what a mutation needs to return as a value. If you don't want it to return a value you type N. De default here is Y. At that point you have two options. The CLI will generate an endpoint that returns the altered record with all its fields and subfields as a default. If you have altered several records it will return all the altered records. You can then choose to configure this default query as a return value in the same way as any other query or you can choose to have your own custom query. In the first situation you can only configure Exclude/Include, Override and Calculated fields. In the latter you can configure the entire query. 
-
+//
 // TODO explain what a subfield is.
-
-
+// TODO Configuring validation
+// TODO Configuring data manipulation on the frontend.
+// TODO Configuring extra crudaction beside the infered actions
+//
 
 
 <h2>Example</h2>
