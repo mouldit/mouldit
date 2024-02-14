@@ -72,9 +72,7 @@ All these actions represent either a query or a mutation. Queries are all action
   }
 ```
 
-In the example above <i>Account</i> en <i>Person</i> are concepts. 
-
-// TODO subconcepts or fields instead of the resource itself.
+In the example above <i>Account</i> en <i>Person</i> are concepts. Since the CLI infers all possible crudactions from the concepts in your schema, you don't have to select the concept when configuring an action. 
 </p>
 <h5>Filter</h5>
 <p>
