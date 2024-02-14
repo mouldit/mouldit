@@ -101,8 +101,8 @@ Configuring concept and filter happens exactly the same as for a query. But some
 // TODO Configuring data manipulation on the frontend.
 // TODO Configuring extra crudaction beside the infered actions
 // TODO Configuring error handling
-
-
+<h2>Frontend configuration</h3>
+<p></p>
 <h2>Example</h2>
 <p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year. In each card component we want a button to add the movie to our watchlist or if it's already added we want to have a remove button that let's us remove the movie from our watchlist.
 We therefore start with the following schema:</p>
