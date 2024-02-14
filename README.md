@@ -45,12 +45,12 @@ Mouldit only works with an edgeDB project. It will use the types that can be fou
 All these actions represent either a query or a mutation. Queries are all actions that starts with 'Get' (see list above).
 </p>
 <h4>Queries</h4>
-<p>A query represents a get request. A query has five parts you can configure:
+<p>A query represents a get request. A query has four parts you can configure:
 <ul>
  <li>concept</li>
  <li>filter</li>
  <li>exclude/include (sub)field(s)</li>
- <li>transform fieldvalue(s)</li>
+ <li>override (sub)field(s)</li>
  <li>calculated (sub)field(s)</li>
 </ul>
 </p>
@@ -72,23 +72,23 @@ All these actions represent either a query or a mutation. Queries are all action
   }
 ```
 
-In the example above <i>Account</i> en <i>Person</i> are concepts. You can instead of typing a specific concept also type <i>this</i>. That is how you can refer to the current record when your query is part of a calculation (see below).
+In the example above <i>Account</i> en <i>Person</i> are concepts.
 </p>
 <h5>Filter</h5>
 <p>
- Here you can configure at which conditions fetched records need to apply by specififying the values of the different fields within a record.
+All you can do here is stating wether you want a filter on the data. The CLI will know in this case that the resource in the rest API will be fetched without passing a resource (concept) id since the filter will be used for fetching. Of course you have to manually add the filter on the rest API. Later you will be able to enter a value for a filter directly in the CLI if you would want that. If you select N for the filter option, the CLI will generate a Rest API that assumes an ID in the URL based on which the resource will be fetched.
 </p>
-<h5>Field configurations</h5>
+<h5>Exlude/Include field(s)</h5>
 <p>
- You can specify wich fields to include or exclude, how to transform the value of a specific field before sending it to the client or add a calculated field. When prompted to enter fields to include/exclude you type their names separated by comma's. Transforming values is a feature that will be added later. 
+ You can specify wich fields to include or exclude. When prompted to enter fields to include/exclude you select each field that is appropriate. You can either include or exclude, never both.
 </p>
-<h6>Calculated field</h6>
+<h6>Override field(s)</h6>
 <p>
- For a calculated field you specify its name, and its type, for instance a boolean. For Mouldit to know how to calculate its value, you have to specify the type of calculation you want to perform. At the moment there are only two calculations. Of course a lot more will be added in the future, according to the gradual approach as explained in the section below. The current types are:
- <ul>
-  <li><i>Checking for equality</i>: You have to specify two parameters which will be checked for equality. For now these parameters can be either primitive values like a string, a number, a boolean,... or another calculation that when executed will result in such a primitive value. Mouldit will make sure only primitives of the same type will be compared. Therefor only valid calculations can be added as parameter. </li>
-  <li><i>Counting the number of fetched records of a particular query</i>: You pass it a query configuration, which will result in the number of records that query comes up with.</li>
- </ul>
+ This option is for when you want to perform additional manipulations on one or more fieldvalues. You select the field and select a new type. If the transformed value will be of the same type as the fieldvalue than you don't have to configure anything.
+</p>
+<h6>Calculated field(s)</h6>
+<p>
+ When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't you will have to calculate it's value manually in the rest API when it is generated.
 </p>
 <h4>Mutations</h4>
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
