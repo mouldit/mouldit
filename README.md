@@ -7,6 +7,7 @@
 <h3>Rest API's</h3>
 For now the generated API's will be <i>Express.js</i> based Rest API's. In the future it will be possible to opt for <i>Nest.js</i> based Rest API's as well. In some cases you might want to refine them yourself. This is typically the case when you deal with calculated fields, or nested queries. You will have to write edgeQL based queries for that and this is usually more convenient to do this yourself than via the CLI. Of course in the future these usecases will be possible through configuration alone, but even then you still might want to do it manually. In any case Mouldit will always leave you the choice.
 <h3>UI component library</h3>
+<p></p>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of (crud)actions will get bigger as well as the level of detail to which you can configure these actions. For the frontend configuration the set of UI components will get bigger over time as well as the level of detail you can go to customize their appearance and behaviour.</p>
 <h3>Database schema</h3>
