@@ -21,7 +21,7 @@
  <li>Remove Many From List</li>
  <li>Clear List</li>
 </ul> 
-The configuration of each crudaction is explained in detail below. In the future a few more will be added, making it possible to reduce the need for custom development even further
+The configuration of each crudaction is explained in detail below. In the future a few more will be added, making it possible to reduce the need for custom development even further.
 </p>
 <p>After all actions are configured the Mouldit CLI will guide you through the configuration of the frontend. This configuration consists of two parts. First you specify general things about your frontend, like navigation and pages. Then you will configure all UI components and their behaviour, which include triggering the above mentioned crudactions and dealing with their results. The frontend of course is optional, since it's perfectly possible you want API endpoints and expose them to external clients only. At the end the CLI will generate rest API's based on the configuration of your crudactions and a frontend if you have configured one.</p>
 <h3>Rest API's</h3>
