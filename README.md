@@ -39,13 +39,13 @@ For now the generated API's will be <i>Express.js</i> based Rest API's. In the f
 </p>
 <h2>Gradual approach</h2>
 <p>Although the goal is to make the CLI so that you don't need to add any custom code after the initial setup, this will only be achieved gradually. As Mouldit grows the amount of (crud)actions will get bigger as well as the level of detail to which you can configure these actions. For the frontend configuration the set of UI components will get bigger over time as well as the level of detail you can go to customize their appearance and behaviour.</p>
-<h3>Database schema</h3>
+<h2>Database schema</h2>
 Mouldit only works with an edgeDB project. It will use the types that can be found in your edgeQL schema to determine all possible server actions. <a href="https://www.edgedb.com">Here</a> you can find information on how to create an edgeDB project and the necessary schema.
-<h3>Crudactions</h3>
+<h2>Crudaction configuration</h3>
 <p>These type of actions represent all rest API endpoints that a client can send a request to. Each crudaction represents one rest API.
 All these actions represent either a query or a mutation. Queries are all actions that starts with 'Get' (see list above).
 </p>
-<h4>Queries</h4>
+<h3>Queries</h3>
 <p>A query represents a get request. A query has four parts you can configure:
 <ul>
  <li>concept</li>
@@ -55,7 +55,7 @@ All these actions represent either a query or a mutation. Queries are all action
  <li>calculated (sub)field(s)</li>
 </ul>
 </p>
-<h5>Concept</h5>
+<h4>Concept</h4>
 <p>
  This is the resource that will be fetched. In your edgeQL schema it is coded as follows:
  
@@ -75,24 +75,24 @@ All these actions represent either a query or a mutation. Queries are all action
 
 In the example above <i>Account</i> en <i>Person</i> are concepts. Since the CLI infers all possible crudactions from the concepts in your schema, you don't have to select the concept when configuring an action. 
 </p>
-<h5>Filter</h5>
+<h4>Filter</h4>
 <p>
 All you can do here is stating whether you want a filter on the data. The CLI will know in this case that the resource in the rest API will be fetched without passing a resource (concept) id since the filter will be used for fetching. Of course you have to manually add the edgeQL filter on the rest API. Later you will be able to enter a value for a filter directly in the CLI if you would want that. If you select N for the filter option, the CLI will generate a Rest API that assumes an ID of the resource will be passed via the URL, that then can be used to actually fetch the record(s). 
 </p>
-<h5>Exlude/Include field(s)</h5>
+<h4>Exlude/Include field(s)</h4>
 <p>
  You can specify wich fields to include or exclude. When prompted to enter fields to include/exclude you select each field that is appropriate. You can either include or exclude, never both.
 </p>
-<h5>Override field(s)</h5>
+<h4>Override field(s)</h4>
 <p>
  This option is for when you want to perform additional manipulations on one or more fieldvalues. You select the field and select a new type. If the transformed value will be of the same type as the fieldvalue than you don't have to configure anything. When the Rest API is generated you can then code the transformation of the return field value using edgeQL.
 </p>
-<h5>Calculated field(s)</h5>
+<h4>Calculated field(s)</h4>
 <p>
  When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't, you will have to calculate it's value manually in the rest API when it is generated, using edgeQL.
 </p>
 
-<h4>Mutations</h4>
+<h3>Mutations</h3>
 Configuring concept and filter happens exactly the same as for a query. But sometimes you want to mutate a specific field. For the action to know what field you use the include option and then select the concerning field. You can not use the override and calculated field(s) options with a mutation. There is one extra option though. You will have to configure what a mutation needs to return as a value. If you don't want it to return a value you type N. De default here is Y. At that point you have two options. The CLI will generate an endpoint that returns the altered record with all its fields and subfields as a default. If you have altered several records it will return all the altered records. You can then choose to configure this default query as a return value in the same way as any other query or you can choose to have your own custom query. In the first situation you can only configure Exclude/Include, Override and Calculated fields. In the latter you can configure the entire query. 
 <br>
 <br>
