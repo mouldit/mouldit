@@ -72,7 +72,7 @@ All these actions represent either a query or a mutation. Queries are all action
   }
 ```
 
-In the example above <i>Account</i> en <i>Person</i> are concepts.
+In the example above <i>Account</i> en <i>Person</i> are concepts. TODO subconcepts or fields instead of the resource itself.
 </p>
 <h5>Filter</h5>
 <p>
@@ -84,11 +84,11 @@ All you can do here is stating whether you want a filter on the data. The CLI wi
 </p>
 <h5>Override field(s)</h5>
 <p>
- This option is for when you want to perform additional manipulations on one or more fieldvalues. You select the field and select a new type. If the transformed value will be of the same type as the fieldvalue than you don't have to configure anything.
+ This option is for when you want to perform additional manipulations on one or more fieldvalues. You select the field and select a new type. If the transformed value will be of the same type as the fieldvalue than you don't have to configure anything. When the Rest API is generated you can then code the transformation of the return field value using edgeQL.
 </p>
 <h5>Calculated field(s)</h5>
 <p>
- When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't you will have to calculate it's value manually in the rest API when it is generated.
+ When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't you will have to calculate it's value manually in the rest API when it is generated, using edgeQL.
 </p>
 <h4>Mutations</h4>
 A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
