@@ -72,7 +72,9 @@ All these actions represent either a query or a mutation. Queries are all action
   }
 ```
 
-In the example above <i>Account</i> en <i>Person</i> are concepts. TODO subconcepts or fields instead of the resource itself.
+In the example above <i>Account</i> en <i>Person</i> are concepts. 
+
+// TODO subconcepts or fields instead of the resource itself.
 </p>
 <h5>Filter</h5>
 <p>
@@ -88,10 +90,15 @@ All you can do here is stating whether you want a filter on the data. The CLI wi
 </p>
 <h5>Calculated field(s)</h5>
 <p>
- When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't you will have to calculate it's value manually in the rest API when it is generated, using edgeQL.
+ When you need extra fields you use the calculated field(s) option. You have to pass the CLI a name and a type. You can if you want give it a hardcoded value too. When you don't, you will have to calculate it's value manually in the rest API when it is generated, using edgeQL.
 </p>
+
 <h4>Mutations</h4>
-A mutation accepts a concept, a filter and a return query action as configuration parameters. Each of these is explained in detail in the section above.
+// TODO
+
+
+
+
 <h2>Example</h2>
 <p>For now we a very simple application, where in the frontend we have one menu item "movies". When the user clicks on this item, the frontend must show different card components where each card shows the details of the movie, namely its title and its release year. In each card component we want a button to add the movie to our watchlist or if it's already added we want to have a remove button that let's us remove the movie from our watchlist.
 We therefore start with the following schema:</p>
