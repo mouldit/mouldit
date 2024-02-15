@@ -70,7 +70,7 @@ All these actions represent either a query or a mutation. Queries are all action
   }
 ```
 
-In the example above <i>Account</i> en <i>Person</i> are concepts. Since the CLI infers all possible crudactions from the concepts in your schema, you don't have to select the concept when configuring an action. 
+In the example above <i>Account</i> en <i>Person</i> are concepts. Since the CLI infers all possible crudactions for the concepts in your schema, you don't have to select the concept when configuring an action. 
 </p>
 <h4>Filter</h4>
 <p>
