@@ -74,7 +74,7 @@ In the example above <i>Account</i> en <i>Person</i> are concepts. Since the CLI
 </p>
 <h4>Filter</h4>
 <p>
-All you can do here is stating whether you want a filter on the data. The CLI will know in this case that the resource in the rest API will be fetched without passing a resource (concept) id since the filter will be used for fetching. Of course you have to manually add the edgeQL filter on the rest API. Later you will be able to enter a value for a filter directly in the CLI if you would want that. If you select N for the filter option, the CLI will generate a Rest API that assumes an ID of the resource will be passed via the URL, that then can be used to actually fetch the record(s). 
+All you can do here is stating whether you want a filter on the data. If you do, the CLI will know that the resource in the rest API will be fetched without passing a resource (concept) id since the filter will be used for fetching. Of course you have to manually add the edgeQL filter in the rest API. Later you will be able to enter a value for a filter directly in the CLI if you would want that. If you select N for the filter option, the CLI will generate a Rest API that assumes an ID of the resource will be passed via the URL, that then can be used to actually fetch the record(s). 
 </p>
 <h4>Exlude/Include field(s)</h4>
 <p>
