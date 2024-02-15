@@ -11,15 +11,12 @@
  <li>Update Many</li>
  <li>Delete One</li>
  <li>Delete Many</li>
- <li>Delete All</li>
  <li>Get One</li>
  <li>Get Many</li>
- <li>Get All</li>
  <li>Add One To List</li>
  <li>Remove One From List</li>
  <li>Add Many To List</li>
  <li>Remove Many From List</li>
- <li>Clear List</li>
 </ul> 
 The configuration of each crudaction is explained in detail below. In the future a few more will be added, making it possible to reduce the need for custom development even further.
 </p>
