@@ -9,10 +9,13 @@
  <li>Insert Many</li>
  <li>Update One</li>
  <li>Update Many</li>
+  <li>Update All</li>
  <li>Delete One</li>
  <li>Delete Many</li>
+  <li>Delete All</li>
  <li>Get One</li>
  <li>Get Many</li>
+  <li>Get All</li>
  <li>Add One To List</li>
  <li>Remove One From List</li>
  <li>Add Many To List</li>
