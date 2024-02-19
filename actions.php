@@ -96,7 +96,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     </ul>
 </div>
 <div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
-   <h2>Configure backend of action: <?php
+   <h2 style="margin: 0">Configure backend of action: <?php
        for($i=0;$i<sizeof($_SESSION['actions']);$i++){
            if($_SESSION['actions'][$i]->selected){
                echo $_SESSION['actions'][$i]->name;
