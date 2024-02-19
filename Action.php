@@ -11,8 +11,8 @@ class Action
         $this->fields=[];
         $this->selected=false;
     }
-    function addField($fieldname){
-        $this->fields[]=$fieldname;
+    function addField($fieldname,$config,$checked){
+        $this->fields[]=[$fieldname,$config,$checked];
     }
     public function activate(): void
     {

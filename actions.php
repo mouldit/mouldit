@@ -1,52 +1,53 @@
 <?php
-spl_autoload_register(function(){
+spl_autoload_register(function () {
     include 'Action.php';
 });
 session_start();
 global $implementedTypesOfActions;
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
-    file_exists($_SESSION['pathToRootOfServer'].'/dbschema/default.esdl') &&
+        file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
     $implementedTypesOfActions = [
         'GET ALL'
     ];
-    $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'].'/dbschema/default.esdl');
-    $arr = explode('type',$fileAsStr);
-    $arr = array_slice($arr,1);
-    $_SESSION['actions']=[];
-    for ($i=0;$i<sizeof($arr);$i++){
+    $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
+    $arr = explode('type', $fileAsStr);
+    $arr = array_slice($arr, 1);
+    $_SESSION['actions'] = [];
+    for ($i = 0; $i < sizeof($arr); $i++) {
         $concept = strtolower($arr[$i]);
-        if(strstr($concept,'extending',true)){
-            $concept = trim(strstr($concept,'extending',true));
-        } else{
+        if (strstr($concept, 'extending', true)) {
+            $concept = trim(strstr($concept, 'extending', true));
+        } else {
             $concept = trim(explode('{', $concept)[0]);
         }
-        $action = new Action('Get all '.$concept.'s');
-        $start=strpos($arr[$i],'{')+1;
-        $end= strrpos($arr[$i],'}');
-        $conceptBlock=substr($arr[$i],$start,$end);
-        while(str_contains($conceptBlock,'{')){
-            $first= trim(strstr($conceptBlock,'{',true));
-            $last=substr($conceptBlock,strpos($conceptBlock,'}')+1);
-            $conceptBlock=$first.$last;
+        $action = new Action('Get all ' . $concept . 's');
+        $start = strpos($arr[$i], '{') + 1;
+        $end = strrpos($arr[$i], '}');
+        $conceptBlock = substr($arr[$i], $start, $end);
+        while (str_contains($conceptBlock, '{')) {
+            $first = trim(strstr($conceptBlock, '{', true));
+            $last = substr($conceptBlock, strpos($conceptBlock, '}') + 1);
+            $conceptBlock = $first . $last;
         }
-        $propChunks = explode(':',$conceptBlock);
+        $propChunks = explode(':', $conceptBlock);
         array_pop($propChunks);
-        foreach ($propChunks as $chunk){
-            $fieldNameChunks = explode(' ',$chunk);
-            if(is_array($fieldNameChunks)){
+        // todo zorg dat concepten die extenden de velden van het overkoepelende abstracte type overnemen
+        foreach ($propChunks as $chunk) {
+            $fieldNameChunks = explode(' ', $chunk);
+            if (is_array($fieldNameChunks)) {
                 $field = trim(array_pop($fieldNameChunks));
-                while(strlen($field)===0){
+                while (strlen($field) === 0) {
                     $field = trim(array_pop($fieldNameChunks));
                 }
-                $action->addField($field);
+                $action->addField($field,'include',true);
             }
         }
-        if($i===0){
+        if ($i === 0) {
             $action->selected = true;
         }
-        $_SESSION['actions'][]=$action;
+        $_SESSION['actions'][] = $action;
     }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
@@ -54,6 +55,20 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][$i]->selected = false;
         } else if ($_POST['action-name'] === $_SESSION['actions'][$i]->name) {
             $_SESSION['actions'][$i]->selected = true;
+        }
+    }
+} else if(isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+    for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
+        if ($_SESSION['actions'][$i]->selected) {
+            $_SESSION['actions'][$i]->active = $_POST['isActive'];
+            for ($j=0;$j<sizeof($_SESSION['actions'][$i]->fields);$j++){
+                $_SESSION['actions'][$i]->fields[$j][1]=$_POST['fieldsConfig'];
+                if(!isset($_POST[$_SESSION['actions'][$i]->fields[$j][0].'Checked'])){
+                    $_SESSION['actions'][$i]->fields[$j][2]=false;
+                } else{
+                    $_SESSION['actions'][$i]->fields[$j][2]=true;
+                }
+            }
         }
     }
 } else session_destroy();
@@ -68,10 +83,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     <title>Mouldit Code Generator</title>
 </head>
 <style>
-    ul{
+    ul {
         list-style-type: none;
         padding: 0;
     }
+
     .selected {
         background: blue;
         color: antiquewhite;
@@ -96,14 +112,61 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     </ul>
 </div>
 <div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
-   <h2 style="margin: 0">Configure backend of action: <?php
-       for($i=0;$i<sizeof($_SESSION['actions']);$i++){
-           if($_SESSION['actions'][$i]->selected){
-               echo $_SESSION['actions'][$i]->name;
-               break;
-           }
-       }
-       ?></h2>
+    <?php
+    for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
+        $part = '';
+        if ($_SESSION['actions'][$i]->selected) {
+            $part .= '<h2 style="margin: 0">Configure backend of action: ' . $_SESSION['actions'][$i]->name . ' 
+       </h2>
+       <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
+            <div><label><input type="radio" name="isActive" value="1"';
+            if ($_SESSION['actions'][$i]->active) {
+                $part .= ' checked> ON</label>
+                    <label><input type="radio" name="isActive" value="0"> OFF</label></div>';
+            } else {
+                $part .= '> ON</label>
+                    <label><input type="radio" name="isActive" value="0" checked> OFF</label>
+            </div>';
+            }
+            $part.='<div><label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="include"';
+            if ($_SESSION['actions'][$i]->fields[0][1]==='include') {
+                $part .= ' checked> Include</label>
+                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="exclude"> Exclude</label></div>';
+            } else {
+                $part .= '> Include</label>
+                    <label><input type="radio" name="fieldsConfig" value="exclude" checked> Exclude</label>
+            </div>';
+            }
+            for ($j=0;$j<sizeof($_SESSION['actions'][$i]->fields);$j++){
+                $part.='<div><label>'.$_SESSION['actions'][$i]->fields[$j][0].'<input type="checkbox" name="'.$_SESSION['actions'][$i]->fields[$j][0].'Checked" value="1"';
+                if($_SESSION['actions'][$i]->fields[$j][2]){
+                    $part .= ' checked></label></div>';
+                } else{
+                    $part .= '></label></div>';
+                }
+            }
+           $part.='<div><button type="submit" name="action-edited">save</button></div>
+</form>';
+            echo $part;
+            break;
+        }
+    }
+    ?>
 </div>
+<script>
+    // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
+    function checkFields() {
+        const els = document.getElementsByTagName('input');
+        for (let i=0;i<els.length;i++){
+            if(els[i].type==='checkbox' && !(els[i].checked)) els[i].checked = true;
+        }
+    }
+    function uncheckFields() {
+        const els = document.getElementsByTagName('input');
+        for (let i=0;i<els.length;i++){
+            if(els[i].type==='checkbox' && (els[i].checked)) els[i].checked = false;
+        }
+    }
+</script>
 </body>
 </html>
