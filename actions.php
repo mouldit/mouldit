@@ -1,6 +1,8 @@
 <?php
+spl_autoload_register(function(){
+    include 'Action.php';
+});
 session_start();
-include './Action.php';
 global $implementedTypesOfActions;
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
@@ -29,7 +31,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $last=substr($conceptBlock,strpos($conceptBlock,'}')+1);
             $conceptBlock=$first.$last;
         }
-        print $conceptBlock;
         $propChunks = explode(':',$conceptBlock);
         array_pop($propChunks);
         foreach ($propChunks as $chunk){
@@ -51,7 +52,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
             $_SESSION['actions'][$i]->selected = false;
-        } else if ($_POST['new-action-selected'] == $_SESSION['actions'][$i]->name) {
+        } else if ($_POST['action-name'] === $_SESSION['actions'][$i]->name) {
             $_SESSION['actions'][$i]->selected = true;
         }
     }
@@ -77,11 +78,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
 </style>
 <body>
-<div id="actions">
-    <ul>
+<div id="actions" style="float:left; min-width: 200px;border:1px solid red">
+    <ul style="margin:0">
         <?php
         for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
-            if ($_SESSION['actions'][$i]->selected || (!isset($_POST['new-action-selected']) && $i==0) ) {
+            if ($_SESSION['actions'][$i]->selected) {
                 echo "<li class='selected'>" . $_SESSION['actions'][$i]->name . "</li>";
             } else echo "<li style='overflow:auto'>
                             <span style='float:left'>" . $_SESSION['actions'][$i]->name . "</span> 
@@ -94,10 +95,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         ?>
     </ul>
 </div>
-<div id="detail">
-    <!-- todo hier kan de gebruiker zijn API configureren
-         todo toon hier de geselecteerde actie-->
+<div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
+   <h2>Configure backend of action: <?php
+       for($i=0;$i<sizeof($_SESSION['actions']);$i++){
+           if($_SESSION['actions'][$i]->selected){
+               echo $_SESSION['actions'][$i]->name;
+               break;
+           }
+       }
+       ?></h2>
 </div>
 </body>
 </html>
-<?php session_destroy();?>
