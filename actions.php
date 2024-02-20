@@ -17,21 +17,24 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $concepts = [];
     // code blokje van eerstvolgende abstract concept
     $fileAsStr = strtolower($fileAsStr);
+    $_SESSION['actions'] = [];
     $next = strstr($fileAsStr, 'abstract type');
-    function getNextAbstractConceptCodeBlock($next): string
+    function getAbstractConceptCodeBlock($next): string
     {
-        $next = substr($next, strlen('abstract type'));
+        $next = trim(substr($next, strlen('abstract type')));
+        // op dit moment is 'abstract type' er af
         $posType = strpos($next, 'type');
         $posAbstractType = strpos($next, 'abstract type');
         if ($posType > $posAbstractType) {
+            // fix doordat pos FALSE is hier krijg je een lege string terug?
             $next = trim(substr($next, 0, $posAbstractType));
         } else {
             $next = trim(substr($next, 0, $posType));
         }
         return $next;
     }
-    function addFields(&$action, $next): array
-    {
+    function addFields(&$action, $next): array{
+        // todo voeg ook alle velden van het abstracte type toe voor de actie die extends
         $start = strpos($next, '{') + 1;
         $end = strrpos($next, '}');
         $conceptBlock = substr($next, $start, $end);
@@ -69,65 +72,39 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $concepts[] = $conceptArrItem;
         // add action to sessions
         $_SESSION['actions'][] = $action;
-        // todo na creatie van alle acties zet je de eerste actie (van een gewoon type of extending type als "selected"
     }
+
     if ($next) {
-        $next = getNextAbstractConceptCodeBlock($next);
-        processAbstractConcept($next);
+        $next = getAbstractConceptCodeBlock($next);
+        if($next)processAbstractConcept($next);
         // we zoeken nu een eerst volgende blokje van een abstract concept
         $expl = explode($fileAsStr, $next);
         while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
-            $next = getNextAbstractConceptCodeBlock($next);
-            processAbstractConcept($next);
+            $next = getAbstractConceptCodeBlock($next);
+            if($next)processAbstractConcept($next);
             $expl = explode($fileAsStr, $next);
         }
     }
-
-    // concepten die extenden van een abstract concept met de naam van het abstracte concept
-    // todo
-
-    // gewone concepten
-    // todo
-
-
     $arr = explode('type', $fileAsStr);
     $arr = array_slice($arr, 1);
-    $arrConcepts = [];
-    $_SESSION['actions'] = [];
     for ($i = 0; $i < sizeof($arr); $i++) {
         $concept = strtolower($arr[$i]);
-
+        $conceptArrItem = [];
         if (strstr($concept, 'extending', true)) {
             $concept = trim(strstr($concept, 'extending', true));
+            $conceptArrItem = ['extending',$concept];
         } else {
             $concept = trim(explode('{', $concept)[0]);
+            $conceptArrItem = ['regular',$concept];
         }
         $action = new Action('Get all ' . $concept . 's');
-        $start = strpos($arr[$i], '{') + 1;
-        $end = strrpos($arr[$i], '}');
-        $conceptBlock = substr($arr[$i], $start, $end);
-        while (str_contains($conceptBlock, '{')) {
-            $first = trim(strstr($conceptBlock, '{', true));
-            $last = substr($conceptBlock, strpos($conceptBlock, '}') + 1);
-            $conceptBlock = $first . $last;
-        }
-        $propChunks = explode(':', $conceptBlock);
-        array_pop($propChunks);
-        foreach ($propChunks as $chunk) {
-            $fieldNameChunks = explode(' ', $chunk);
-            if (is_array($fieldNameChunks)) {
-                $field = trim(array_pop($fieldNameChunks));
-                while (strlen($field) === 0) {
-                    $field = trim(array_pop($fieldNameChunks));
-                }
-                $action->addField($field, 'include', true);
-            }
-        }
+        $conceptArrItem[2] = addFields($action,$arr[$i]);
         if ($i === 0) {
             $action->selected = true;
         }
         $_SESSION['actions'][] = $action;
     }
+    //print_r($_SESSION['actions']);
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
