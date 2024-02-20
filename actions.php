@@ -1,6 +1,7 @@
 <?php
 spl_autoload_register(function () {
     include 'Action.php';
+    include 'generate.php';
 });
 session_start();
 global $implementedTypesOfActions;
@@ -115,7 +116,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             }
         }
     }
-} else session_destroy();
+} else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+    generate();
+}else session_destroy();
 ?>
 <!doctype html>
 <html lang="en">
@@ -190,7 +193,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 }
             }
             $part .= '<div><button type="submit" name="action-edited">save</button></div>
-</form>';
+</form><br><div><form action="' . $_SERVER['PHP_SELF'] . '" method="post"><input type="hidden" name="generate"><button type="submit">Generate</button></form></div>';
             echo $part;
             break;
         }
