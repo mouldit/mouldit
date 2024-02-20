@@ -12,49 +12,84 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         'GET ALL'
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
-    // todo strategie
-    // ga doorheen de tekst per type concept: abstract, extending en gewoon en zet dit er ook bij in een aparte arr:
-    // deze arr bevat de concept naam en welk van de 3 types er zijn en de bijhorende properties
-    // bij het invullen van de actions array kan je dan de bijhorende props nemen voor de verschillende concepten die
-    // extenden van een abstract concept
-
-    // aanpak, je doet onderstaande oefening om elke type concept eruit te halen met zijn props
-
     // abstracte concepten
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
-
+    $concepts = [];
     // code blokje van eerstvolgende abstract concept
-    $next = strstr($fileAsStr,'abstract type');
-    function getNext($next){
-        $next = substr($next,strlen('abstract type'));
-        $posType = strpos($next,'type');
-        $posAbstractType=  strpos($next,'abstract type');
-        if($posType>$posAbstractType){
-            $next = trim(substr($next,0,$posAbstractType));
-        } else{
-            $next = trim(substr($next,0,$posType));
+    $fileAsStr = strtolower($fileAsStr);
+    $next = strstr($fileAsStr, 'abstract type');
+    function getNextAbstractConceptCodeBlock($next): string
+    {
+        $next = substr($next, strlen('abstract type'));
+        $posType = strpos($next, 'type');
+        $posAbstractType = strpos($next, 'abstract type');
+        if ($posType > $posAbstractType) {
+            $next = trim(substr($next, 0, $posAbstractType));
+        } else {
+            $next = trim(substr($next, 0, $posType));
         }
         return $next;
     }
-    function processNext($next){
-        // todo process $next qua naam en properties en bewaar in een data structuur
-
+    function addFields(&$action, $next): array
+    {
+        $start = strpos($next, '{') + 1;
+        $end = strrpos($next, '}');
+        $conceptBlock = substr($next, $start, $end);
+        while (str_contains($conceptBlock, '{')) {
+            $first = trim(strstr($conceptBlock, '{', true));
+            $last = substr($conceptBlock, strpos($conceptBlock, '}') + 1);
+            $conceptBlock = $first . $last;
+        }
+        $propChunks = explode(':', $conceptBlock);
+        array_pop($propChunks);
+        $fields = [];
+        foreach ($propChunks as $chunk) {
+            $fieldNameChunks = explode(' ', $chunk);
+            if (is_array($fieldNameChunks)) {
+                $field = trim(array_pop($fieldNameChunks));
+                while (strlen($field) === 0) {
+                    $field = trim(array_pop($fieldNameChunks));
+                }
+                $fields[] = $field;
+                $action->addField($field, 'include', true);
+            }
+        }
+        return $fields;
     }
-    if($next){
-        $next = getNext($next);
-        processNext($next);
+    function processAbstractConcept($next): void{
+        // get concept en create action
+        $concept = trim(strstr($next, '{', true));
+        $action = new Action('Get all ' . $concept . 's');
+        // add concept to concepts arr
+        $conceptArrItem = ['abstract', $concept];
+        // get every prop and and add it as art to concepts arr
+        $fields = addFields($action, $next);
+        // add every field to session action instance
+        $conceptArrItem[2] = $fields;
+        $concepts[] = $conceptArrItem;
+        // add action to sessions
+        $_SESSION['actions'][] = $action;
+        // todo na creatie van alle acties zet je de eerste actie (van een gewoon type of extending type als "selected"
+    }
+    if ($next) {
+        $next = getNextAbstractConceptCodeBlock($next);
+        processAbstractConcept($next);
         // we zoeken nu een eerst volgende blokje van een abstract concept
-        $expl = explode($fileAsStr,$next);
-        while(sizeof($expl)>1 && $next = strstr($expl[1],'abstract type')){
-            $next = getNext($next);
-            processNext($next);
-            $expl = explode($fileAsStr,$next);
+        $expl = explode($fileAsStr, $next);
+        while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
+            $next = getNextAbstractConceptCodeBlock($next);
+            processAbstractConcept($next);
+            $expl = explode($fileAsStr, $next);
         }
     }
+
     // concepten die extenden van een abstract concept met de naam van het abstracte concept
     // todo
+
     // gewone concepten
     // todo
+
+
     $arr = explode('type', $fileAsStr);
     $arr = array_slice($arr, 1);
     $arrConcepts = [];
@@ -78,7 +113,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         $propChunks = explode(':', $conceptBlock);
         array_pop($propChunks);
-        // todo zorg dat concepten die extenden de velden van het overkoepelende abstracte type overnemen
         foreach ($propChunks as $chunk) {
             $fieldNameChunks = explode(' ', $chunk);
             if (is_array($fieldNameChunks)) {
@@ -86,7 +120,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 while (strlen($field) === 0) {
                     $field = trim(array_pop($fieldNameChunks));
                 }
-                $action->addField($field,'include',true);
+                $action->addField($field, 'include', true);
             }
         }
         if ($i === 0) {
@@ -102,16 +136,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][$i]->selected = true;
         }
     }
-} else if(isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+} else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
             $_SESSION['actions'][$i]->active = $_POST['isActive'];
-            for ($j=0;$j<sizeof($_SESSION['actions'][$i]->fields);$j++){
-                $_SESSION['actions'][$i]->fields[$j][1]=$_POST['fieldsConfig'];
-                if(!isset($_POST[$_SESSION['actions'][$i]->fields[$j][0].'Checked'])){
-                    $_SESSION['actions'][$i]->fields[$j][2]=false;
-                } else{
-                    $_SESSION['actions'][$i]->fields[$j][2]=true;
+            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fields); $j++) {
+                $_SESSION['actions'][$i]->fields[$j][1] = $_POST['fieldsConfig'];
+                if (!isset($_POST[$_SESSION['actions'][$i]->fields[$j][0] . 'Checked'])) {
+                    $_SESSION['actions'][$i]->fields[$j][2] = false;
+                } else {
+                    $_SESSION['actions'][$i]->fields[$j][2] = true;
                 }
             }
         }
@@ -173,8 +207,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     <label><input type="radio" name="isActive" value="0" checked> OFF</label>
             </div>';
             }
-            $part.='<div><label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="include"';
-            if ($_SESSION['actions'][$i]->fields[0][1]==='include') {
+            $part .= '<div><label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="include"';
+            if ($_SESSION['actions'][$i]->fields[0][1] === 'include') {
                 $part .= ' checked> Include</label>
                     <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="exclude"> Exclude</label></div>';
             } else {
@@ -182,15 +216,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     <label><input type="radio" name="fieldsConfig" value="exclude" checked> Exclude</label>
             </div>';
             }
-            for ($j=0;$j<sizeof($_SESSION['actions'][$i]->fields);$j++){
-                $part.='<div><label>'.$_SESSION['actions'][$i]->fields[$j][0].'<input type="checkbox" name="'.$_SESSION['actions'][$i]->fields[$j][0].'Checked" value="1"';
-                if($_SESSION['actions'][$i]->fields[$j][2]){
+            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fields); $j++) {
+                $part .= '<div><label>' . $_SESSION['actions'][$i]->fields[$j][0] . '<input type="checkbox" name="' . $_SESSION['actions'][$i]->fields[$j][0] . 'Checked" value="1"';
+                if ($_SESSION['actions'][$i]->fields[$j][2]) {
                     $part .= ' checked></label></div>';
-                } else{
+                } else {
                     $part .= '></label></div>';
                 }
             }
-           $part.='<div><button type="submit" name="action-edited">save</button></div>
+            $part .= '<div><button type="submit" name="action-edited">save</button></div>
 </form>';
             echo $part;
             break;
@@ -202,14 +236,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
     function checkFields() {
         const els = document.getElementsByTagName('input');
-        for (let i=0;i<els.length;i++){
-            if(els[i].type==='checkbox' && !(els[i].checked)) els[i].checked = true;
+        for (let i = 0; i < els.length; i++) {
+            if (els[i].type === 'checkbox' && !(els[i].checked)) els[i].checked = true;
         }
     }
+
     function uncheckFields() {
         const els = document.getElementsByTagName('input');
-        for (let i=0;i<els.length;i++){
-            if(els[i].type==='checkbox' && (els[i].checked)) els[i].checked = false;
+        for (let i = 0; i < els.length; i++) {
+            if (els[i].type === 'checkbox' && (els[i].checked)) els[i].checked = false;
         }
     }
 </script>
