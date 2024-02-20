@@ -86,8 +86,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $concept = trim(explode('{', $concept)[0]);
         }
         $action = new Action('Get all ' . $concept . 's');
-        addFields($action,$arr[$i]);
         if($fields)array_push($action->fields,...$fields);
+        addFields($action,$arr[$i]);
         if ($i === 0) {
             $action->selected = true;
         }
