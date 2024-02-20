@@ -12,19 +12,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         'GET ALL'
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
-    // abstracte concepten
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
-    // code blokje van eerstvolgende abstract concept
     $fileAsStr = strtolower($fileAsStr);
     $_SESSION['actions'] = [];
     $next = strstr($fileAsStr, 'abstract type');
     function getAbstractConceptCodeBlock($next): string {
         $next = trim(substr($next, strlen('abstract type')));
-        // op dit moment is 'abstract type' er af
         $posType = strpos($next, 'type');
         $posAbstractType = strpos($next, 'abstract type');
         if ($posType > $posAbstractType) {
-            // fix doordat pos FALSE is hier krijg je een lege string terug?
             $next = trim(substr($next, 0, $posAbstractType));
         } else {
             $next = trim(substr($next, 0, $posType));
@@ -63,7 +59,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     if ($next) {
         $next = getAbstractConceptCodeBlock($next);
         if($next)processAbstractConcept($next);
-        // we zoeken nu een eerst volgende blokje van een abstract concept
         $expl = explode($fileAsStr, $next);
         while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
             $next = getAbstractConceptCodeBlock($next);
@@ -87,17 +82,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     $fields = $_SESSION['actions'][$j]->fields;
                 }
             }
-/*            $arrtemp = array_filter($_SESSION['actions'],function ($it) use ($abstract) {
-                return $it->name==='Get all '.$abstract.'s';
-            });*/
         } else {
             $concept = trim(explode('{', $concept)[0]);
         }
         $action = new Action('Get all ' . $concept . 's');
         addFields($action,$arr[$i]);
-        // todo dit zou wel moeten werken
         if($fields)array_push($action->fields,...$fields);
-        //print_r($action);
         if ($i === 0) {
             $action->selected = true;
         }
