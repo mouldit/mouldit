@@ -117,7 +117,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-    generate();
+    generate($_SESSION['actions']);
 }else session_destroy();
 ?>
 <!doctype html>
@@ -193,7 +193,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 }
             }
             $part .= '<div><button type="submit" name="action-edited">save</button></div>
-</form><br><div><form action="' . $_SERVER['PHP_SELF'] . '" method="post"><input type="hidden" name="generate"><button type="submit">Generate</button></form></div>';
+</form><br><div><form style="float:right;" action="' . $_SERVER['PHP_SELF'] . '" method="post"><input type="hidden" name="generate"><button type="submit">Generate</button></form></div>';
             echo $part;
             break;
         }
