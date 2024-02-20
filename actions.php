@@ -14,13 +14,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // abstracte concepten
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
-    $concepts = [];
     // code blokje van eerstvolgende abstract concept
     $fileAsStr = strtolower($fileAsStr);
     $_SESSION['actions'] = [];
     $next = strstr($fileAsStr, 'abstract type');
-    function getAbstractConceptCodeBlock($next): string
-    {
+    function getAbstractConceptCodeBlock($next): string {
         $next = trim(substr($next, strlen('abstract type')));
         // op dit moment is 'abstract type' er af
         $posType = strpos($next, 'type');
@@ -33,8 +31,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         return $next;
     }
-    function addFields(&$action, $next): array{
-        // todo voeg ook alle velden van het abstracte type toe voor de actie die extends
+    function addFields(&$action, $next){
         $start = strpos($next, '{') + 1;
         $end = strrpos($next, '}');
         $conceptBlock = substr($next, $start, $end);
@@ -45,7 +42,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         $propChunks = explode(':', $conceptBlock);
         array_pop($propChunks);
-        $fields = [];
         foreach ($propChunks as $chunk) {
             $fieldNameChunks = explode(' ', $chunk);
             if (is_array($fieldNameChunks)) {
@@ -53,24 +49,14 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 while (strlen($field) === 0) {
                     $field = trim(array_pop($fieldNameChunks));
                 }
-                $fields[] = $field;
                 $action->addField($field, 'include', true);
             }
         }
-        return $fields;
     }
     function processAbstractConcept($next): void{
-        // get concept en create action
         $concept = trim(strstr($next, '{', true));
         $action = new Action('Get all ' . $concept . 's');
-        // add concept to concepts arr
-        $conceptArrItem = ['abstract', $concept];
-        // get every prop and and add it as art to concepts arr
-        $fields = addFields($action, $next);
-        // add every field to session action instance
-        $conceptArrItem[2] = $fields;
-        $concepts[] = $conceptArrItem;
-        // add action to sessions
+        addFields($action, $next);
         $_SESSION['actions'][] = $action;
     }
 
@@ -88,23 +74,35 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $arr = explode('type', $fileAsStr);
     $arr = array_slice($arr, 1);
     for ($i = 0; $i < sizeof($arr); $i++) {
-        $concept = strtolower($arr[$i]);
-        $conceptArrItem = [];
-        if (strstr($concept, 'extending', true)) {
+        $concept = $arr[$i];
+        $fields=null;
+        if (str_contains($concept, 'extending')) {
+            $abstract = trim(strstr($concept, 'extending'));
+            $end = strpos($abstract,'{');
+            $start = strlen('extending');
+            $abstract = trim(substr($abstract,$start,$end-$start));
             $concept = trim(strstr($concept, 'extending', true));
-            $conceptArrItem = ['extending',$concept];
+            for ($j=0;$j<sizeof($_SESSION['actions']);$j++){
+                if($_SESSION['actions'][$j]->name==='Get all '.$abstract.'s'){
+                    $fields = $_SESSION['actions'][$j]->fields;
+                }
+            }
+/*            $arrtemp = array_filter($_SESSION['actions'],function ($it) use ($abstract) {
+                return $it->name==='Get all '.$abstract.'s';
+            });*/
         } else {
             $concept = trim(explode('{', $concept)[0]);
-            $conceptArrItem = ['regular',$concept];
         }
         $action = new Action('Get all ' . $concept . 's');
-        $conceptArrItem[2] = addFields($action,$arr[$i]);
+        addFields($action,$arr[$i]);
+        // todo dit zou wel moeten werken
+        if($fields)array_push($action->fields,...$fields);
+        //print_r($action);
         if ($i === 0) {
             $action->selected = true;
         }
         $_SESSION['actions'][] = $action;
     }
-    //print_r($_SESSION['actions']);
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
