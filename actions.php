@@ -12,11 +12,56 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         'GET ALL'
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
+    // todo strategie
+    // ga doorheen de tekst per type concept: abstract, extending en gewoon en zet dit er ook bij in een aparte arr:
+    // deze arr bevat de concept naam en welk van de 3 types er zijn en de bijhorende properties
+    // bij het invullen van de actions array kan je dan de bijhorende props nemen voor de verschillende concepten die
+    // extenden van een abstract concept
+
+    // aanpak, je doet onderstaande oefening om elke type concept eruit te halen met zijn props
+
+    // abstracte concepten
+    // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
+
+    // code blokje van eerstvolgende abstract concept
+    $next = strstr($fileAsStr,'abstract type');
+    function getNext($next){
+        $next = substr($next,strlen('abstract type'));
+        $posType = strpos($next,'type');
+        $posAbstractType=  strpos($next,'abstract type');
+        if($posType>$posAbstractType){
+            $next = trim(substr($next,0,$posAbstractType));
+        } else{
+            $next = trim(substr($next,0,$posType));
+        }
+        return $next;
+    }
+    function processNext($next){
+        // todo process $next qua naam en properties en bewaar in een data structuur
+
+    }
+    if($next){
+        $next = getNext($next);
+        processNext($next);
+        // we zoeken nu een eerst volgende blokje van een abstract concept
+        $expl = explode($fileAsStr,$next);
+        while(sizeof($expl)>1 && $next = strstr($expl[1],'abstract type')){
+            $next = getNext($next);
+            processNext($next);
+            $expl = explode($fileAsStr,$next);
+        }
+    }
+    // concepten die extenden van een abstract concept met de naam van het abstracte concept
+    // todo
+    // gewone concepten
+    // todo
     $arr = explode('type', $fileAsStr);
     $arr = array_slice($arr, 1);
+    $arrConcepts = [];
     $_SESSION['actions'] = [];
     for ($i = 0; $i < sizeof($arr); $i++) {
         $concept = strtolower($arr[$i]);
+
         if (strstr($concept, 'extending', true)) {
             $concept = trim(strstr($concept, 'extending', true));
         } else {
