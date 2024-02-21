@@ -106,6 +106,23 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         $_SESSION['actions'][] = $action;
     }
+    $arrReOrdered = [];
+    $index = null;
+    for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
+        if($_SESSION['actions'][$j]->selected){
+            $index = $j;
+            $arrReOrdered[]=$_SESSION['actions'][$j];
+        } else if($index && $j>$index){
+            $arrReOrdered[]=$_SESSION['actions'][$j];
+        }
+    }
+    for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
+        if($j<$index){
+            $arrReOrdered[]=$_SESSION['actions'][$j];
+        }
+        if($j>=$index) break;
+    }
+    $_SESSION['actions'] = $arrReOrdered;
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
