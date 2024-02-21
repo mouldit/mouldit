@@ -1,0 +1,32 @@
+'use strict'
+const express = require('express')
+const bodyParser = require('body-parser')
+const app = express()
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+
+app.use(((req, res, next) => {
+    res.header('Access-Control-Allow-Origin','*')
+    res.header('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Authorization')
+    if(req.method === 'OPTIONS'){
+        res.header('Access-Control-Allow-Methods','PUT, PATCH, DELETE, POST, GET')
+        return res.status(200).json({})
+    }
+    next()
+}))
+
+// setting up middlewares
+***replace this with actual routes***
+
+// handle all non-defined requests
+app.use((req,res,next)=>{
+    const err = new Error('not found')
+    err.status = 404
+    next(err)
+})
+
+app.use(( req, res, next) =>{
+    res.error()
+})
+
+module.exports = app
