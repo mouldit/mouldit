@@ -9,6 +9,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
+    //todo maak een aparte SESSIONS variabele met enkel de concepten erin
+    //todo pas de implemented actions array aan zodat er het subpath in voorkomt en het verb
+    //todo pas actions aan zodat concept, actie en subpath erin voorkomen
     $implementedTypesOfActions = [
         'GET ALL'
     ];
