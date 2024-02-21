@@ -19,9 +19,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $next = strstr($fileAsStr, 'abstract type');
     function getAbstractConceptCodeBlock($next): string {
         $next = trim(substr($next, strlen('abstract type')));
+        // dit geeft alle code vanaf de naam van het eerste abstracte concept
         $posType = strpos($next, 'type');
-        $posAbstractType = strpos($next, 'abstract type');
+        $posAbstractType = strpos($next, 'abstract type'); // in het voorbeeld is dit getal groter
+        // de redenering is dat je de code neemt tot het VOLGENDE concept waarbij je checkt van welk type dat is
         if ($posType > $posAbstractType) {
+            // todo fix hier het probleem indien $next het volledige type bevat en er geen achterliggende type meer is krijg je hier een empty string
             $next = trim(substr($next, 0, $posAbstractType));
         } else {
             $next = trim(substr($next, 0, $posType));
@@ -56,15 +59,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         addFields($action, $next);
         $_SESSION['actions'][] = $action;
     }
-
     if ($next) {
         $next = getAbstractConceptCodeBlock($next);
         if($next)processAbstractConcept($next);
-        $expl = explode($fileAsStr, $next);
-        while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
+        $expl = explode($next,$fileAsStr);
+        while (sizeof($expl) > 1 && $next =strstr($expl[1], 'abstract type')) {
+            var_dump($next); // todo fix de fout zit bij het allerlaatste => dit bevat dan reeds het volledige abstracte type
             $next = getAbstractConceptCodeBlock($next);
+            var_dump($next); // bij allerlaatste is dit problematisch omdat getAbstractetc. dan het te processen blok weggooit
             if($next)processAbstractConcept($next);
-            $expl = explode($fileAsStr, $next);
+            $expl = explode($next,$fileAsStr);
         }
     }
     $arr = explode('type', $fileAsStr);
@@ -117,7 +121,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-    generate($_SESSION['actions']);
+    generate($_SESSION['actions'],$_SESSION['pathToRootOfServer']);
 }else session_destroy();
 ?>
 <!doctype html>

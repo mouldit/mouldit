@@ -1,7 +1,6 @@
 <?php
-function generate($actions):bool{
+function generate($actions,$path):bool{
     $success=true;
-    // todo
 
     return $success;
 }
