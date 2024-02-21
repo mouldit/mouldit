@@ -24,9 +24,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $posAbstractType = strpos($next, 'abstract type'); // in het voorbeeld is dit getal groter
         // de redenering is dat je de code neemt tot het VOLGENDE concept waarbij je checkt van welk type dat is
         if ($posType > $posAbstractType) {
-            // todo fix hier het probleem indien $next het volledige type bevat en er geen achterliggende type meer is krijg je hier een empty string
             $next = trim(substr($next, 0, $posAbstractType));
-        } else {
+        } else if($posType && $posAbstractType) {
             $next = trim(substr($next, 0, $posType));
         }
         return $next;
@@ -64,17 +63,26 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if($next)processAbstractConcept($next);
         $expl = explode($next,$fileAsStr);
         while (sizeof($expl) > 1 && $next =strstr($expl[1], 'abstract type')) {
-            var_dump($next); // todo fix de fout zit bij het allerlaatste => dit bevat dan reeds het volledige abstracte type
             $next = getAbstractConceptCodeBlock($next);
-            var_dump($next); // bij allerlaatste is dit problematisch omdat getAbstractetc. dan het te processen blok weggooit
             if($next)processAbstractConcept($next);
             $expl = explode($next,$fileAsStr);
         }
     }
     $arr = explode('type', $fileAsStr);
     $arr = array_slice($arr, 1);
-    for ($i = 0; $i < sizeof($arr); $i++) {
-        $concept = $arr[$i];
+    $arrFiltered = [];
+    for ($i = 0; $i < sizeof($arr); $i++){
+        $found = false;
+        for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
+            if($_SESSION['actions'][$j]->name==='Get all '.trim(substr($arr[$i],0,strpos($arr[$i],'{'))).'s'){
+                $found = true;
+                break;
+            }
+        }
+        if(!$found)$arrFiltered[]=$arr[$i];
+    }
+    for ($i = 0; $i < sizeof($arrFiltered); $i++) {
+        $concept = $arrFiltered[$i];
         $fields=null;
         if (str_contains($concept, 'extending')) {
             $abstract = trim(strstr($concept, 'extending'));
@@ -92,7 +100,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         $action = new Action('Get all ' . $concept . 's');
         if($fields)array_push($action->fields,...$fields);
-        addFields($action,$arr[$i]);
+        addFields($action,$arrFiltered[$i]);
         if ($i === 0) {
             $action->selected = true;
         }
