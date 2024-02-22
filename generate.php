@@ -1,61 +1,60 @@
 <?php
 function generate($concepts, $actions, $path): bool
 {
-    $success = true;
-    /* STRATEGIE
-     * 1. maak een routes directory
-     */
-    if (!file_exists($path . '/routes')) {
-        if (mkdir($path . '/routes')) {
-            for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
-                if (touch($path . '/routes/' . $_SESSION['concepts'][$i] . '.js')) {
-                    if($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i] . '.js','ab')){
-                        $fileAsStr = file_get_contents('./route.txt');
-                        $p1 = strstr($fileAsStr,'***replace this with actual route handlers***',true)."\n";
-                        $p2 = "\n".trim(substr(strstr($fileAsStr,'***replace this with actual route handlers***'),
-                                strlen('***replace this with actual route handlers***')));
-                        fwrite($fp,$p1,strlen($p1));
-                        for ($j = 0; $j < sizeof($actions); $j++) {
-                            if (str_contains($actions[$j]->name, $_SESSION['concepts'][$i])) {
-                                $api1 = 'router.'.$actions[$j]->verb.'(\''.$_SESSION['concepts'][$i]
-                                    .'/'.$_SESSION['concepts'][$i].'s\', async (req,res,next)=>{'."\n";
-                                $api2 = "\n".'});'."\n";
-                                fwrite($fp,$api1,strlen($api1));
-                                // todo write body
-                                fwrite($fp,$api2,strlen($api2));
+    if($success = touch($path . '/server.js')){
+        $fp=fopen($path . '/server.js', 'w');
+        $fileAsStr = file_get_contents('./server.txt');
+        fwrite($fp,$fileAsStr,strlen($fileAsStr));
+        fclose($fp);
+        if (!file_exists($path . '/routes')) {
+            if ($success = mkdir($path . '/routes')) {
+                for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
+                    if (touch($path . '/routes/' . $_SESSION['concepts'][$i] . '.ts')) {
+                        if ($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i] . '.ts', 'ab')) {
+                            $fileAsStr = file_get_contents('./route.txt');
+                            $p1 = strstr($fileAsStr, '***replace this with actual route handlers***', true) . "\n";
+                            $p2 = "\n" . trim(substr(strstr($fileAsStr, '***replace this with actual route handlers***'),
+                                    strlen('***replace this with actual route handlers***')));
+                            fwrite($fp, $p1, strlen($p1));
+                            for ($j = 0; $j < sizeof($actions); $j++) {
+                                if (str_contains($actions[$j]->name, $_SESSION['concepts'][$i])) {
+                                    $api1 = 'router.' . $actions[$j]->verb . '(\'' . $_SESSION['concepts'][$i]
+                                        . '/' . $_SESSION['concepts'][$i] . 's\', async (req:any,res:any,next:any)=>{' . "\n\t";
+                                    $api2 = "\n" . '}});' . "\n";
+                                    fwrite($fp, $api1, strlen($api1));
+                                    $body = 'try { return e.select(e.' . ucfirst($_SESSION['concepts'][$i]) . ', () => ({' . "\t" . '
+                   ...e.' . ucfirst($_SESSION['concepts'][$i]) . '[\'*\']
+               })).run(client);'."\t".'} catch(err){' . "\t" . '
+           res.status(500).json({' . "\t\t" . '
+               error: err
+           })';
+                                    fwrite($fp, $body, strlen($body));
+                                    fwrite($fp, $api2, strlen($api2));
+                                }
                             }
+                            fwrite($fp, $p2, strlen($p2));
+                            fclose($fp);
                         }
-                        fwrite($fp,$p2,strlen($p2));
-                        fclose($fp);
+
+                        /* 5. per file print de verschillende API's
+            * het algo voor elke API is als volgt:
+            * isoleer alle acties voor dit concept,
+                         * per actie schrijf je
+            * /body/
+            * });
+            * Voor de /body/:
+            *
+            * VOORLOPIG is dit voldoende, we gaan ook nog niet de verb in kwestie in detail beoordelen is voor volgende stap
+            *
+
+            }*/
                     }
 
-                    /* 5. per file print de verschillende API's
-        * het algo voor elke API is als volgt:
-        * isoleer alle acties voor dit concept,
-                     * per actie schrijf je
-        * /body/
-        * });
-        * Voor de /body/:
-        *
-        * VOORLOPIG is dit voldoende, we gaan ook nog niet de verb in kwestie in detail beoordelen is voor volgende stap
-        *
-        try {
-           return e.select(e./Concept met hoofdletter/, () => ({
-                   /prop1/: true/false afhankelijk van de config include/exclude,
-                   /prop2/: true,
-                   ...
-               }))
-               .run(client);
-        } catch(err){
-           res.status(500).json({
-               error: err
-           })
-        }*/
                 }
-
             }
         }
     }
+
     /*
     * 2. todo maak een aparte SESSIONS variabele met enkel de concepten erin
     *    todo pas de implemented actions array aan zodat er het subpath in voorkomt en het verb
