@@ -21,15 +21,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['actions'] = [];
     $next = strstr($fileAsStr, 'abstract type');
     function getAbstractConceptCodeBlock($next): string {
+        /*
+         *  todo dit komt er binnen
+         *
+         * abstract type content { required title: str; multi actors: person
+         *  { character_name: str; }; } type movie extending content { release_year: int32; }
+         *  type show extending content { property num_seasons := count(.<show[is season]); }
+         * type season { required number: int32; required show: show; } }
+         * */
         $next = trim(substr($next, strlen('abstract type')));
         // dit geeft alle code vanaf de naam van het eerste abstracte concept
         $posType = strpos($next, 'type');
         $posAbstractType = strpos($next, 'abstract type'); // in het voorbeeld is dit getal groter
         // de redenering is dat je de code neemt tot het VOLGENDE concept waarbij je checkt van welk type dat is
-        if ($posType > $posAbstractType) {
-            $next = trim(substr($next, 0, $posAbstractType));
-        } else if($posType && $posAbstractType) {
+        if(!$posType&&!$posAbstractType){
+            $next = trim(substr($next,0,strrpos($next,'}')));
+        } else if(($posType && !$posAbstractType)||($posType&&$posAbstractType&&$posType<$posAbstractType)){
             $next = trim(substr($next, 0, $posType));
+        } else if((!$posType && $posAbstractType)||($posType&&$posAbstractType&&$posType>$posAbstractType)){
+            $next = trim(substr($next, 0, $posAbstractType));
         }
         return $next;
     }
@@ -65,7 +75,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $next = getAbstractConceptCodeBlock($next);
         if($next)processAbstractConcept($next);
         $expl = explode($next,$fileAsStr);
-        while (sizeof($expl) > 1 && $next =strstr($expl[1], 'abstract type')) {
+        while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
             $next = getAbstractConceptCodeBlock($next);
             if($next)processAbstractConcept($next);
             $expl = explode($next,$fileAsStr);
