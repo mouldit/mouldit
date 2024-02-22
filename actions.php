@@ -4,16 +4,17 @@ spl_autoload_register(function () {
     include 'generate.php';
 });
 session_start();
-global $implementedTypesOfActions;
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
+    $_SESSION['concepts']=[];
     //todo maak een aparte SESSIONS variabele met enkel de concepten erin
     //todo pas de implemented actions array aan zodat er het subpath in voorkomt en het verb
     //todo pas actions aan zodat concept, actie en subpath erin voorkomen
-    $implementedTypesOfActions = [
-        'GET ALL'
+    global $implementedTypesOfActions;
+    $implementedTypesOfActions= [
+        ['Get all','get']
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
@@ -66,8 +67,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     function processAbstractConcept($next): void{
+        global $implementedTypesOfActions;
         $concept = trim(strstr($next, '{', true));
-        $action = new Action('Get all ' . $concept . 's');
+        $_SESSION['concepts'][]=$concept;
+        $action = new Action('Get all ' . $concept . 's',$implementedTypesOfActions[0][1],$implementedTypesOfActions[0][0]);
         addFields($action, $next);
         $_SESSION['actions'][] = $action;
     }
@@ -111,7 +114,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         } else {
             $concept = trim(explode('{', $concept)[0]);
         }
-        $action = new Action('Get all ' . $concept . 's');
+        $_SESSION['concepts'][]=$concept;
+        $action = new Action('Get all ' . $concept . 's',$implementedTypesOfActions[0][1],$implementedTypesOfActions[0][0]);
         if($fields)array_push($action->fields,...$fields);
         addFields($action,$arrFiltered[$i]);
         if ($i === 0) {
@@ -159,7 +163,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-    generate($_SESSION['actions'],$_SESSION['pathToRootOfServer']);
+    generate($_SESSION['concepts'],$_SESSION['actions'],$_SESSION['pathToRootOfServer']);
 }else session_destroy();
 ?>
 <!doctype html>

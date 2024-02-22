@@ -2,11 +2,15 @@
 class Action
 {
     public $name;
+    public $verb;
+    public $action;
     public $active;
     public $fields;
     public $selected;
-    function __construct($name){
+    function __construct($name,$verb,$action){
         $this->name=$name;
+        $this->verb=$verb;
+        $this->action=$action;
         $this->active=true;
         $this->fields=[];
         $this->selected=false;
