@@ -2,6 +2,7 @@
 const bodyParser = require('body-parser')
 import * as edgedb from "edgedb"
 import express from 'express'
+***add route imports***
 
 export const app = express()
 export const client:edgedb.Client = edgedb.createClient();
@@ -20,7 +21,7 @@ app.use(((req, res, next) => {
 }))
 
 // setting up middlewares
-***replace this with actual routes***
+***use routes***
 
 // handle all non-defined requests
 app.use((req,res,next)=>{
