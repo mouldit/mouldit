@@ -1,8 +1,7 @@
-const express = require('express')
-const router = express.Router()
-import e from "./../dbschema/edgeql-js";
 import {client} from "../app";
+const express = require('express')
+export const router = express.Router()
+import e from "./../dbschema/edgeql-js";
 
 ***route handlers***
 
-module.exports = router
