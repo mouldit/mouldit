@@ -9,9 +9,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
     $_SESSION['concepts']=[];
-    //todo maak een aparte SESSIONS variabele met enkel de concepten erin
-    //todo pas de implemented actions array aan zodat er het subpath in voorkomt en het verb
-    //todo pas actions aan zodat concept, actie en subpath erin voorkomen
     global $implementedTypesOfActions;
     $implementedTypesOfActions= [
         ['Get all','get']
@@ -22,14 +19,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['actions'] = [];
     $next = strstr($fileAsStr, 'abstract type');
     function getAbstractConceptCodeBlock($next): string {
-        /*
-         *  todo dit komt er binnen
-         *
-         * abstract type content { required title: str; multi actors: person
-         *  { character_name: str; }; } type movie extending content { release_year: int32; }
-         *  type show extending content { property num_seasons := count(.<show[is season]); }
-         * type season { required number: int32; required show: show; } }
-         * */
         $next = trim(substr($next, strlen('abstract type')));
         // dit geeft alle code vanaf de naam van het eerste abstracte concept
         $posType = strpos($next, 'type');
@@ -45,24 +34,28 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         return $next;
     }
     function addFields(&$action, $next){
+        // hier wordt de text gehaald van de concept body
         $start = strpos($next, '{') + 1;
         $end = strrpos($next, '}');
         $conceptBlock = substr($next, $start, $end);
         while (str_contains($conceptBlock, '{')) {
+            // hier worden bijkomende constraint er tussenuit gehaald
             $first = trim(strstr($conceptBlock, '{', true));
             $last = substr($conceptBlock, strpos($conceptBlock, '}') + 1);
             $conceptBlock = $first . $last;
         }
-        $propChunks = explode(':', $conceptBlock);
+        $propChunks = explode(';', $conceptBlock);
         array_pop($propChunks);
         foreach ($propChunks as $chunk) {
-            $fieldNameChunks = explode(' ', $chunk);
-            if (is_array($fieldNameChunks)) {
-                $field = trim(array_pop($fieldNameChunks));
-                while (strlen($field) === 0) {
-                    $field = trim(array_pop($fieldNameChunks));
-                }
-                $action->addField($field, 'include', true);
+            $chunk = trim($chunk);
+            $parts = explode(':',$chunk);
+            $parts[0]=trim($parts[0]);
+            $parts[1]=trim($parts[1]);
+            $type = str_replace(' ','',$parts[1]);
+            $fieldExpl = explode(' ',$parts[0]);
+            if(is_array($fieldExpl)){
+                $fieldName = array_pop($fieldExpl);
+                $action->addField($fieldName, 'include', true, $type);
             }
         }
     }
@@ -76,6 +69,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     if ($next) {
         $next = getAbstractConceptCodeBlock($next);
+        // todo add subfields too and think of a good data strcuture to use them in the frontend
         if($next)processAbstractConcept($next);
         $expl = explode($next,$fileAsStr);
         while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
@@ -117,6 +111,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $_SESSION['concepts'][]=$concept;
         $action = new Action('Get all ' . $concept . 's',$implementedTypesOfActions[0][1],$implementedTypesOfActions[0][0]);
         if($fields)array_push($action->fields,...$fields);
+        // todo add subfields too
         addFields($action,$arrFiltered[$i]);
         if ($i === 0) {
             $action->selected = true;
@@ -140,6 +135,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if($j>=$index) break;
     }
     $_SESSION['actions'] = $arrReOrdered;
+    print_r($_SESSION['actions']);
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
