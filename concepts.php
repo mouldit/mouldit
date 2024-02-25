@@ -1,21 +1,27 @@
 <?php
 function splitSchema($schemaContent){
-    $filtered = $schemaContent;
     $abstractBlocks = [];
-    while($nextAbstract = strpos($filtered,'abstract')){
-        $nextCodeBlock = strpos($filtered,'{',$nextAbstract);
-        $keepFirst = strstr($filtered,'abstract',true);
-        $endCodeBlock = strpos($filtered,'}',$nextCodeBlock);
-        $next = strpos($filtered,'{',$nextCodeBlock);
-        while($endCodeBlock>$next){
-            $next=strpos($filtered,'{',$endCodeBlock);
-            $endCodeBlock = strpos($filtered,'}',$endCodeBlock);
+    $regBlocks = [];
+    $extendBlocks = [];
+    $schemaContent = trim($schemaContent);
+    while($schemaContent){
+        $nextClosingTag = strpos($schemaContent,'}');
+        $nextOpeningTag =strpos($schemaContent,'{',strpos($schemaContent,'{')+1);
+        while($nextClosingTag>$nextOpeningTag){
+            $nextClosingTag = strpos($schemaContent,'}',$nextClosingTag+1);
+            $nextOpeningTag = strpos($schemaContent,'{',$nextOpeningTag+1);
         }
-        $abstractBlocks[]=trim(substr($filtered,$nextAbstract,$endCodeBlock-$nextAbstract));
-        $keepSecond = substr($filtered,$endCodeBlock+1);
-        $filtered=$keepFirst.$keepSecond;
+        $codeBlock = substr($schemaContent,0,$nextClosingTag);
+        if(str_contains($codeBlock,'extending')){
+            $extendBlocks[]=$codeBlock;
+        } else if(str_contains($codeBlock,'abstract')){
+            $abstractBlocks[]=$codeBlock;
+        } else{
+            $regBlocks[]=$codeBlock;
+        }
+        $schemaContent = substr($schemaContent,strlen($codeBlock));
     }
-    return [$filtered,$abstractBlocks];
+    return [$regBlocks,$extendBlocks,$abstractBlocks];
 }
 function getConcepts($schema){
     $concepts = [];
@@ -23,45 +29,29 @@ function getConcepts($schema){
     $last = strrpos($schema,'}')-1;
     $schemaContent = trim(substr($schema,$first,$last-$first));
     $temp = splitSchema($schemaContent);
-    $codeBlocks = $temp[0];
+    $codeBlocksAsStr = $temp[0];
     $abstractCodeBlocks = $temp[1];
     // abstracte concepten eerst
     foreach ($abstractCodeBlocks as $ac){
-        // todo strategie:
-        $next = getAbstractConceptCodeBlock($ac);
-        if($next){
-            $concepts[]=processAbstractConcept($next); // toevoegen velden aan concept + aanmaken concept
-        }
-    }
-    $next = strstr($schemaContent, 'abstract');
-    if($next){
-        $next = getAbstractConceptCodeBlock($next);
-        if($next){
-            $concepts[]=processAbstractConcept($next);
-        }
-        $expl = explode($next,$schemaContent);
-        while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract')) {
-            $next = getAbstractConceptCodeBlock($next);
-            if($next)processAbstractConcept($next);
-            $expl = explode($next,$schemaContent);
-        }
-    }
-    // nu de andere concepten
-    // strategie: eerst de abstracte blokken eruit filteren
-    $filteredSchemaContent = clearAbstractBlocks($schemaContent);
-    $arr = explode('type', $schemaContent);
-    $arr = array_slice($arr, 1);
-    $arrFiltered = [];
-    for ($i = 0; $i < sizeof($arr); $i++){
-        $found = false;
-        for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
-            if($_SESSION['actions'][$j]->name==='Get all '.trim(substr($arr[$i],0,strpos($arr[$i],'{'))).'s'){
-                $found = true;
-                break;
+        $name = trim(substr(strstr($ac,'{',true),strpos($ac,'type')+4));
+        $fields = [];
+        $block = trim(substr($ac,strpos($ac,'{')+1,strpos($ac,'}')-strpos($ac,'{')));
+        $props = explode(';',$block);
+        array_pop($props);
+        foreach ($props as $prop){
+            $t=explode(':',trim($prop));
+            $f = explode(' ',$t[0]);
+            if(is_array($f)){
+                $fieldName = trim(array_pop($f));
+                $fieldType = trim($t[1]);
+                $fields[]=new Field($fieldName,$fieldType);
             }
         }
-        if(!$found)$arrFiltered[]=$arr[$i];
+        $concepts[]=new Concept($name,'abstract',$fields);
     }
+    // nu de andere concepten
+
+
     for ($i = 0; $i < sizeof($arrFiltered); $i++) {
         $concept = $arrFiltered[$i];
         $fields=null;
@@ -90,21 +80,6 @@ function getConcepts($schema){
         }
         $_SESSION['actions'][] = $action;
     }
-}
-function getAbstractConceptCodeBlock($next): string {
-    $next = trim(substr($next, strlen('abstract type')));
-    // dit geeft alle code vanaf de naam van het eerste abstracte concept
-    $posType = strpos($next, 'type');
-    $posAbstractType = strpos($next, 'abstract type'); // in het voorbeeld is dit getal groter
-    // de redenering is dat je de code neemt tot het VOLGENDE concept waarbij je checkt van welk type dat is
-    if(!$posType&&!$posAbstractType){
-        $next = trim(substr($next,0,strrpos($next,'}')));
-    } else if(($posType && !$posAbstractType)||($posType&&$posAbstractType&&$posType<$posAbstractType)){
-        $next = trim(substr($next, 0, $posType));
-    } else if((!$posType && $posAbstractType)||($posType&&$posAbstractType&&$posType>$posAbstractType)){
-        $next = trim(substr($next, 0, $posAbstractType));
-    }
-    return $next;
 }
 function addFields(Concept &$concept, string $next){
     // hier wordt de text gehaald van de concept body
