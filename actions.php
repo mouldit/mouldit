@@ -2,13 +2,15 @@
 spl_autoload_register(function () {
     include 'Action.php';
     include 'generate.php';
+    include 'concepts.php';
 });
 session_start();
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
-    $_SESSION['concepts']=[];
+
+
     global $implementedTypesOfActions;
     $implementedTypesOfActions= [
         ['Get all','get']
@@ -16,23 +18,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
+    $_SESSION['concepts']=getConcepts($fileAsStr);
+    // todo
     $_SESSION['actions'] = [];
-    $next = strstr($fileAsStr, 'abstract type');
-    function getAbstractConceptCodeBlock($next): string {
-        $next = trim(substr($next, strlen('abstract type')));
-        // dit geeft alle code vanaf de naam van het eerste abstracte concept
-        $posType = strpos($next, 'type');
-        $posAbstractType = strpos($next, 'abstract type'); // in het voorbeeld is dit getal groter
-        // de redenering is dat je de code neemt tot het VOLGENDE concept waarbij je checkt van welk type dat is
-        if(!$posType&&!$posAbstractType){
-            $next = trim(substr($next,0,strrpos($next,'}')));
-        } else if(($posType && !$posAbstractType)||($posType&&$posAbstractType&&$posType<$posAbstractType)){
-            $next = trim(substr($next, 0, $posType));
-        } else if((!$posType && $posAbstractType)||($posType&&$posAbstractType&&$posType>$posAbstractType)){
-            $next = trim(substr($next, 0, $posAbstractType));
-        }
-        return $next;
-    }
+
+
     function addFields(&$action, $next){
         // hier wordt de text gehaald van de concept body
         $start = strpos($next, '{') + 1;
@@ -44,6 +34,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $last = substr($conceptBlock, strpos($conceptBlock, '}') + 1);
             $conceptBlock = $first . $last;
         }
+        // todo extraheer dit om $concepts mee op te bouwen
+        //      $concepts gebruik je vervolgens om $actions op te bouwen
+        //      aangezien dit niets anders is dan er een verb aan te koppelen met wat extra metadata
         $propChunks = explode(';', $conceptBlock);
         array_pop($propChunks);
         foreach ($propChunks as $chunk) {
@@ -68,15 +61,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $_SESSION['actions'][] = $action;
     }
     if ($next) {
-        $next = getAbstractConceptCodeBlock($next);
-        // todo add subfields too and think of a good data strcuture to use them in the frontend
-        if($next)processAbstractConcept($next);
-        $expl = explode($next,$fileAsStr);
-        while (sizeof($expl) > 1 && $next = strstr($expl[1], 'abstract type')) {
-            $next = getAbstractConceptCodeBlock($next);
-            if($next)processAbstractConcept($next);
-            $expl = explode($next,$fileAsStr);
-        }
+
     }
     $arr = explode('type', $fileAsStr);
     $arr = array_slice($arr, 1);
@@ -94,6 +79,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     for ($i = 0; $i < sizeof($arrFiltered); $i++) {
         $concept = $arrFiltered[$i];
         $fields=null;
+        // todo ook dit hier is eigenlijk pure concept info
         if (str_contains($concept, 'extending')) {
             $abstract = trim(strstr($concept, 'extending'));
             $end = strpos($abstract,'{');
@@ -134,7 +120,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         if($j>=$index) break;
     }
+    function getSubFields($field){
+        if($field[3]!=='str'&&$field[3]!=='int32'&&!str_contains($field[3],'=')){
+
+        }
+    }
     $_SESSION['actions'] = $arrReOrdered;
+    for ($i=0;$i<sizeof($_SESSION['actions']);$i++){
+        for ($j=0;$j<sizeof($_SESSION['actions'][$i]->fields);$j++){
+
+        }
+    }
+    // todo per actie en per fields voeg subfields toe met addSubfield method en params:
+    //
     print_r($_SESSION['actions']);
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
