@@ -16,9 +16,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
+    // todo vul fieldset aan voor extending concepts met die van het overeenkomstige abstracte concept
     $_SESSION['concepts']=getConcepts($fileAsStr);
     $_SESSION['actions'] = [];
 
+    foreach ($_SESSION['concepts'] as $concept){
+        foreach ($implementedTypesOfActions as $actionType){
+            $action = new Action($actionType[0].$concept->name.'s',$actionType[1],$actionType[0],$concept->fieldset);
+            $action->fieldset->setInclusivity(true);
+            foreach ($action->fieldset as $f){
+                $f->checked = true;
+            }
+            $action->activate();
+            // todo voeg ook de nodige subfields toe in dezelfde loop iteratie
+            // strategie: doe dit per veld in fieldset:
+            //              elk veld heeft een type als dat type een concept is dan zoek je het fieldset van dat concept in concepts
+            //              vervolgens voeg je dit fieldset toe aan de prop subfields van dat veld en zet ook inclusivity+checked per veld
+            //              vervolgens ga je hetzelfde doen voor elk der subfields tot er geen nieuwe subfields meer aangemaakt worden omdat er geen meer zijn
+        }
+    }
     function addFields(&$action, $next){
         // hier wordt de text gehaald van de concept body
         $start = strpos($next, '{') + 1;

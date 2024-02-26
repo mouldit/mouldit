@@ -1,22 +1,21 @@
 <?php
 class Action
 {
-    public $name;
-    public $verb;
-    public $action;
-    public $active;
-    public $fields;
-    public $selected;
-    function __construct($name,$verb,$action){
+    public string $name;
+    public string $verb;
+    public string $type;
+    public bool $active;
+    public FieldSet $fieldset;
+    function __construct($name,$verb,$type,$fieldset=NULL){
         $this->name=$name;
         $this->verb=$verb;
-        $this->action=$action;
+        $this->type=$type;
         $this->active=true;
-        $this->fields=[];
-        $this->selected=false;
+        $this->fieldset=$fieldset;
     }
-    function addField($fieldname,$config,$checked,$type){
-        $this->fields[]=[$fieldname,$config,$checked,$type];
+    function addField($name,$type,$checked,$subfields=NULL){
+        if(!isset($this->fieldset)) $this->fieldset=new FieldSet();
+        $this->fieldset->addField(new Field($name,$type,$checked,$subfields));
     }
     public function activate(): void
     {
