@@ -9,8 +9,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
-
-
     global $implementedTypesOfActions;
     $implementedTypesOfActions= [
         ['Get all','get']
@@ -19,9 +17,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
     $_SESSION['concepts']=getConcepts($fileAsStr);
-    // todo
     $_SESSION['actions'] = [];
-
 
     function addFields(&$action, $next){
         // hier wordt de text gehaald van de concept body
