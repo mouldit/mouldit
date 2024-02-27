@@ -19,7 +19,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     // todo vul fieldset aan voor extending concepts met die van het overeenkomstige abstracte concept
     $_SESSION['concepts']=getConcepts($fileAsStr);
     $_SESSION['actions'] = [];
-
+    function fieldIsConcept($f){
+        return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
+    }
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
             $action = new Action($actionType[0].$concept->name.'s',$actionType[1],$actionType[0],$concept->fieldset);
@@ -27,12 +29,31 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             foreach ($action->fieldset as $f){
                 $f->checked = true;
             }
+            $subFieldSetsToProcess=[$action->fieldset];
             $action->activate();
-            // todo voeg ook de nodige subfields toe in dezelfde loop iteratie
-            // strategie: doe dit per veld in fieldset:
-            //              elk veld heeft een type als dat type een concept is dan zoek je het fieldset van dat concept in concepts
-            //              vervolgens voeg je dit fieldset toe aan de prop subfields van dat veld en zet ook inclusivity+checked per veld
-            //              vervolgens ga je hetzelfde doen voor elk der subfields tot er geen nieuwe subfields meer aangemaakt worden omdat er geen meer zijn
+            $newSubFieldSets=[];
+            while(sizeof($subFieldSetsToProcess)>0){
+                foreach ($subFieldSetsToProcess as $set){
+                    foreach ($set->fields as $f){
+                        if(fieldIsConcept($f)){
+                            for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
+                                if($_SESSION['concepts'][$i]->name===$f->type){
+                                    $fs=new FieldSet($_SESSION['concepts'][$i]->fields);
+                                    $fs->setInclusivity(true);
+                                    foreach ($fs->fields as $subf){
+                                        $subf->checked = true;
+                                    }
+                                    $f->subfields = new SubFieldSet($fs);
+                                    $newSubFieldSets[]=$f->subfields;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                $subFieldSetsToProcess = $newSubFieldSets;
+                $newSubFieldSets=[];
+            }
         }
     }
     function addFields(&$action, $next){
@@ -133,9 +154,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if($j>=$index) break;
     }
     function getSubFields($field){
-        if($field[3]!=='str'&&$field[3]!=='int32'&&!str_contains($field[3],'=')){
 
-        }
     }
     $_SESSION['actions'] = $arrReOrdered;
     for ($i=0;$i<sizeof($_SESSION['actions']);$i++){
