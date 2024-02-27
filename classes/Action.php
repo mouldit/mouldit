@@ -5,17 +5,24 @@ class Action
     public string $verb;
     public string $type;
     public bool $active;
+    public bool $selected;
     public FieldSet $fieldset;
-    function __construct($name,$verb,$type,$fieldset=NULL){
+    function __construct($name,$verb,$type){
         $this->name=$name;
         $this->verb=$verb;
         $this->type=$type;
         $this->active=true;
-        $this->fieldset=$fieldset;
+        $this->selected=false;
     }
     function addField($name,$type,$checked,$subfields=NULL){
         if(!isset($this->fieldset)) $this->fieldset=new FieldSet();
-        $this->fieldset->addField(new Field($name,$type,$checked,$subfields));
+        $f = new Field($name,$type);
+        $f->setChecked($checked);
+        if(isset($subfields)) $f->subfields=$subfields;
+        $this->fieldset->addField($f);
+    }
+    function setFields($fs){
+        $this->fieldset=$fs;
     }
     public function activate(): void
     {
@@ -24,5 +31,11 @@ class Action
     public function deactivate(): void
     {
         $this->active = false;
+    }
+    public function select(){
+        $this->selected=true;
+    }
+    public function deselect(){
+        $this->selected=false;
     }
 }

@@ -5,7 +5,7 @@ class FieldSet
     public array $fields;
     public string $inclusivity;
 
-    public function __construct(Field ...$fields)
+    public function __construct(array $fields)
     {
         $this->fields=$fields;
     }

@@ -1,8 +1,12 @@
 <?php
 spl_autoload_register(function () {
-    include 'Action.php';
+
+    include 'classes/Action.php';
+    include 'classes/Concept.php';
+    include 'classes/Field.php';
+    include 'classes/FieldSet.php';
+    include 'classes/SubFieldSet.php';
     include 'generate.php';
-    include 'concepts.php';
 });
 session_start();
 if (isset($_SESSION['pathToRootOfServer']) &&
@@ -16,7 +20,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
-    // todo vul fieldset aan voor extending concepts met die van het overeenkomstige abstracte concept
+    include 'concepts.php';
     $_SESSION['concepts']=getConcepts($fileAsStr);
     $_SESSION['actions'] = [];
     function fieldIsConcept($f){
@@ -24,28 +28,55 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
-            $action = new Action($actionType[0].$concept->name.'s',$actionType[1],$actionType[0],$concept->fieldset);
+            // todo replace "extending"
+            $name=$actionType[0].' '.$concept->name.'s';
+            $action = new Action($name,$actionType[1],$actionType[0]);
+            $action->setFields($concept->fields);
             $action->fieldset->setInclusivity(true);
-            foreach ($action->fieldset as $f){
-                $f->checked = true;
+            foreach ($action->fieldset->fields as $f){
+                $f->setChecked(true);
             }
             $subFieldSetsToProcess=[$action->fieldset];
             $action->activate();
             $newSubFieldSets=[];
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
-                    foreach ($set->fields as $f){
-                        if(fieldIsConcept($f)){
-                            for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
-                                if($_SESSION['concepts'][$i]->name===$f->type){
-                                    $fs=new FieldSet($_SESSION['concepts'][$i]->fields);
-                                    $fs->setInclusivity(true);
-                                    foreach ($fs->fields as $subf){
-                                        $subf->checked = true;
+                    if($set instanceof SubFieldSet){
+                        foreach ($set->fields->fields as $f){
+                            if(fieldIsConcept($f)){
+                                for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
+                                    if($_SESSION['concepts'][$i]->name===$f->type){
+                                        // dit zijn in principe main fields dus van type : FieldSet
+                                        $fs=$_SESSION['concepts'][$i]->fields;
+                                        $fs->setInclusivity(true);
+                                        foreach ($fs->fields as $subf){
+                                            $subf->setChecked(true);
+                                        }
+                                        $sfs=new SubFieldSet();
+                                        $sfs->setFields($fs);
+                                        $f->subfields=$sfs;
+                                        $newSubFieldSets[]=$f->subfields;
+                                        break;
                                     }
-                                    $f->subfields = new SubFieldSet($fs);
-                                    $newSubFieldSets[]=$f->subfields;
-                                    break;
+                                }
+                            }
+                        }
+                    } else{
+                        foreach ($set->fields as $f){
+                            if(fieldIsConcept($f)){
+                                for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
+                                    if($_SESSION['concepts'][$i]->name===$f->type){
+                                        $fs=$_SESSION['concepts'][$i]->fields;
+                                        $fs->setInclusivity(true);
+                                        foreach ($fs->fields as $subf){
+                                            $subf->setChecked(true);
+                                        }
+                                        $sfs=new SubFieldSet();
+                                        $sfs->setFields($fs);
+                                        $f->subfields=$sfs;
+                                        $newSubFieldSets[]=$f->subfields;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -57,24 +88,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][]=$action;
         }
     }
-    $arrReOrdered = [];
-    $index = null;
-    for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
-        if($_SESSION['actions'][$j]->selected){
-            $index = $j;
-            $arrReOrdered[]=$_SESSION['actions'][$j];
-        } else if($index && $j>$index){
-            $arrReOrdered[]=$_SESSION['actions'][$j];
-        }
-    }
-    for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
-        if($j<$index){
-            $arrReOrdered[]=$_SESSION['actions'][$j];
-        }
-        if($j>=$index) break;
-    }
-    $_SESSION['actions'] = $arrReOrdered;
-    print_r($_SESSION['actions']);
+    //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {

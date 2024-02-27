@@ -1,4 +1,43 @@
 <?php
+function getConcepts($schema): array
+{
+    $concepts = [];
+    $first = strpos($schema,'{')+1;
+    $last = strrpos($schema,'}')-1;
+    $schemaContent = trim(substr($schema,$first,$last-$first));
+    $temp = splitSchema($schemaContent);
+    $regBlocksAsStr = $temp[0];
+    $extBlocksAsStr = $temp[1];
+    $abstractCodeBlocks = $temp[2];
+    foreach ($abstractCodeBlocks as $ac){
+        $data = getConceptData($ac);
+        $concept = new Concept($data[0],'abs');
+        $concept->addFields($data[1]);
+        $concepts[]=$concept;
+    }
+    foreach ($extBlocksAsStr as $ac){
+        $data = getConceptData($ac);
+        $from = strpos($data[0],'extending')+strlen('extending');
+        $extendsFrom = trim(substr($data[0],$from));
+        for ($i=0;$i<sizeof($concepts);$i++){
+            if($concepts[$i]->name===$extendsFrom){
+                $concept = new Concept($data[0],'ext');
+                $concept->setFields($concepts[$i]->fields);
+                $concept->addFields($data[1]);
+                $concepts[]=$concept;
+                break;
+            }
+        }
+    }
+    foreach ($regBlocksAsStr as $ac){
+        $data = getConceptData($ac);
+        $concept = new Concept($data[0],'reg');
+        $concept->addFields($data[1]);
+        $concepts[]=$concept;
+    }
+    echo '<pre>'.print_r($concepts, true).'</pre>';
+    return $concepts;
+}
 function splitSchema($schemaContent): array
 {
     $abstractBlocks = [];
@@ -7,12 +46,13 @@ function splitSchema($schemaContent): array
     $schemaContent = trim($schemaContent);
     while($schemaContent){
         $nextClosingTag = strpos($schemaContent,'}');
-        $nextOpeningTag =strpos($schemaContent,'{',strpos($schemaContent,'{')+1);
-        while($nextClosingTag>$nextOpeningTag){
+        $offset = strpos($schemaContent,'{');
+        $nextOpeningTag =strpos($schemaContent,'{',$offset+1);
+        while($nextOpeningTag!==false&&$nextClosingTag>$nextOpeningTag){
             $nextClosingTag = strpos($schemaContent,'}',$nextClosingTag+1);
             $nextOpeningTag = strpos($schemaContent,'{',$nextOpeningTag+1);
         }
-        $codeBlock = substr($schemaContent,0,$nextClosingTag);
+        $codeBlock = substr($schemaContent,0,$nextClosingTag+1);
         if(str_contains($codeBlock,'extending')){
             $extendBlocks[]=$codeBlock;
         } else if(str_contains($codeBlock,'abstract')){
@@ -27,6 +67,11 @@ function splitSchema($schemaContent): array
 function getConceptData($codeBlock): array
 {
     $name = trim(substr(strstr($codeBlock,'{',true),strpos($codeBlock,'type')+4));
+    if(str_contains($name,'extending')){
+
+        $name=trim(strstr($name,'extending',true));
+        echo $name;
+    }
     $fields = [];
     $block = trim(substr($codeBlock,strpos($codeBlock,'{')+1,strpos($codeBlock,'}')-strpos($codeBlock,'{')));
     $props = explode(';',$block);
@@ -41,36 +86,4 @@ function getConceptData($codeBlock): array
         }
     }
     return [$name,$fields];
-}
-function getConcepts($schema): array
-{
-    $concepts = [];
-    $first = strpos($schema,'{')+1;
-    $last = strrpos($schema,'}')-1;
-    $schemaContent = trim(substr($schema,$first,$last-$first));
-    $temp = splitSchema($schemaContent);
-    $regBlocksAsStr = $temp[0];
-    $extBlocksAsStr = $temp[1];
-    $abstractCodeBlocks = $temp[2];
-    foreach ($abstractCodeBlocks as $ac){
-        $data = getConceptData($ac);
-        $concepts[]=new Concept($data[0],'abs',$data[1]);
-    }
-    foreach ($extBlocksAsStr as $ac){
-        $data = getConceptData($ac);
-        $from = strpos($data[0],'extending')+strlen('extending');
-        $extendsFrom = trim(substr($data[0],$from));
-        for ($i=0;$i<sizeof($concepts);$i++){
-            if($concepts[$i]->name===$extendsFrom){
-                $concepts[]=new Concept($data[0],'ext',$data[0]+$concepts[$i]->fields);
-                break;
-            }
-        }
-
-    }
-    foreach ($regBlocksAsStr as $ac){
-        $data = getConceptData($ac);
-        $concepts[]=new Concept($data[0],'reg',$data[1]);
-    }
-    return $concepts;
 }
