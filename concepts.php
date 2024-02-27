@@ -58,7 +58,15 @@ function getConcepts($schema): array
     }
     foreach ($extBlocksAsStr as $ac){
         $data = getConceptData($ac);
-        $concepts[]=new Concept($data[0],'ext',$data[1]);
+        $from = strpos($data[0],'extending')+strlen('extending');
+        $extendsFrom = trim(substr($data[0],$from));
+        for ($i=0;$i<sizeof($concepts);$i++){
+            if($concepts[$i]->name===$extendsFrom){
+                $concepts[]=new Concept($data[0],'ext',$data[0]+$concepts[$i]->fields);
+                break;
+            }
+        }
+
     }
     foreach ($regBlocksAsStr as $ac){
         $data = getConceptData($ac);

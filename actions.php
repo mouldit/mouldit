@@ -54,88 +54,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 $subFieldSetsToProcess = $newSubFieldSets;
                 $newSubFieldSets=[];
             }
+            $_SESSION['actions'][]=$action;
         }
-    }
-    function addFields(&$action, $next){
-        // hier wordt de text gehaald van de concept body
-        $start = strpos($next, '{') + 1;
-        $end = strrpos($next, '}');
-        $conceptBlock = substr($next, $start, $end);
-        while (str_contains($conceptBlock, '{')) {
-            // hier worden bijkomende constraint er tussenuit gehaald
-            $first = trim(strstr($conceptBlock, '{', true));
-            $last = substr($conceptBlock, strpos($conceptBlock, '}') + 1);
-            $conceptBlock = $first . $last;
-        }
-        // todo extraheer dit om $concepts mee op te bouwen
-        //      $concepts gebruik je vervolgens om $actions op te bouwen
-        //      aangezien dit niets anders is dan er een verb aan te koppelen met wat extra metadata
-        $propChunks = explode(';', $conceptBlock);
-        array_pop($propChunks);
-        foreach ($propChunks as $chunk) {
-            $chunk = trim($chunk);
-            $parts = explode(':',$chunk);
-            $parts[0]=trim($parts[0]);
-            $parts[1]=trim($parts[1]);
-            $type = str_replace(' ','',$parts[1]);
-            $fieldExpl = explode(' ',$parts[0]);
-            if(is_array($fieldExpl)){
-                $fieldName = array_pop($fieldExpl);
-                $action->addField($fieldName, 'include', true, $type);
-            }
-        }
-    }
-    function processAbstractConcept($next): void{
-        global $implementedTypesOfActions;
-        $concept = trim(strstr($next, '{', true));
-        $_SESSION['concepts'][]=$concept;
-        $action = new Action('Get all ' . $concept . 's',$implementedTypesOfActions[0][1],$implementedTypesOfActions[0][0]);
-        addFields($action, $next);
-        $_SESSION['actions'][] = $action;
-    }
-    if ($next) {
-
-    }
-    $arr = explode('type', $fileAsStr);
-    $arr = array_slice($arr, 1);
-    $arrFiltered = [];
-    for ($i = 0; $i < sizeof($arr); $i++){
-        $found = false;
-        for ($j = 0; $j < sizeof($_SESSION['actions']); $j++){
-            if($_SESSION['actions'][$j]->name==='Get all '.trim(substr($arr[$i],0,strpos($arr[$i],'{'))).'s'){
-                $found = true;
-                break;
-            }
-        }
-        if(!$found)$arrFiltered[]=$arr[$i];
-    }
-    for ($i = 0; $i < sizeof($arrFiltered); $i++) {
-        $concept = $arrFiltered[$i];
-        $fields=null;
-        // todo ook dit hier is eigenlijk pure concept info
-        if (str_contains($concept, 'extending')) {
-            $abstract = trim(strstr($concept, 'extending'));
-            $end = strpos($abstract,'{');
-            $start = strlen('extending');
-            $abstract = trim(substr($abstract,$start,$end-$start));
-            $concept = trim(strstr($concept, 'extending', true));
-            for ($j=0;$j<sizeof($_SESSION['actions']);$j++){
-                if($_SESSION['actions'][$j]->name==='Get all '.$abstract.'s'){
-                    $fields = $_SESSION['actions'][$j]->fields;
-                }
-            }
-        } else {
-            $concept = trim(explode('{', $concept)[0]);
-        }
-        $_SESSION['concepts'][]=$concept;
-        $action = new Action('Get all ' . $concept . 's',$implementedTypesOfActions[0][1],$implementedTypesOfActions[0][0]);
-        if($fields)array_push($action->fields,...$fields);
-        // todo add subfields too
-        addFields($action,$arrFiltered[$i]);
-        if ($i === 0) {
-            $action->selected = true;
-        }
-        $_SESSION['actions'][] = $action;
     }
     $arrReOrdered = [];
     $index = null;
@@ -153,17 +73,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
         if($j>=$index) break;
     }
-    function getSubFields($field){
-
-    }
     $_SESSION['actions'] = $arrReOrdered;
-    for ($i=0;$i<sizeof($_SESSION['actions']);$i++){
-        for ($j=0;$j<sizeof($_SESSION['actions'][$i]->fields);$j++){
-
-        }
-    }
-    // todo per actie en per fields voeg subfields toe met addSubfield method en params:
-    //
     print_r($_SESSION['actions']);
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
