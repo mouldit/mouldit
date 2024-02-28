@@ -9,28 +9,23 @@ function getConcepts($schema): array {
     $regBlocksAsStr = $temp[0];
     $extBlocksAsStr = $temp[1];
     $abstractCodeBlocks = $temp[2];
-    // ok tot hier
     foreach ($abstractCodeBlocks as $ac){
         $data = getConceptData($ac);
         $concept = new Concept($data[0],'abs');
         $concept->addFields($data[1]);
-        //echo '<pre>abs concept => '.print_r($concept, true).'</pre>';
-        $concepts[]=$concept;
+        $concepts[] = $concept;
     }
     foreach ($extBlocksAsStr as $ac){
-        // todo movies en shows worden niet gevonden
         $data = getConceptData($ac);
         $from = strpos($data[0],'extending')+strlen('extending');
-        echo '<pre>concept data for  => '.print_r($data, true).'</pre>';
         $extendsFrom = trim(substr($data[0],$from));
-        //echo 'in => '.$extendsFrom.' from: '.$from;
         for ($i=0;$i<sizeof($concepts);$i++){
             if($concepts[$i]->name===$extendsFrom){
-                echo 'in';
-                $concept = new Concept($data[0],'ext');
-                $concept->setFields($concepts[$i]->fields);
+                $name = trim(strstr($data[0],'extending',true));
+                $concept =  new Concept($name,'ext');
+                $concept->setFields(clone $concepts[$i]->fields);
                 $concept->addFields($data[1]);
-                $concepts[]=$concept;
+                $concepts[] = $concept;
                 break;
             }
         }
@@ -39,9 +34,8 @@ function getConcepts($schema): array {
         $data = getConceptData($ac);
         $concept = new Concept($data[0],'reg');
         $concept->addFields($data[1]);
-        $concepts[]=$concept;
+        $concepts[] = $concept;
     }
-
     return $concepts;
 }
 function splitSchema($schemaContent): array
@@ -73,18 +67,14 @@ function splitSchema($schemaContent): array
 function getConceptData($codeBlock): array
 {
     $name = trim(substr(strstr($codeBlock,'{',true),strpos($codeBlock,'type')+4));
-    if(str_contains($name,'extending')){
-        // todo dit is niet goed want je moet weten waarvan het extends om de velden naderhand te kunnen toevoegen
-        $name=trim(strstr($name,'extending',true));
-        echo $name;
-    }
     $fields = [];
     $block = trim(substr($codeBlock,strpos($codeBlock,'{')+1,strpos($codeBlock,'}')-strpos($codeBlock,'{')));
     $props = explode(';',$block);
     array_pop($props);
+    //echo '<pre>props as strings => '.print_r($props, true).'</pre><br>';
     foreach ($props as $prop){
         $t=explode(':',trim($prop));
-        $f = explode(' ',$t[0]);
+        $f = explode(' ',trim($t[0]));
         if(is_array($f)){
             $fieldName = trim(array_pop($f));
             $fieldType = trim($t[1]);

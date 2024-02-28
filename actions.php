@@ -28,7 +28,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
-            // todo replace "extending"
             $name=$actionType[0].' '.$concept->name.'s';
             $action = new Action($name,$actionType[1],$actionType[0]);
             $action->setFields($concept->fields);
@@ -88,7 +87,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][]=$action;
         }
     }
-    //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
+   // echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
