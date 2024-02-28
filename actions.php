@@ -27,10 +27,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
     }
     // todo maak één der acties selected
+    $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
             $name=$actionType[0].' '.$concept->name.'s';
             $action = new Action($name,$actionType[1],$actionType[0]);
+            if(!$selected) {
+                $action->selected=true;
+                $selected=true;
+            }
             $action->setFields($concept->fields);
             $action->fieldset->setInclusivity(true);
             foreach ($action->fieldset->fields as $f){
@@ -98,15 +103,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo include/exclude werkt nog niet goed
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
             $_SESSION['actions'][$i]->active = $_POST['isActive'];
-            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fields); $j++) {
-                $_SESSION['actions'][$i]->fields[$j][1] = $_POST['fieldsConfig'];
-                if (!isset($_POST[$_SESSION['actions'][$i]->fields[$j][0] . 'Checked'])) {
-                    $_SESSION['actions'][$i]->fields[$j][2] = false;
+            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fieldset->fields); $j++) {
+                $_SESSION['actions'][$i]->fieldset->inclusivity = (bool)$_POST['fieldsConfig'];
+                if (!isset($_POST[$_SESSION['actions'][$i]->fieldset->fields[$j]->name . 'Checked'])) {
+                    $_SESSION['actions'][$i]->fieldset->fields[$j]->checked = false;
                 } else {
-                    $_SESSION['actions'][$i]->fields[$j][2] = true;
+                    $_SESSION['actions'][$i]->fieldset->fields[$j]->checked = true;
                 }
             }
         }
@@ -170,18 +176,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     <label><input type="radio" name="isActive" value="0" checked> OFF</label>
             </div>';
             }
-            $part .= '<div><label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="include"';
-            if ($_SESSION['actions'][$i]->fields[0][1] === 'include') {
+            $part .= '<div><label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="1"';
+            if ($_SESSION['actions'][$i]->fieldset->inclusivity) {
                 $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="exclude"> Exclude</label></div>';
+                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="0"> Exclude</label></div>';
             } else {
                 $part .= '> Include</label>
-                    <label><input type="radio" name="fieldsConfig" value="exclude" checked> Exclude</label>
+                    <label><input type="radio" name="fieldsConfig" value="0" checked> Exclude</label>
             </div>';
             }
-            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fields); $j++) {
-                $part .= '<div><label>' . $_SESSION['actions'][$i]->fields[$j][0] . '<input type="checkbox" name="' . $_SESSION['actions'][$i]->fields[$j][0] . 'Checked" value="1"';
-                if ($_SESSION['actions'][$i]->fields[$j][2]) {
+            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fieldset->fields); $j++) {
+                $part .= '<div><label>' . $_SESSION['actions'][$i]->fieldset->fields[$j]->name . '<input type="checkbox" name="' . $_SESSION['actions'][$i]->fieldset->fields[$j]->name
+                    . 'Checked" value="1"';
+                if ($_SESSION['actions'][$i]->fieldset->fields[$j]->checked) {
                     $part .= ' checked></label></div>';
                 } else {
                     $part .= '></label></div>';
