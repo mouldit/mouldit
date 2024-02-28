@@ -26,6 +26,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     function fieldIsConcept($f){
         return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
     }
+    // todo maak één der acties selected
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
             $name=$actionType[0].' '.$concept->name.'s';
@@ -87,7 +88,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][]=$action;
         }
     }
-   // echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
+    //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
