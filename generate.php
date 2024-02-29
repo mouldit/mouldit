@@ -1,7 +1,7 @@
 <?php
 function generate($concepts, $actions, $path): bool
 {
-    // todo aanpassen aan nieuwe classes
+    // todo printen van subfields
     if ($success = touch($path . '/app.ts')) {
         $fp = fopen($path . '/app.ts', 'w');
         $fileAsStr = file_get_contents('./app.txt');
@@ -30,7 +30,6 @@ function generate($concepts, $actions, $path): bool
         if (!file_exists($path . '/routes')) {
             if ($success = mkdir($path . '/routes')) {
                 for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
-                    echo htmlspecialchars($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts');
                     if (touch($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts')) {
                         if ($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts', 'ab')) {
                             $fileAsStr = file_get_contents('./route.txt');

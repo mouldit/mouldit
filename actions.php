@@ -26,7 +26,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     function fieldIsConcept($f){
         return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
     }
-    // todo maak één der acties selected
     $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
