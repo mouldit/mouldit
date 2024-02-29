@@ -103,7 +103,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo include/exclude werkt nog niet goed
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
             $_SESSION['actions'][$i]->active = $_POST['isActive'];

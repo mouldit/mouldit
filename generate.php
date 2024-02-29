@@ -1,11 +1,7 @@
 <?php
 function generate($concepts, $actions, $path): bool
 {
-    /*
-     * todo benodigde config data: concepts
-     * import account from './routes/account')
-app.use('/account',account)
-     * */
+    // todo aanpassen aan nieuwe classes
     if ($success = touch($path . '/app.ts')) {
         $fp = fopen($path . '/app.ts', 'w');
         $fileAsStr = file_get_contents('./app.txt');
@@ -18,7 +14,7 @@ app.use('/account',account)
         $imports = "\n";
         for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
             global $imports;
-            $imports .= 'import {router as ' . $_SESSION['concepts'][$i] . '} from \'./routes/' . $_SESSION['concepts'][$i] . '\'' . "\n";
+            $imports .= 'import {router as ' . $_SESSION['concepts'][$i]->name . '} from \'./routes/' . $_SESSION['concepts'][$i]->name . '\'' . "\n";
         }
         fwrite($fp, $imports, strlen($imports));
         fwrite($fp, $app2, strlen($app2));
@@ -26,7 +22,7 @@ app.use('/account',account)
         $routes = "\n";
         for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
             global $routes;
-            $routes .= 'app.use(\'/' . $_SESSION['concepts'][$i] . '\', ' . $_SESSION['concepts'][$i] . ')' . "\n";
+            $routes .= 'app.use(\'/' . $_SESSION['concepts'][$i]->name . '\', ' . $_SESSION['concepts'][$i]->name . ')' . "\n";
         }
         fwrite($fp, $routes, strlen($routes));
         fwrite($fp, $app3, strlen($app3));
@@ -34,30 +30,32 @@ app.use('/account',account)
         if (!file_exists($path . '/routes')) {
             if ($success = mkdir($path . '/routes')) {
                 for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
-                    if (touch($path . '/routes/' . $_SESSION['concepts'][$i] . '.ts')) {
-                        if ($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i] . '.ts', 'ab')) {
+                    echo htmlspecialchars($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts');
+                    if (touch($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts')) {
+                        if ($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts', 'ab')) {
                             $fileAsStr = file_get_contents('./route.txt');
                             $p1 = strstr($fileAsStr, '***route handlers***', true) . "\n";
                             $p2 = "\n" . trim(substr(strstr($fileAsStr, '***route handlers***'),
                                     strlen('***route handlers***')));
                             fwrite($fp, $p1, strlen($p1));
                             for ($j = 0; $j < sizeof($actions); $j++) {
-                                if (str_contains($actions[$j]->name, $_SESSION['concepts'][$i])) {
+                                if (str_contains($actions[$j]->name, $_SESSION['concepts'][$i]->name)) {
                                     $api1 = 'router.' . $actions[$j]->verb . '(\''
-                                        . '/' . $_SESSION['concepts'][$i] . 's\', async (req:any,res:any,next:any)=>{' . "\n\t";
+                                        . '/' . $_SESSION['concepts'][$i]->name . 's\', async (req:any,res:any,next:any)=>{' . "\n\t";
                                     $api2 = "\n" . '}});' . "\n";
                                     fwrite($fp, $api1, strlen($api1));
                                     $fields='';
-                                    for ($k=0;$k<sizeof($actions[$j]->fields);$k++){
-                                        $fields.=$actions[$j]->fields[$k][0].':';
-                                        if(($actions[$j]->fields[$k][1]==='include'&&$actions[$j]->fields[$k][2])
-                                        ||($actions[$j]->fields[$k][1]==='exclude')&&!$actions[$j]->fields[$k][2]){
+                                    for ($k=0;$k<sizeof($actions[$j]->fieldset->fields);$k++){
+                                        $fields.=$actions[$j]->fieldset->fields[$k]->name.':';
+                                        if(($actions[$j]->fieldset->inclusivity&&$actions[$j]->fieldset->fields[$k]->checked)
+                                        ||(!$actions[$j]->fieldset->inclusivity&&!$actions[$j]->fieldset->fields[$k]->checked)){
                                             $fields.='true,'."\n";
                                         } else{
                                             $fields.='false,'."\n";
                                         }
                                     }
-                                    $body = 'try { const result = await e.select(e.' . ucfirst($_SESSION['concepts'][$i]) . ', () => ({' . "\t" .
+                                    $body = 'try { const result = await e.select(e.' . ucfirst($_SESSION['concepts'][$i]->name)
+                                        . ', () => ({' . "\t" .
 //                   ...e.' . ucfirst($_SESSION['concepts'][$i]) . '[\'*\']
                            $fields.
                '})).run(client);' . "\n" . '        if (result) {
