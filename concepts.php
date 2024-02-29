@@ -1,6 +1,5 @@
 <?php
 function getConcepts($schema): array {
-    // todo fix loopt serieus fout
     $concepts = [];
     $first = strpos($schema,'{')+1;
     $last = strrpos($schema,'}')-1;
@@ -48,11 +47,13 @@ function splitSchema($schemaContent): array
         $nextClosingTag = strpos($schemaContent,'}');
         $offset = strpos($schemaContent,'{');
         $nextOpeningTag =strpos($schemaContent,'{',$offset+1);
+        // todo de tussenin properties moeten er wel uit en dat gebeurt niet!
         while($nextOpeningTag!==false&&$nextClosingTag>$nextOpeningTag){
             $nextClosingTag = strpos($schemaContent,'}',$nextClosingTag+1);
             $nextOpeningTag = strpos($schemaContent,'{',$nextOpeningTag+1);
         }
         $codeBlock = substr($schemaContent,0,$nextClosingTag+1);
+        echo htmlspecialchars($codeBlock);
         if(str_contains($codeBlock,'extending')){
             $extendBlocks[]=$codeBlock;
         } else if(str_contains($codeBlock,'abstract')){
