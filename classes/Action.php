@@ -6,7 +6,7 @@ class Action
     public string $type;
     public bool $active;
     public bool $selected;
-    public FieldSet $fieldset;
+    public FieldSet $fieldset; // de conceptnaam komt voor als attribuut in de fieldset property
     function __construct($name,$verb,$type){
         $this->name=$name;
         $this->verb=$verb;
@@ -15,11 +15,12 @@ class Action
         $this->selected=false;
     }
     function addField($name,$type,$checked,$subfields=NULL){
-        if(!isset($this->fieldset)) $this->fieldset=new FieldSet();
-        $f = new Field($name,$type);
-        $f->setChecked($checked);
-        if(isset($subfields)) $f->subfields=$subfields;
-        $this->fieldset->addField($f);
+        if(isset($this->fieldset)){
+            $f = new Field($name,$type);
+            $f->setChecked($checked);
+            if(isset($subfields)) $f->subfields=$subfields;
+            $this->fieldset->addField($f);
+        }
     }
     function setFields($fs){
         $this->fieldset=$fs;

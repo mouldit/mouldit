@@ -9,18 +9,14 @@ class Concept
     {
         $this->name=$name;
         $this->type=$type;
+        $this->fields=new FieldSet($this->name);
     }
     public function addField(Field $field){
-        if(!isset($this->fields)) $this->fields = new FieldSet();
         $this->fields->addField($field);
     }
     public function addFields(array $fields){
-        if(!isset($this->fields)){
-            $this->fields = new FieldSet($fields);
-        } else{
-            foreach ($fields as $f){
-                $this->fields->addField($f);
-            }
+        foreach ($fields as $f) {
+            $this->fields->addField($f);
         }
     }
     public function setFields($fs){

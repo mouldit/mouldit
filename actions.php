@@ -1,6 +1,6 @@
 <?php
 spl_autoload_register(function () {
-
+    include 'showAction.php';
     include 'classes/Action.php';
     include 'classes/Concept.php';
     include 'classes/Field.php';
@@ -45,9 +45,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $newSubFieldSets=[];
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
-                    if($set instanceof SubFieldSet){
+                    if($set instanceof SubFieldSet && isset($set->fields->fields)){
                         foreach ($set->fields->fields as $f){
                             if(fieldIsConcept($f)){
+                                // in het subfieldset gaan we nu per veld nieuwe subfeildsets aanmaken
                                 for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                     if($_SESSION['concepts'][$i]->name===$f->type){
                                         // dit zijn in principe main fields dus van type : FieldSet
@@ -58,6 +59,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         }
                                         $sfs=new SubFieldSet();
                                         $sfs->setFields($fs);
+                                        $sfs->setParentFieldSet($set->fields);
                                         $f->subfields=$sfs;
                                         $newSubFieldSets[]=$f->subfields;
                                         break;
@@ -65,10 +67,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 }
                             }
                         }
-                    } else{
+                    } else if(isset($set->fields)){
                         foreach ($set->fields as $f){
                             if(fieldIsConcept($f)){
                                 for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
+                                    // todo link gewoon het concept aan een subfieldset of fieldset
+                                    //      in het concept immers bevindt zich ook een fieldset en dat kan je dan als het parent fieldset zien?
                                     if($_SESSION['concepts'][$i]->name===$f->type){
                                         $fs=$_SESSION['concepts'][$i]->fields;
                                         $fs->setInclusivity(true);
@@ -77,6 +81,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         }
                                         $sfs=new SubFieldSet();
                                         $sfs->setFields($fs);
+                                        $sfs->setParentFieldSet($set);
                                         $f->subfields=$sfs;
                                         $newSubFieldSets[]=$f->subfields;
                                         break;
@@ -160,43 +165,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
-        $part = '';
-        if ($_SESSION['actions'][$i]->selected) {
-            $part .= '<h2 style="margin: 0">Configure backend of action: ' . $_SESSION['actions'][$i]->name . ' 
-       </h2>
-       <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
-            <div><label><input type="radio" name="isActive" value="1"';
-            if ($_SESSION['actions'][$i]->active) {
-                $part .= ' checked> ON</label>
-                    <label><input type="radio" name="isActive" value="0"> OFF</label></div>';
-            } else {
-                $part .= '> ON</label>
-                    <label><input type="radio" name="isActive" value="0" checked> OFF</label>
-            </div>';
-            }
-            $part .= '<div><label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="1"';
-            if ($_SESSION['actions'][$i]->fieldset->inclusivity) {
-                $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="0"> Exclude</label></div>';
-            } else {
-                $part .= '> Include</label>
-                    <label><input type="radio" name="fieldsConfig" value="0" checked> Exclude</label>
-            </div>';
-            }
-            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fieldset->fields); $j++) {
-                $part .= '<div><label>' . $_SESSION['actions'][$i]->fieldset->fields[$j]->name . '<input type="checkbox" name="' . $_SESSION['actions'][$i]->fieldset->fields[$j]->name
-                    . 'Checked" value="1"';
-                if ($_SESSION['actions'][$i]->fieldset->fields[$j]->checked) {
-                    $part .= ' checked></label></div>';
-                } else {
-                    $part .= '></label></div>';
-                }
-            }
-            $part .= '<div><button type="submit" name="action-edited">save</button></div>
-</form><br><div><form style="float:right;" action="' . $_SERVER['PHP_SELF'] . '" method="post"><input type="hidden" name="generate"><button type="submit">Generate</button></form></div>';
-            echo $part;
-            break;
-        }
+       showAction($_SESSION['actions'][$i]);
     }
     ?>
 </div>
@@ -208,7 +177,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             if (els[i].type === 'checkbox' && !(els[i].checked)) els[i].checked = true;
         }
     }
-
     function uncheckFields() {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
