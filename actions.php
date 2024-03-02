@@ -48,7 +48,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     if($set instanceof SubFieldSet && isset($set->fields->fields)){
                         foreach ($set->fields->fields as $f){
                             if(fieldIsConcept($f)){
-                                // in het subfieldset gaan we nu per veld nieuwe subfeildsets aanmaken
+                                // todo set "parentSubFieldSet" en SubFieldSet for this Field
+                                //      vergeet objecten niet te clonen voor toekenning!
                                 for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                     if($_SESSION['concepts'][$i]->name===$f->type){
                                         // dit zijn in principe main fields dus van type : FieldSet
@@ -61,6 +62,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         $sfs->setFields($fs);
                                         $sfs->setParentFieldSet($set->fields);
                                         $f->subfields=$sfs;
+                                        echo'vreemd';
+                                        echo '<pre> subfieldset for field '.$f->name.' in subfieldset of concept: '.$set->fields->conceptName.' '.print_r($sfs, true).'</pre>';
                                         $newSubFieldSets[]=$f->subfields;
                                         break;
                                     }
@@ -69,7 +72,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                         }
                     } else if(isset($set->fields)){
                         foreach ($set->fields as $f){
+                            // $set is een main fieldset
                             if(fieldIsConcept($f)){
+                                // todo set "parentFieldSet" en SubFieldSet for this Field
+                                //      vergeet objecten niet te clonen voor toekenning!
                                 for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                     // todo link gewoon het concept aan een subfieldset of fieldset
                                     //      in het concept immers bevindt zich ook een fieldset en dat kan je dan als het parent fieldset zien?
@@ -83,6 +89,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         $sfs->setFields($fs);
                                         $sfs->setParentFieldSet($set);
                                         $f->subfields=$sfs;
+                                        echo '<pre> subfieldset for field '.$f->name.' in fieldset of concept: '.$set->conceptName.' '.print_r($sfs, true).'</pre>';
                                         $newSubFieldSets[]=$f->subfields;
                                         break;
                                     }

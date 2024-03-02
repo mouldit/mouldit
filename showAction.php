@@ -30,6 +30,7 @@ function showActivationState(bool $isActive){
             </div>';
     }
 }
+//'.getPath($fs,$sfs).'
 function showConceptBlock(FieldSet $fs,SubFieldSet $sfs=NULL){
     // indien dit null is dan is fs een main field set
     // anders is fs een fieldset van het subfieldset zoals gespecifieerd in de tweede param
@@ -37,7 +38,7 @@ function showConceptBlock(FieldSet $fs,SubFieldSet $sfs=NULL){
     $part = '<div>'.$fs->conceptName.' <label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="1"';
     if ($fs->inclusivity) {
         $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig'.getPath($fs,$sfs).'" value="0"> Exclude</label></div>';
+                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="0"> Exclude</label></div>';
     } else {
         $part .= '> Include</label>
                     <label><input type="radio" name="fieldsConfig" value="0" checked> Exclude</label>
@@ -46,6 +47,7 @@ function showConceptBlock(FieldSet $fs,SubFieldSet $sfs=NULL){
     return $part;
 }
 function getPath(FieldSet $fs,SubFieldSet $sfs=NULL){
+    // todo
     $path='_'.$fs->conceptName;
     if(isset($sfs)){
         if(isset($sfs->parentFieldSet)){
@@ -53,7 +55,7 @@ function getPath(FieldSet $fs,SubFieldSet $sfs=NULL){
             $path.=getPath($sfs->parentFieldSet->fields,$sfs->parentSubFieldSet);
         } else{
             // het bovenliggende set is ook een subfieldset
-            $path.=
+            //$path.=
         }
     }
     return $path;
@@ -67,7 +69,6 @@ function showField(Field $f){
     } else {
         $part .= '></label>';
     }
-    echo '<pre>veld => '.print_r($f, true).'</pre><br>';
     if($f->hasSubfields()){
         // todo dit geeft nu false terug omdat wellicht het veld niet correct aangemaakt wordt
         //      waarom: omdat het parent field gezet moet worden anders werkt het allemaal niet
