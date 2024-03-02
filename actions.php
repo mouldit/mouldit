@@ -28,14 +28,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
+        $cpt=clone $concept;
         foreach ($implementedTypesOfActions as $actionType){
-            $name=$actionType[0].' '.$concept->name.'s';
+            $name=$actionType[0].' '.$cpt->name.'s';
             $action = new Action($name,$actionType[1],$actionType[0]);
             if(!$selected) {
                 $action->selected=true;
                 $selected=true;
             }
-            $action->setFields($concept->fields);
+            $action->setFields($cpt->fields);
             $action->fieldset->setInclusivity(true);
             foreach ($action->fieldset->fields as $f){
                 $f->setChecked(true);
@@ -45,54 +46,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $newSubFieldSets=[];
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
-                    if($set instanceof SubFieldSet && isset($set->fields->fields)){
-                        foreach ($set->fields->fields as $f){
-                            if(fieldIsConcept($f)){
-                                // todo set "parentSubFieldSet" en SubFieldSet for this Field
-                                //      vergeet objecten niet te clonen voor toekenning!
-                                for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
-                                    if($_SESSION['concepts'][$i]->name===$f->type){
-                                        // dit zijn in principe main fields dus van type : FieldSet
-                                        $fs=$_SESSION['concepts'][$i]->fields;
-                                        $fs->setInclusivity(true);
-                                        foreach ($fs->fields as $subf){
-                                            $subf->setChecked(true);
-                                        }
-                                        $sfs=new SubFieldSet();
-                                        $sfs->setFields($fs);
-                                        $sfs->setParentFieldSet($set->fields);
-                                        $f->subfields=$sfs;
-                                        echo'vreemd';
-                                        echo '<pre> subfieldset for field '.$f->name.' in subfieldset of concept: '.$set->fields->conceptName.' '.print_r($sfs, true).'</pre>';
-                                        $newSubFieldSets[]=$f->subfields;
-                                        break;
+                    foreach ($set->fields as $f){
+                        if(fieldIsConcept($f)){
+                            for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
+                                if($_SESSION['concepts'][$i]->name===$f->type){
+                                    $fs=clone $_SESSION['concepts'][$i]->fields; // het gaat hier om een fieldset instance
+                                    foreach ($fs->fields as $subf){
+                                        $subf->setChecked(true);
                                     }
-                                }
-                            }
-                        }
-                    } else if(isset($set->fields)){
-                        foreach ($set->fields as $f){
-                            // $set is een main fieldset
-                            if(fieldIsConcept($f)){
-                                // todo set "parentFieldSet" en SubFieldSet for this Field
-                                //      vergeet objecten niet te clonen voor toekenning!
-                                for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
-                                    // todo link gewoon het concept aan een subfieldset of fieldset
-                                    //      in het concept immers bevindt zich ook een fieldset en dat kan je dan als het parent fieldset zien?
-                                    if($_SESSION['concepts'][$i]->name===$f->type){
-                                        $fs=$_SESSION['concepts'][$i]->fields;
-                                        $fs->setInclusivity(true);
-                                        foreach ($fs->fields as $subf){
-                                            $subf->setChecked(true);
-                                        }
-                                        $sfs=new SubFieldSet();
-                                        $sfs->setFields($fs);
-                                        $sfs->setParentFieldSet($set);
-                                        $f->subfields=$sfs;
-                                        echo '<pre> subfieldset for field '.$f->name.' in fieldset of concept: '.$set->conceptName.' '.print_r($sfs, true).'</pre>';
-                                        $newSubFieldSets[]=$f->subfields;
-                                        break;
+                                    $sfs=null;
+                                    if($set instanceof SubFieldSet){
+                                        $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName);
+                                    } else{
+                                        $sfs=new SubFieldSet($fs->conceptName,$set->conceptName.'_'.$fs->conceptName);
                                     }
+                                    $sfs->setSubFields($fs->fields);
+                                    $sfs->setInclusivity(true);
+                                    $f->subfields=$sfs;
+                                    $newSubFieldSets[]=$f->subfields;
+                                    break;
                                 }
                             }
                         }

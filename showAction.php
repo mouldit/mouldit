@@ -8,7 +8,7 @@ function showAction(Action $action)
        <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
             <div><label><input type="radio" name="isActive" value="1"';
         $part .= showActivationState($action->active);
-        $part.=showConceptBlock($action->fieldset);
+        $part.=showConceptBlock($action->fieldset->conceptName,$action->fieldset->inclusivity);
         $part.='<ul>';
         for ($j = 0; $j < sizeof($action->fieldset->fields); $j++) {
             $part .=showField($action->fieldset->fields[$j]);
@@ -30,35 +30,29 @@ function showActivationState(bool $isActive){
             </div>';
     }
 }
-//'.getPath($fs,$sfs).'
-function showConceptBlock(FieldSet $fs,SubFieldSet $sfs=NULL){
-    // indien dit null is dan is fs een main field set
-    // anders is fs een fieldset van het subfieldset zoals gespecifieerd in de tweede param
-    // todo zie dat elk concept block zijn eigen naam heeft
-    $part = '<div>'.$fs->conceptName.' <label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="1"';
-    if ($fs->inclusivity) {
-        $part .= ' checked> Include</label>
+function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
+    if(!$path){
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="1"';
+        if ($incl) {
+            $part .= ' checked> Include</label>
                     <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="0"> Exclude</label></div>';
-    } else {
-        $part .= '> Include</label>
+        } else {
+            $part .= '> Include</label>
                     <label><input type="radio" name="fieldsConfig" value="0" checked> Exclude</label>
             </div>';
-    }
-    return $part;
-}
-function getPath(FieldSet $fs,SubFieldSet $sfs=NULL){
-    // todo
-    $path='_'.$fs->conceptName;
-    if(isset($sfs)){
-        if(isset($sfs->parentFieldSet)){
-            // dit is het main fieldset
-            $path.=getPath($sfs->parentFieldSet->fields,$sfs->parentSubFieldSet);
-        } else{
-            // het bovenliggende set is ook een subfieldset
-            //$path.=
+        }
+    } else{
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields()" type="radio" name="fieldsConfig_'.$path.'" value="1"';
+        if ($incl) {
+            $part .= ' checked> Include</label>
+                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig_'.$path.'" value="0"> Exclude</label></div>';
+        } else {
+            $part .= '> Include</label>
+                    <label><input type="radio" name="fieldsConfig_'.$path.'" value="0" checked> Exclude</label>
+            </div>';
         }
     }
-    return $path;
+    return $part;
 }
 function showField(Field $f){
     $part = '<li><label>' . $f->name . '<input type="checkbox" name="'
@@ -70,18 +64,16 @@ function showField(Field $f){
         $part .= '></label>';
     }
     if($f->hasSubfields()){
-        // todo dit geeft nu false terug omdat wellicht het veld niet correct aangemaakt wordt
-        //      waarom: omdat het parent field gezet moet worden anders werkt het allemaal niet
-        $part .= showSubFields($f);
+        $part .= showSubFields($f->subfields);
     }
     $part.='</li>';
     return $part;
 }
-function showSubFields(Field $f){
-    $part=showConceptBlock($f->subfields->fields);
+function showSubFields(SubFieldSet $sfs){
+    $part=showConceptBlock($sfs->conceptName,$sfs->inclusivity,$sfs->conceptPath);
     $part.='<ul>';
-    foreach ($f->subfields->fields->fields as $sf){
-        $part.=showField($sf);
+    foreach ($sfs->fields as $subf){
+        $part.=showField($subf);
     }
     $part.='</ul>';
     return $part;

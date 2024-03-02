@@ -16,7 +16,7 @@ class Action
     }
     function addField($name,$type,$checked,$subfields=NULL){
         if(isset($this->fieldset)){
-            $f = new Field($name,$type);
+            $f = new Field($name,$type,$this->fieldset);
             $f->setChecked($checked);
             if(isset($subfields)) $f->subfields=$subfields;
             $this->fieldset->addField($f);

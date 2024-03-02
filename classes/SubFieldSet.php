@@ -2,13 +2,23 @@
 
 class SubFieldSet
 {
-    public FieldSet $fields;
-
-    public function addSubField(Field $field,$conceptName=NULL){
-            if(!isset($this->fields) && $conceptName) $this->fields=new FieldSet($conceptName);
-            if(isset($this->fields)) $this->fields->addField($field);
+    public array $fields;
+    public bool $inclusivity;
+    public string $conceptName;
+    public string $conceptPath;
+    public function __construct(string $conceptName,string $path)
+    {
+        $this->conceptName=$conceptName;
+        $this->fields=[];
+        $this->conceptPath=$path;
     }
-    public function setFields(FieldSet $fs){
-        $this->fields=$fs;
+    public function addSubField(Field $field){
+        $this->fields[]=$field;
+    }
+    public function setSubFields($fields){
+        $this->fields = $fields;
+    }
+    public function setInclusivity(bool $inc){
+        $this->inclusivity=$inc;
     }
 }

@@ -3,7 +3,7 @@
 class FieldSet
 {
     public array $fields;
-    public string $inclusivity;
+    public bool $inclusivity;
     public string $conceptName;
 
     public function __construct(string $conceptName)
@@ -17,7 +17,7 @@ class FieldSet
     public function addFields($fields){
         $this->fields = $fields;
     }
-    public function setInclusivity($inc){
+    public function setInclusivity(bool $inc){
         $this->inclusivity=$inc;
     }
 }
