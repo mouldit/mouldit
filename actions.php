@@ -30,8 +30,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
-        $cpt=clone $concept;
         foreach ($implementedTypesOfActions as $actionType){
+            $cpt=clone $concept;
             $name=$actionType[0].' '.$cpt->name.'s';
             $action = new Action($name,$actionType[1],$actionType[0]);
             if(!$selected) {
