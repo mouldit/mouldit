@@ -22,9 +22,10 @@ function getConcepts($schema): array {
             if($concepts[$i]->name===$extendsFrom){
                 $name = trim(strstr($data[0],'extending',true));
                 $concept =  new Concept($name,'ext');
-                $concept->setFields(clone $concepts[$i]->fields);
+                $concept->addFields((clone $concepts[$i]->fields)->fields);
                 $concept->addFields($data[1]);
                 $concepts[] = $concept;
+
                 break;
             }
         }

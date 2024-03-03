@@ -22,7 +22,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $fileAsStr = strtolower($fileAsStr);
     include 'concepts.php';
     $_SESSION['concepts']=getConcepts($fileAsStr);
-   // echo '<pre>'.print_r($_SESSION['concepts'], true).'</pre>';
+    //echo '<pre>'.print_r($_SESSION['concepts'], true).'</pre>';
 
     $_SESSION['actions'] = [];
     function fieldIsConcept($f){
@@ -38,6 +38,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 $action->selected=true;
                 $selected=true;
             }
+            // todo fix bug $cpt-fields fieldset heeft voor movie en show een foute naam
             $action->setFields($cpt->fields);
             $action->fieldset->setInclusivity(true);
             foreach ($action->fieldset->fields as $f){
@@ -46,13 +47,17 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $subFieldSetsToProcess=[$action->fieldset];
             $action->activate();
             $newSubFieldSets=[];
+           // echo '<pre> 1ste subfieldset to process'.print_r($subFieldSetsToProcess, true).'</pre>';
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
                     foreach ($set->fields as $f){
+                        // dit zijn Fields
                         if(fieldIsConcept($f)){
+                            // we clonen dit Field niet dus daar kan mogelijks iets fout gaan
                             for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                 if($_SESSION['concepts'][$i]->name===$f->type){
-                                    $fs=clone $_SESSION['concepts'][$i]->fields; // het gaat hier om een fieldset instance
+                                    // het gaat hier om een fieldset instance $fs
+                                    $fs=clone $_SESSION['concepts'][$i]->fields;
                                     foreach ($fs->fields as $subf){
                                         $subf->setChecked(true);
                                     }
@@ -60,12 +65,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     if($set instanceof SubFieldSet){
                                         // todo een mogelijk issue is dat een conceptName ook iets kan zijn als show extending content wat niet de bedoeling is => cut it away
                                         //      person komt hier nergens voor wat toch raar is, en movie en show komen enkel voor als content wat niet goed is!
-                                        echo 'path='.$set->conceptPath;
+                                        //echo 'path='.$set->conceptPath;
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName);
                                     } else{
-                                        echo 'name='.$set->conceptName;
+                                        // todo om te beginnen hebben we drie content als conceptnaam, wat betekent dat dit in de orginiele $concepts session var al fout staat!
+                                        //echo 'name='.$set->conceptName;
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptName.'_'.$fs->conceptName);
                                     }
+                                    // de subfieldset s die gemaakt worden zijn per veld in de main fieldset van het eerste concept CONTENT
+                                    //  het actor fieldset voor person
                                     $sfs->setSubFields($fs->fields);
                                     $sfs->setInclusivity(true);
                                     $f->subfields=$sfs;
