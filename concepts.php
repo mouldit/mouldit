@@ -78,7 +78,11 @@ function getConceptData($codeBlock): array
         if(is_array($f)){
             $fieldName = trim(array_pop($f));
             $fieldType = trim($t[1]);
-            $fields[]=new Field($fieldName,$fieldType,$name);
+            $nameTemp = $name;
+            if(str_contains($nameTemp,'extending')){
+                $nameTemp = strstr($nameTemp,'extending',true);
+            }
+            $fields[]=new Field($fieldName,$fieldType,$nameTemp);
         }
     }
     return [$name,$fields];

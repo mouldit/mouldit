@@ -32,20 +32,20 @@ function showActivationState(bool $isActive){
 }
 function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
     if(!$path){
-        $part = '<div>'.$conceptName.' <label><input onchange="checkFields()" type="radio" name="fieldsConfig" value="1"';
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$conceptName.'\')" type="radio" name="fieldsConfig_'.$conceptName.'" value="1"';
         if ($incl) {
             $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig" value="0"> Exclude</label></div>';
+                    <label><input onchange="uncheckFields(\''.$conceptName.'\')" type="radio" name="fieldsConfig_'.$conceptName.'" value="0"> Exclude</label></div>';
         } else {
             $part .= '> Include</label>
-                    <label><input type="radio" name="fieldsConfig" value="0" checked> Exclude</label>
+                    <label><input type="radio" name="fieldsConfig_'.$conceptName.'" value="0" checked> Exclude</label>
             </div>';
         }
     } else{
-        $part = '<div>'.$conceptName.' <label><input onchange="checkFields()" type="radio" name="fieldsConfig_'.$path.'" value="1"';
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$path.'\')" type="radio" name="fieldsConfig_'.$path.'" value="1"';
         if ($incl) {
             $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields()" type="radio" name="fieldsConfig_'.$path.'" value="0"> Exclude</label></div>';
+                    <label><input onchange="uncheckFields(\''.$path.'\')" type="radio" name="fieldsConfig_'.$path.'" value="0"> Exclude</label></div>';
         } else {
             $part .= '> Include</label>
                     <label><input type="radio" name="fieldsConfig_'.$path.'" value="0" checked> Exclude</label>
@@ -55,9 +55,10 @@ function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
     return $part;
 }
 function showField(Field $f,string $conceptPath){
+    // todo fix bug with $contentPath: je hebt ergens season_content_person als conceptPath terwijl season daar niets mee vandoen heeft
     $part = '<li><label>' . $f->name . '<input type="checkbox" name="'.$conceptPath.'_'
         . $f->name
-        . '_checked" value="1"';
+        . '_checkbox" value="1"';
     if ($f->checked) {
         $part .= ' checked></label>';
     } else {

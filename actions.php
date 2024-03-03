@@ -22,6 +22,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $fileAsStr = strtolower($fileAsStr);
     include 'concepts.php';
     $_SESSION['concepts']=getConcepts($fileAsStr);
+   // echo '<pre>'.print_r($_SESSION['concepts'], true).'</pre>';
+
     $_SESSION['actions'] = [];
     function fieldIsConcept($f){
         return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
@@ -56,8 +58,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     }
                                     $sfs=null;
                                     if($set instanceof SubFieldSet){
+                                        // todo een mogelijk issue is dat een conceptName ook iets kan zijn als show extending content wat niet de bedoeling is => cut it away
+                                        //      person komt hier nergens voor wat toch raar is, en movie en show komen enkel voor als content wat niet goed is!
+                                        echo 'path='.$set->conceptPath;
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName);
                                     } else{
+                                        echo 'name='.$set->conceptName;
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptName.'_'.$fs->conceptName);
                                     }
                                     $sfs->setSubFields($fs->fields);
@@ -150,18 +156,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 </div>
 <script>
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
-    function checkFields() {
+    function checkFields(name) {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
-            // todo enkel (sub)concept niet alle concept blokken!
-            if (els[i].type === 'checkbox' && !(els[i].checked)) els[i].checked = true;
+            if (els[i].type === 'checkbox' && !(els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')) els[i].checked = true;
         }
     }
-    function uncheckFields() {
+    function uncheckFields(name) {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
-            // todo enkel (sub)concept niet alle concept blokken!
-            if (els[i].type === 'checkbox' && (els[i].checked)) els[i].checked = false;
+            if (els[i].type === 'checkbox' && (els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')) els[i].checked = false;
         }
     }
 </script>
