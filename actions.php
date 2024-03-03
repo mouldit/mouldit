@@ -38,7 +38,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 $action->selected=true;
                 $selected=true;
             }
-            // todo fix bug $cpt-fields fieldset heeft voor movie en show een foute naam
+            // todo dit zet het fieldset mmaar hierna wordt dit gewijzigd en dit reflecteert al meteen in de concepts sessian var
+            //      verklaring: cloning gebeurt net als bij js oppervlakkig
             $action->setFields($cpt->fields);
             $action->fieldset->setInclusivity(true);
             foreach ($action->fieldset->fields as $f){
@@ -47,7 +48,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $subFieldSetsToProcess=[$action->fieldset];
             $action->activate();
             $newSubFieldSets=[];
-           // echo '<pre> 1ste subfieldset to process'.print_r($subFieldSetsToProcess, true).'</pre>';
+           //echo '<pre> 1ste subfieldset to process'.print_r($subFieldSetsToProcess, true).'</pre>';
+            echo '<br><pre> dit zijn de concepts die in principe elke iteratie aan zichzelf gelijk zouden moeten blijevn<br>'.print_r($_SESSION['concepts'], true).'</pre>';
+           // het probleem wordt duidelijk: elke iteratie komt er uiteraard een nieuw concept binnen waaraan de actie
+            // moet gekoppeld worden, maar in principe zouden dit nog geen subfields mogen zijn edoch ze zijn dat wel
+            // ook niet toevallig: content is het eerste concept en daarin heb je een subfieldset van person, en in het volgend eis ploep al een gegeven
+            // van in het begin => todo dit kan alleen als in het proces hieronder de sessian var concepts werd aangepast
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
                     foreach ($set->fields as $f){
@@ -57,7 +63,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                 if($_SESSION['concepts'][$i]->name===$f->type){
                                     // het gaat hier om een fieldset instance $fs
-                                    $fs=clone $_SESSION['concepts'][$i]->fields;
+                                    $fs=clone ($_SESSION['concepts'][$i]->fields);
                                     foreach ($fs->fields as $subf){
                                         $subf->setChecked(true);
                                     }
