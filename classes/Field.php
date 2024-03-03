@@ -5,11 +5,13 @@ class Field
     public string $name;
     public string $type;
     public bool $checked;
+    public string $conceptName;
     public SubFieldSet $subfields;
-    public function __construct($name,$type)
+    public function __construct($name,$type,$concept)
     {
         $this->name=$name;
         $this->type=$type;
+        $this->conceptName=$concept;
     }
     public function addSubfield(Field $field){
         if(isset($this->subfields)){

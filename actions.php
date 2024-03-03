@@ -149,6 +149,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     ?>
 </div>
 <script>
+    // todo als je nu op exlude klikt gaan alle velden uit in plaats enkel het onderliggende fieldset
+
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
     function checkFields() {
         const els = document.getElementsByTagName('input');

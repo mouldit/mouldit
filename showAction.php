@@ -11,7 +11,7 @@ function showAction(Action $action)
         $part.=showConceptBlock($action->fieldset->conceptName,$action->fieldset->inclusivity);
         $part.='<ul>';
         for ($j = 0; $j < sizeof($action->fieldset->fields); $j++) {
-            $part .=showField($action->fieldset->fields[$j]);
+            $part .=showField($action->fieldset->fields[$j],$action->fieldset->conceptName);
         }
         $part.='</ul>';
         $part .= '<div><button type="submit" name="action-edited">save</button></div>
@@ -54,10 +54,10 @@ function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
     }
     return $part;
 }
-function showField(Field $f){
-    $part = '<li><label>' . $f->name . '<input type="checkbox" name="'
+function showField(Field $f,string $conceptPath){
+    $part = '<li><label>' . $f->name . '<input type="checkbox" name="'.$conceptPath.'_'
         . $f->name
-        . 'Checked" value="1"';
+        . '_checked" value="1"';
     if ($f->checked) {
         $part .= ' checked></label>';
     } else {
@@ -73,7 +73,7 @@ function showSubFields(SubFieldSet $sfs){
     $part=showConceptBlock($sfs->conceptName,$sfs->inclusivity,$sfs->conceptPath);
     $part.='<ul>';
     foreach ($sfs->fields as $subf){
-        $part.=showField($subf);
+        $part.=showField($subf,$sfs->conceptPath);
     }
     $part.='</ul>';
     return $part;
