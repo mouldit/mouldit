@@ -149,18 +149,18 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     ?>
 </div>
 <script>
-    // todo als je nu op exlude klikt gaan alle velden uit in plaats enkel het onderliggende fieldset
-
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
     function checkFields() {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
+            // todo enkel (sub)concept niet alle concept blokken!
             if (els[i].type === 'checkbox' && !(els[i].checked)) els[i].checked = true;
         }
     }
     function uncheckFields() {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
+            // todo enkel (sub)concept niet alle concept blokken!
             if (els[i].type === 'checkbox' && (els[i].checked)) els[i].checked = false;
         }
     }
