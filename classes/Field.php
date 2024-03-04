@@ -13,6 +13,11 @@ class Field
         $this->type=$type;
         $this->conceptName=$concept;
     }
+    public function __clone(){
+        if(isset($this->subfields)){
+            $this->subfields=clone $this->subfields;
+        }
+    }
     public function addSubfield(Field $field){
         if(isset($this->subfields)){
             $this->subfields->addSubField($field);

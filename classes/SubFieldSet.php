@@ -12,6 +12,13 @@ class SubFieldSet
         $this->fields=[];
         $this->conceptPath=$path;
     }
+    public function __clone(){
+        $temp=[];
+        foreach ($this->fields as $f){
+            $temp[]=clone $f;
+        }
+        $this->fields=$temp;
+    }
     public function addSubField(Field $field){
         $this->fields[]=$field;
     }

@@ -38,7 +38,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 $action->selected=true;
                 $selected=true;
             }
-            // todo dit zet het fieldset mmaar hierna wordt dit gewijzigd en dit reflecteert al meteen in de concepts sessian var
+            // todo dit zet het fieldset mmaar hierna wordt dit gewijzigd en dit reflecteert al meteen in de concepts session var
             //      verklaring: cloning gebeurt net als bij js oppervlakkig
             $action->setFields($cpt->fields);
             $action->fieldset->setInclusivity(true);
@@ -48,18 +48,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $subFieldSetsToProcess=[$action->fieldset];
             $action->activate();
             $newSubFieldSets=[];
-           //echo '<pre> 1ste subfieldset to process'.print_r($subFieldSetsToProcess, true).'</pre>';
-            echo '<br><pre> dit zijn de concepts die in principe elke iteratie aan zichzelf gelijk zouden moeten blijevn<br>'.print_r($_SESSION['concepts'], true).'</pre>';
-           // het probleem wordt duidelijk: elke iteratie komt er uiteraard een nieuw concept binnen waaraan de actie
-            // moet gekoppeld worden, maar in principe zouden dit nog geen subfields mogen zijn edoch ze zijn dat wel
-            // ook niet toevallig: content is het eerste concept en daarin heb je een subfieldset van person, en in het volgend eis ploep al een gegeven
-            // van in het begin => todo dit kan alleen als in het proces hieronder de sessian var concepts werd aangepast
+            //echo '<br><pre> dit zijn de concepts die in principe elke iteratie aan zichzelf gelijk zouden moeten blijevn<br>'.print_r($_SESSION['concepts'], true).'</pre>';
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
                     foreach ($set->fields as $f){
                         // dit zijn Fields
                         if(fieldIsConcept($f)){
-                            // we clonen dit Field niet dus daar kan mogelijks iets fout gaan
                             for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                 if($_SESSION['concepts'][$i]->name===$f->type){
                                     // het gaat hier om een fieldset instance $fs
@@ -173,13 +167,20 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     function checkFields(name) {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
-            if (els[i].type === 'checkbox' && !(els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')) els[i].checked = true;
+            if (els[i].type === 'checkbox'
+                && !(els[i].checked)
+                && els[i].name?.startsWith(name)
+                && els[i].name?.endsWith('_checkbox')) {
+                if(els[i].name.split(name)[1].trim().split('_').length===3) els[i].checked = true
+            }
         }
     }
     function uncheckFields(name) {
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
-            if (els[i].type === 'checkbox' && (els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')) els[i].checked = false;
+            if (els[i].type === 'checkbox' && (els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')){
+                if(els[i].name.split(name)[1].trim().split('_').length===3) els[i].checked = false
+            }
         }
     }
 </script>

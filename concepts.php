@@ -22,8 +22,6 @@ function getConcepts($schema): array {
             if($concepts[$i]->name===$extendsFrom){
                 $name = trim(strstr($data[0],'extending',true));
                 $concept =  new Concept($name,'ext');
-                // todo er blijkt duidelijk dat de velden binnen een gekloond fieldset ook hier een referentie blijven
-                //      deep cloning functionaliteit is nodig! gebruik de __clone constrcutor in de desbetreffende classes zoals FieldSet
                 $concept->addFields((clone $concepts[$i]->fields)->fields);
                 $concept->addFields($data[1]);
                 $concepts[] = $concept;

@@ -11,6 +11,9 @@ class Concept
         $this->type=$type;
         $this->fields=new FieldSet($this->name);
     }
+    public function __clone(){
+        $this->fields = clone $this->fields;
+    }
     public function addField(Field $field){
         $this->fields->addField($field);
     }

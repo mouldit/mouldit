@@ -2,7 +2,7 @@
 
 class FieldSet
 {
-    public array $fields;
+    public array $fields; // bij een gewone clone ga je hier referenties hebben naar de Fiel instanties van de gekloonde Fieldset
     public bool $inclusivity;
     public string $conceptName;
 
@@ -10,6 +10,13 @@ class FieldSet
     {
         $this->conceptName=$conceptName;
         $this->fields=[];
+    }
+    public function __clone(){
+        $temp=[];
+        foreach ($this->fields as $f){
+            $temp[]=clone $f;
+        }
+        $this->fields=$temp;
     }
     public function addField(Field $field){
         $this->fields[]=$field;
