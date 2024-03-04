@@ -11,6 +11,7 @@ function showAction(Action $action)
         $part.=showConceptBlock($action->fieldset->conceptName,$action->fieldset->inclusivity);
         $part.='<ul>';
         for ($j = 0; $j < sizeof($action->fieldset->fields); $j++) {
+            // todo fix
             $part .=showField($action->fieldset->fields[$j],$action->fieldset->conceptName);
         }
         $part.='</ul>';
@@ -31,6 +32,7 @@ function showActivationState(bool $isActive){
     }
 }
 function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
+    // todo pas name aan aan nieuwe manier van naming
     if(!$path){
         $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$conceptName.'\')" type="radio" name="fieldsConfig_'.$conceptName.'" value="1"';
         if ($incl) {
@@ -54,11 +56,8 @@ function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
     }
     return $part;
 }
-function showField(Field $f,string $conceptPath){
-    // todo fix bug with $contentPath: je hebt ergens season_content_person als conceptPath terwijl season daar niets mee vandoen heeft
-    $part = '<li><label>' . $f->name . '<input type="checkbox" name="'.$conceptPath.'_'
-        . $f->name
-        . '_checkbox" value="1"';
+function showField(string $actionName,string $fieldString,Field $f){
+    $part = '<li><label>' . $f->name . '<input type="checkbox" name="'.$actionName.'_checkbox_'.$fieldString.'" value="1"';
     if ($f->checked) {
         $part .= ' checked></label>';
     } else {
@@ -74,6 +73,7 @@ function showSubFields(SubFieldSet $sfs){
     $part=showConceptBlock($sfs->conceptName,$sfs->inclusivity,$sfs->conceptPath);
     $part.='<ul>';
     foreach ($sfs->fields as $subf){
+        // todo fix
         $part.=showField($subf,$sfs->conceptPath);
     }
     $part.='</ul>';

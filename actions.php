@@ -90,7 +90,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][]=$action;
         }
     }
-    //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
+    echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
@@ -100,6 +100,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo alles omvormen naar nameaction_wat?_keten_van_fieldNames
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
             $_SESSION['actions'][$i]->active = $_POST['isActive'];
@@ -157,6 +158,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 </div>
 <div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
     <?php
+    // todo : bewaren van subfield configuratie
+    // todo : de bewaarde configuratie genereren in code (dwz generate functie aanpassen inzake de subfields
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
        showAction($_SESSION['actions'][$i]);
     }
@@ -165,6 +168,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <script>
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
     function checkFields(name) {
+        // name heeft het volgende format: actienaam_checkbox_fieldstring
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
             if (els[i].type === 'checkbox'
