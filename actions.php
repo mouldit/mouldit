@@ -9,13 +9,16 @@ spl_autoload_register(function () {
     include 'generate.php';
 });
 session_start();
+function fieldIsConcept($f){
+    return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
+}
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
     global $implementedTypesOfActions;
     $implementedTypesOfActions= [
-        ['Get all','get']
+        ['Get_all','get']
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
@@ -25,14 +28,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //echo '<pre>'.print_r($_SESSION['concepts'], true).'</pre>';
 
     $_SESSION['actions'] = [];
-    function fieldIsConcept($f){
-        return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
-    }
+
     $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
             $cpt=clone $concept;
-            $name=$actionType[0].' '.$cpt->name.'s';
+            $name=$actionType[0].'_'.$cpt->name.'s';
             $action = new Action($name,$actionType[1],$actionType[0]);
             if(!$selected) {
                 $action->selected=true;
@@ -65,7 +66,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     if($set instanceof SubFieldSet){
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName,$set->fieldPath.'_'.$f->name);
                                     } else{
-                                        $sfs=new SubFieldSet($fs->conceptName,$set->fieldPath.'_'.$fs->conceptName,$f->name);
+                                        // todo fix!
+                                        $sfs=new SubFieldSet($fs->conceptName,$set->conceptName.'_'.$fs->conceptName,$f->name);
                                     }
                                     $sfs->setSubFields($fs->fields);
                                     $sfs->setInclusivity(true);
@@ -83,7 +85,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['actions'][]=$action;
         }
     }
-    echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
+    //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
@@ -93,17 +95,42 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo alles omvormen naar nameaction_wat?_keten_van_fieldNames
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
+            //echo '<pre> dit is er aanwezig <br>'.print_r($_POST, true).'</pre>';
             $_SESSION['actions'][$i]->active = $_POST['isActive'];
-            for ($j = 0; $j < sizeof($_SESSION['actions'][$i]->fieldset->fields); $j++) {
-                $_SESSION['actions'][$i]->fieldset->inclusivity = (bool)$_POST['fieldsConfig'];
-                if (!isset($_POST[$_SESSION['actions'][$i]->fieldset->fields[$j]->name . 'Checked'])) {
-                    $_SESSION['actions'][$i]->fieldset->fields[$j]->checked = false;
-                } else {
-                    $_SESSION['actions'][$i]->fieldset->fields[$j]->checked = true;
+            $subFieldSetsToProcess=[$_SESSION['actions'][$i]->fieldset];
+            $newSubFieldSets=[];
+            while(sizeof($subFieldSetsToProcess)>0){
+                foreach ($subFieldSetsToProcess as $set){
+                    if($set instanceof FieldSet){
+                        $set->inclusivity= (bool)$_POST[$_SESSION['actions'][$i]->name.'_fieldsConfig'];
+                        foreach ($set->fields as $f){
+                            if (isset($_POST[$_SESSION['actions'][$i]->name.'_checkbox_'.$f->name])) {
+                                $f->checked = true;
+                            } else {
+                                $f->checked = false;
+                            }
+                            if(fieldIsConcept($f)){
+                                $newSubFieldSets[]=$f->subfields;
+                            }
+                        }
+                    } else{
+                        $set->inclusivity= (bool)$_POST[$_SESSION['actions'][$i]->name.'_fieldsConfig_'.$set->fieldPath];
+                        foreach ($set->fields as $f){
+                            if (isset($_POST[$_SESSION['actions'][$i]->name.'_checkbox_'.$set->fieldPath.'_'.$f->name])) {
+                                $f->checked = true;
+                            } else {
+                                $f->checked = false;
+                            }
+                            if(fieldIsConcept($f)){
+                                $newSubFieldSets[]=$f->subfields;
+                            }
+                        }
+                    }
                 }
+                $subFieldSetsToProcess = $newSubFieldSets;
+                $newSubFieldSets=[];
             }
         }
     }
@@ -151,7 +178,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 </div>
 <div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
     <?php
-    // todo : bewaren van subfield configuratie
     // todo : de bewaarde configuratie genereren in code (dwz generate functie aanpassen inzake de subfields
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
        showAction($_SESSION['actions'][$i]);
@@ -161,23 +187,21 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <script>
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
     function checkFields(name) {
-        // todo name heeft het volgende format: actienaam_checkbox_fieldstring
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
             if (els[i].type === 'checkbox'
                 && !(els[i].checked)
-                && els[i].name?.startsWith(name)
-                && els[i].name?.endsWith('_checkbox')) {
-                if(els[i].name.split(name)[1].trim().split('_').length===3) els[i].checked = true
+                && els[i].name?.startsWith(name)) {
+                if(els[i].name.split(name)[1].trim().split('_').length===1) els[i].checked = true
             }
         }
     }
     function uncheckFields(name) {
-        // todo name heeft het volgende format: actienaam_checkbox_fieldstring
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
-            if (els[i].type === 'checkbox' && (els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')){
-                if(els[i].name.split(name)[1].trim().split('_').length===3) els[i].checked = false
+            if (els[i].type === 'checkbox' && (els[i].checked) && els[i].name?.startsWith(name)){
+
+                if(els[i].name.split(name)[1].trim().split('_').length===1) els[i].checked = false
             }
         }
     }

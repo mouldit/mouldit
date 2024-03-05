@@ -44,11 +44,11 @@ function showConceptBlock(string $actionName,string $conceptName, bool $incl, st
             </div>';
         }
     } else{
-        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$actionName.'_checkbox_'.$fieldPath.'\')" 
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$actionName.'_checkbox_'.$fieldPath.'_\')" 
         type="radio" name="'.$actionName.'_fieldsConfig_'.$fieldPath.'" value="1"';
         if ($incl) {
             $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields(\''.$actionName.'_checkbox_'.$fieldPath.'\')" 
+                    <label><input onchange="uncheckFields(\''.$actionName.'_checkbox_'.$fieldPath.'_\')" 
                     type="radio" name="'.$actionName.'_fieldsConfig_'.$fieldPath.'" value="0"> Exclude</label></div>';
         } else {
             $part .= '> Include</label>
