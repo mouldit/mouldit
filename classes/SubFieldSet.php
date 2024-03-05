@@ -6,11 +6,13 @@ class SubFieldSet
     public bool $inclusivity;
     public string $conceptName;
     public string $conceptPath;
-    public function __construct(string $conceptName,string $path)
+    public string $fieldPath;
+    public function __construct(string $conceptName,string $conceptPath, string $fieldPath)
     {
         $this->conceptName=$conceptName;
         $this->fields=[];
-        $this->conceptPath=$path;
+        $this->conceptPath=$conceptPath;
+        $this->fieldPath=$fieldPath;
     }
     public function __clone(){
         $temp=[];

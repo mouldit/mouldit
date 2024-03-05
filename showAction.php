@@ -8,11 +8,11 @@ function showAction(Action $action)
        <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
             <div><label><input type="radio" name="isActive" value="1"';
         $part .= showActivationState($action->active);
+        // todo fix
         $part.=showConceptBlock($action->fieldset->conceptName,$action->fieldset->inclusivity);
         $part.='<ul>';
         for ($j = 0; $j < sizeof($action->fieldset->fields); $j++) {
-            // todo fix
-            $part .=showField($action->fieldset->fields[$j],$action->fieldset->conceptName);
+            $part .=showField($action->name,$action->fieldset->fields[$j]);
         }
         $part.='</ul>';
         $part .= '<div><button type="submit" name="action-edited">save</button></div>
@@ -31,50 +31,54 @@ function showActivationState(bool $isActive){
             </div>';
     }
 }
-function showConceptBlock(string $conceptName, bool $incl,string $path=NULL){
-    // todo pas name aan aan nieuwe manier van naming
-    if(!$path){
-        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$conceptName.'\')" type="radio" name="fieldsConfig_'.$conceptName.'" value="1"';
+function showConceptBlock(string $actionName,string $conceptName, bool $incl, string $fieldPath=NULL){
+    if(!$fieldPath){
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$actionName.'_checkbox_'.'\')" 
+        type="radio" name="'.$actionName.'_fieldsConfig" value="1"';
         if ($incl) {
             $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields(\''.$conceptName.'\')" type="radio" name="fieldsConfig_'.$conceptName.'" value="0"> Exclude</label></div>';
+                    <label><input onchange="uncheckFields(\''.$actionName.'_checkbox_'.'\')" 
+                    type="radio" name="'.$actionName.'_fieldsConfig" value="0"> Exclude</label></div>';
         } else {
             $part .= '> Include</label>
-                    <label><input type="radio" name="fieldsConfig_'.$conceptName.'" value="0" checked> Exclude</label>
+                    <label><input type="radio" name="'.$actionName.'_fieldsConfig" value="0" checked> Exclude</label>
             </div>';
         }
     } else{
-        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$path.'\')" type="radio" name="fieldsConfig_'.$path.'" value="1"';
+        $part = '<div>'.$conceptName.' <label><input onchange="checkFields(\''.$actionName.'_checkbox_'.$fieldPath.'\')" 
+        type="radio" name="'.$actionName.'_fieldsConfig_'.$fieldPath.'" value="1"';
         if ($incl) {
             $part .= ' checked> Include</label>
-                    <label><input onchange="uncheckFields(\''.$path.'\')" type="radio" name="fieldsConfig_'.$path.'" value="0"> Exclude</label></div>';
+                    <label><input onchange="uncheckFields(\''.$actionName.'_checkbox_'.$fieldPath.'\')" 
+                    type="radio" name="'.$actionName.'_fieldsConfig_'.$fieldPath.'" value="0"> Exclude</label></div>';
         } else {
             $part .= '> Include</label>
-                    <label><input type="radio" name="fieldsConfig_'.$path.'" value="0" checked> Exclude</label>
+                    <label><input type="radio" name="'.$actionName.'_fieldsConfig_'.$fieldPath.'" value="0" checked> Exclude</label>
             </div>';
         }
     }
     return $part;
 }
-function showField(string $actionName,string $fieldString,Field $f){
-    $part = '<li><label>' . $f->name . '<input type="checkbox" name="'.$actionName.'_checkbox_'.$fieldString.'" value="1"';
+function showField(string $actionName,Field $f,string $fieldString=NULL){
+    if(isset($fieldString)) $fieldString='_'.$fieldString; else $fieldString='';
+    $part = '<li><label>' . $f->name . '<input type="checkbox" name="'.$actionName.'_checkbox'.$fieldString.'_'.$f->name.'" value="1"';
     if ($f->checked) {
         $part .= ' checked></label>';
     } else {
         $part .= '></label>';
     }
     if($f->hasSubfields()){
-        $part .= showSubFields($f->subfields);
+        $part .= showSubFields($actionName,$f->subfields);
     }
     $part.='</li>';
     return $part;
 }
-function showSubFields(SubFieldSet $sfs){
+function showSubFields($actionName,SubFieldSet $sfs){
+    // todo fix
     $part=showConceptBlock($sfs->conceptName,$sfs->inclusivity,$sfs->conceptPath);
     $part.='<ul>';
     foreach ($sfs->fields as $subf){
-        // todo fix
-        $part.=showField($subf,$sfs->conceptPath);
+        $part.=showField($actionName,$subf,$sfs->fieldPath);
     }
     $part.='</ul>';
     return $part;

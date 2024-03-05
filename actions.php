@@ -63,17 +63,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     }
                                     $sfs=null;
                                     if($set instanceof SubFieldSet){
-                                        // todo een mogelijk issue is dat een conceptName ook iets kan zijn als show extending content wat niet de bedoeling is => cut it away
-                                        //      person komt hier nergens voor wat toch raar is, en movie en show komen enkel voor als content wat niet goed is!
-                                        //echo 'path='.$set->conceptPath;
-                                        $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName);
+                                        $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName,$set->fieldPath.'_'.$f->name);
                                     } else{
-                                        // todo om te beginnen hebben we drie content als conceptnaam, wat betekent dat dit in de orginiele $concepts session var al fout staat!
-                                        //echo 'name='.$set->conceptName;
-                                        $sfs=new SubFieldSet($fs->conceptName,$set->conceptName.'_'.$fs->conceptName);
+                                        $sfs=new SubFieldSet($fs->conceptName,$set->fieldPath.'_'.$fs->conceptName,$f->name);
                                     }
-                                    // de subfieldset s die gemaakt worden zijn per veld in de main fieldset van het eerste concept CONTENT
-                                    //  het actor fieldset voor person
                                     $sfs->setSubFields($fs->fields);
                                     $sfs->setInclusivity(true);
                                     $f->subfields=$sfs;
@@ -168,7 +161,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <script>
     // todo later toevoegen dat je geen zaken kan wijzigen zonder te bewaren zodat zeker alle wijzigen bewaard worden
     function checkFields(name) {
-        // name heeft het volgende format: actienaam_checkbox_fieldstring
+        // todo name heeft het volgende format: actienaam_checkbox_fieldstring
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
             if (els[i].type === 'checkbox'
@@ -180,6 +173,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     function uncheckFields(name) {
+        // todo name heeft het volgende format: actienaam_checkbox_fieldstring
         const els = document.getElementsByTagName('input');
         for (let i = 0; i < els.length; i++) {
             if (els[i].type === 'checkbox' && (els[i].checked) && els[i].name?.startsWith(name) && els[i].name?.endsWith('_checkbox')){
