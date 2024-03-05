@@ -1,4 +1,40 @@
 <?php
+function printField(Field $f,bool $included,bool $last){
+    $printedField = "\n".$f->name.': ';
+    if(!$f->hasSubfields()) {
+        if(($included && $f->checked)||(!$included&&!$f->checked)){
+            $printedField.='true';
+        } else{
+            $printedField.='false';
+        }
+        if($last){
+            $printedField.="\n}";
+        } else{
+            $printedField.=",";
+        }
+        return $printedField;
+    }
+    $printedField.='{'."\n";
+    $printedField.=printSubFields($f->subfields);
+    $printedField.="\n".'}';
+    if($last){
+        $printedField.="\n";
+    } else{
+        $printedField.=",";
+    }
+    return $printedField;
+}
+function printSubFields(SubFieldSet $sfs){
+    $printedSubFields = '';
+    for ($i=0;$i<sizeof($sfs->fields);$i++){
+        if($i+1==sizeof($sfs->fields)){
+            $printedSubFields.=printField($sfs->fields[$i],$sfs->inclusivity,true);
+        } else{
+           $printedSubFields.=printField($sfs->fields[$i],$sfs->inclusivity,false);
+        }
+    }
+    return $printedSubFields;
+}
 function generate($concepts, $actions, $path): bool
 {
     // todo printen van subfields
@@ -44,7 +80,11 @@ function generate($concepts, $actions, $path): bool
                                     $api2 = "\n" . '}});' . "\n";
                                     fwrite($fp, $api1, strlen($api1));
                                     $fields='';
+                                    // dit blokje kan een aparte functie worden
+                                    // op te roepen voor elk concept blok
+                                    // en dit soms op de true/false plaats
                                     for ($k=0;$k<sizeof($actions[$j]->fieldset->fields);$k++){
+                                        // fieldname
                                         $fields.=$actions[$j]->fieldset->fields[$k]->name.':';
                                         if(($actions[$j]->fieldset->inclusivity&&$actions[$j]->fieldset->fields[$k]->checked)
                                         ||(!$actions[$j]->fieldset->inclusivity&&!$actions[$j]->fieldset->fields[$k]->checked)){
