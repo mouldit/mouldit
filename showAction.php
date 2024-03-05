@@ -8,8 +8,7 @@ function showAction(Action $action)
        <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
             <div><label><input type="radio" name="isActive" value="1"';
         $part .= showActivationState($action->active);
-        // todo fix
-        $part.=showConceptBlock($action->fieldset->conceptName,$action->fieldset->inclusivity);
+        $part.=showConceptBlock($action->name,$action->fieldset->conceptName,$action->fieldset->inclusivity);
         $part.='<ul>';
         for ($j = 0; $j < sizeof($action->fieldset->fields); $j++) {
             $part .=showField($action->name,$action->fieldset->fields[$j]);
@@ -74,8 +73,7 @@ function showField(string $actionName,Field $f,string $fieldString=NULL){
     return $part;
 }
 function showSubFields($actionName,SubFieldSet $sfs){
-    // todo fix
-    $part=showConceptBlock($sfs->conceptName,$sfs->inclusivity,$sfs->conceptPath);
+    $part=showConceptBlock($actionName,$sfs->conceptName,$sfs->inclusivity,$sfs->fieldPath);
     $part.='<ul>';
     foreach ($sfs->fields as $subf){
         $part.=showField($actionName,$subf,$sfs->fieldPath);
