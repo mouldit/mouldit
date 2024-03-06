@@ -3,7 +3,7 @@ function printField(Field $f,bool $included,bool $last){
     // todo aanpassen UI zodat dit duidelijker is
     $printedField = "\n".$f->name.': ';
     // todo hier gewoon de extra mogelijkheid toevoegen dat het wel subfields heeft maar unchecked is en included of excluded en checked dan enkel false printen en geen subfields tonen
-    if(!$f->hasSubfields()) {
+    if(!$f->hasSubfields()||!(($included && $f->checked)||(!$included&&!$f->checked))) {
         if(($included && $f->checked)||(!$included&&!$f->checked)){
             $printedField.='true';
         } else{
