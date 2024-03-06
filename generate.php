@@ -1,9 +1,8 @@
 <?php
 function printField(Field $f,bool $included,bool $last){
-    // todo fix probleem: als actors uitstaat mogen de subfields zelfs niet geprint worden! en zo all the way down
     // todo aanpassen UI zodat dit duidelijker is
     $printedField = "\n".$f->name.': ';
-    // todo hier gewoon de extra mogelijkheid toevoegen dat het wel subfields heeft maar unchecked is en included of excluded en checked
+    // todo hier gewoon de extra mogelijkheid toevoegen dat het wel subfields heeft maar unchecked is en included of excluded en checked dan enkel false printen en geen subfields tonen
     if(!$f->hasSubfields()) {
         if(($included && $f->checked)||(!$included&&!$f->checked)){
             $printedField.='true';
@@ -40,7 +39,6 @@ function printSubFields(SubFieldSet $sfs){
 }
 function generate($concepts, $actions, $path): bool
 {
-    // todo printen van subfields
     if ($success = touch($path . '/app.ts')) {
         $fp = fopen($path . '/app.ts', 'w');
         $fileAsStr = file_get_contents('./app.txt');
