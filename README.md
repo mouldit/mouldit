@@ -5,4 +5,6 @@
   <li>alter UI so it's much clearer to which field a subfieldset belongs</li>
   <li>Add more CRUD actions</li>
   <li>General save button instead of per action</li>
+  <li>Add calculated fields configuration</li>
+  <li>Add overriding fields configuration</li>
 </ul>
