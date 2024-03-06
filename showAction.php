@@ -3,10 +3,12 @@ function showAction(Action $action)
 {
     $part = '';
     if ($action->selected) {
-        $part .= '<h2 style="margin: 0">Configure backend of action: ' . $action->name . ' 
-       </h2>
-       <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
-            <div><label><input type="radio" name="isActive" value="1"';
+        $part .=
+            '<h2 style="margin: 0">Configure backend of action: ' . $action->name . '</h2>
+             <form action="' . $_SERVER['PHP_SELF'] . '" method="post">
+                <div>
+                    <label>
+                    <input type="radio" name="isActive" value="1"';
         $part .= showActivationState($action->active);
         $part.=showConceptBlock($action->name,$action->fieldset->conceptName,$action->fieldset->inclusivity);
         $part.='<ul>';
@@ -14,9 +16,14 @@ function showAction(Action $action)
             $part .=showField($action->name,$action->fieldset->fields[$j]);
         }
         $part.='</ul>';
-        $part .= '<div><button type="submit" name="action-edited">save</button></div>
-</form><br><div><form style="float:right;" action="' . $_SERVER['PHP_SELF']
-            . '" method="post"><input type="hidden" name="generate"><button type="submit">Generate</button></form></div>';
+        $part .=
+                '<div><button type="submit" name="action-edited">save</button></div>
+            </form><br>
+            <div>
+                <form style="float:right;" action="' . $_SERVER['PHP_SELF']. '" method="post">
+                    <input type="hidden" name="generate"><button type="submit">Generate</button>
+                </form>
+            </div>';
         echo $part;
     }
 }

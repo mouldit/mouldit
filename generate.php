@@ -1,5 +1,7 @@
 <?php
 function printField(Field $f,bool $included,bool $last){
+    // todo fix probleem: als actors uitstaat mogen de subfields zelfs niet geprint worden! en zo all the way down
+    // todo aanpassen UI zodat dit duidelijker is
     $printedField = "\n".$f->name.': ';
     if(!$f->hasSubfields()) {
         if(($included && $f->checked)||(!$included&&!$f->checked)){
@@ -8,7 +10,7 @@ function printField(Field $f,bool $included,bool $last){
             $printedField.='false';
         }
         if($last){
-            $printedField.="\n}";
+            $printedField.="\n";
         } else{
             $printedField.=",";
         }
@@ -85,13 +87,18 @@ function generate($concepts, $actions, $path): bool
                                     // en dit soms op de true/false plaats
                                     for ($k=0;$k<sizeof($actions[$j]->fieldset->fields);$k++){
                                         // fieldname
-                                        $fields.=$actions[$j]->fieldset->fields[$k]->name.':';
+                                        if($k+1==sizeof($actions[$j]->fieldset->fields)){
+                                            $fields.=printField($actions[$j]->fieldset->fields[$k],$actions[$j]->fieldset->inclusivity,true);
+                                        } else{
+                                            $fields.=printField($actions[$j]->fieldset->fields[$k],$actions[$j]->fieldset->inclusivity,false);
+                                        }
+/*                                        $fields.=$actions[$j]->fieldset->fields[$k]->name.':';
                                         if(($actions[$j]->fieldset->inclusivity&&$actions[$j]->fieldset->fields[$k]->checked)
                                         ||(!$actions[$j]->fieldset->inclusivity&&!$actions[$j]->fieldset->fields[$k]->checked)){
                                             $fields.='true,'."\n";
                                         } else{
                                             $fields.='false,'."\n";
-                                        }
+                                        }*/
                                     }
                                     $body = 'try { const result = await e.select(e.' . ucfirst($_SESSION['concepts'][$i]->name)
                                         . ', () => ({' . "\t" .
