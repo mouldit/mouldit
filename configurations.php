@@ -1,7 +1,9 @@
 <?php
 spl_autoload_register(function () {
     include 'showAction.php';
+    include 'showPage.php';
     include 'classes/Action.php';
+    include 'classes/Page.php';
     include 'classes/Concept.php';
     include 'classes/Field.php';
     include 'classes/FieldSet.php';
@@ -18,7 +20,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         !isset($_SESSION['actions'])) {
     global $implementedTypesOfActions;
     $implementedTypesOfActions= [
-        ['Get_all','get']
+        ['Get_all','get','/get/all/']
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
@@ -29,18 +31,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 
     $_SESSION['actions'] = [];
 
+    // todo construct default pages based in actions: begin met naam en in het detail een url
+
     $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
             $cpt=clone $concept;
             $name=$actionType[0].'_'.$cpt->name.'s';
-            $action = new Action($name,$actionType[1],$actionType[0]);
+            // todo sommige verbs daar moet nog /:id achter! hetgeen dan automtisch in de Mouldit frontend een id zal krijgen via de angular generated code
+            $action = new Action($name,$actionType[1],$actionType[0],$actionType[2].$cpt->name);
             if(!$selected) {
                 $action->selected=true;
                 $selected=true;
             }
-            // todo dit zet het fieldset mmaar hierna wordt dit gewijzigd en dit reflecteert al meteen in de concepts session var
-            //      verklaring: cloning gebeurt net als bij js oppervlakkig
             $action->setFields($cpt->fields);
             $action->fieldset->setInclusivity(true);
             foreach ($action->fieldset->fields as $f){
@@ -66,7 +69,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     if($set instanceof SubFieldSet){
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptPath.'_'.$fs->conceptName,$set->fieldPath.'_'.$f->name);
                                     } else{
-                                        // todo fix!
                                         $sfs=new SubFieldSet($fs->conceptName,$set->conceptName.'_'.$fs->conceptName,$f->name);
                                     }
                                     $sfs->setSubFields($fs->fields);
@@ -86,12 +88,30 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
+    $_SESSION['pages'] = [];
+    $selected=false;
+    foreach ($_SESSION['actions'] as $a){
+        $p=new Page($a->name.'_page',$a->clientURL);
+        if(!$selected) {
+            $p->selected=true;
+            $selected=true;
+        }
+        $_SESSION['pages'][]=$p;
+    }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
             $_SESSION['actions'][$i]->selected = false;
         } else if ($_POST['action-name'] === $_SESSION['actions'][$i]->name) {
             $_SESSION['actions'][$i]->selected = true;
+        }
+    }
+} else if(isset($_POST['new-page-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+        if ($_SESSION['pages'][$i]->selected) {
+            $_SESSION['pages'][$i]->selected = false;
+        } else if ($_POST['page-name'] === $_SESSION['pages'][$i]->name) {
+            $_SESSION['pages'][$i]->selected = true;
         }
     }
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -176,9 +196,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         ?>
     </ul>
 </div>
-<div id="detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
+<div id="action-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
     <?php
-    // todo : de bewaarde configuratie genereren in code (dwz generate functie aanpassen inzake de subfields
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
        showAction($_SESSION['actions'][$i]);
     }
@@ -206,5 +225,29 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 </script>
+<div id="pages" style="float:left; min-width: 200px;border:1px solid red">
+    <ul style="margin:0">
+        <?php
+        for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+            if ($_SESSION['pages'][$i]->selected) {
+                echo "<li class='selected'>" . $_SESSION['pages'][$i]->name . "</li>";
+            } else echo "<li style='overflow:auto'>
+                            <span style='float:left'>" . $_SESSION['pages'][$i]->name . "</span> 
+                             <form style='float:right' action=\"" . $_SERVER['PHP_SELF'] . "\" method='post'>
+                               <input  type='hidden' value='" . $_SESSION['pages'][$i]->name . "' name='page-name'>
+                               <button type='submit' name='new-page-selected'>edit</button>
+                            </form>
+                         </li>";
+        }
+        ?>
+    </ul>
+</div>
+<div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
+    <?php
+    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+        showPage($_SESSION['pages'][$i]);
+    }
+    ?>
+</div>
 </body>
 </html>

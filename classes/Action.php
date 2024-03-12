@@ -6,13 +6,15 @@ class Action
     public string $type;
     public bool $active;
     public bool $selected;
+    public string $clientURL;
     public FieldSet $fieldset; // de conceptnaam komt voor als attribuut in de fieldset property
-    function __construct($name,$verb,$type){
+    function __construct($name,$verb,$type,$clientURL){
         $this->name=$name;
         $this->verb=$verb;
         $this->type=$type;
         $this->active=true;
         $this->selected=false;
+        $this->clientURL=$clientURL;
     }
     function addField($name,$type,$checked,$subfields=NULL){
         if(isset($this->fieldset)){

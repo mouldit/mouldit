@@ -3,7 +3,7 @@ session_start();
 if(isset($_POST['path'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
     $_SESSION['pathToRootOfServer']= trim($_POST['path-to-root-server-folder']);
     echo $_SESSION['pathToRootOfServer'];
-    header('Location: actions.php');
+    header('Location: configurations.php');
 }
 ?>
 <!doctype html>
