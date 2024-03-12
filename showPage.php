@@ -18,7 +18,6 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents,$components)
             } else{
                 $part.='<option value="'.$a->name.'">'.$a->name.'</option>';
             }
-
         }
         $part.='</select>
                 <label style="display:block; margin-bottom:8px;clear:left;float:left">target</label>';
