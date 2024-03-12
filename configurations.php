@@ -3,6 +3,8 @@ spl_autoload_register(function () {
     include 'showAction.php';
     include 'showPage.php';
     include 'classes/Action.php';
+    include 'classes/ActionLink.php';
+    include 'classes/Component.php';
     include 'classes/Page.php';
     include 'classes/Concept.php';
     include 'classes/Field.php';
@@ -14,6 +16,8 @@ session_start();
 function fieldIsConcept($f){
     return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
 }
+global $implementedTypesOfComponents;
+$implementedTypesOfComponents=['card','menubar','table'];
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
@@ -22,6 +26,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $implementedTypesOfActions= [
         ['Get_all','get','/get/all/']
     ];
+
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
@@ -99,6 +104,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $p->linkWithAction($a->name);
         $_SESSION['pages'][]=$p;
     }
+    $_SESSION['components']=[];
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
@@ -160,7 +166,20 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['pages'][$i]->selected) {
             $_SESSION['pages'][$i]->name=$_POST['name'];
             $_SESSION['pages'][$i]->url=$_POST['url'];
-            $_SESSION['pages'][$i]->action=$_POST['action'];
+            if(isset($_POST['action'])&&isset($_POST['target']))$_SESSION['pages'][$i]->actionLink=new ActionLink($_POST['action'],$_POST['target']);
+            break;
+        }
+    }
+} else if (isset($_POST['add']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+        if ($_SESSION['pages'][$i]->selected) {
+            $counter=0;
+            for ($j=0; $j<sizeof($_SESSION['components']);$j++){
+                if($_SESSION['components'][$j]->type==$_POST['add-component']) $counter++;
+            }
+            $comp = new Component($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,$_POST['add-component']);
+            $_SESSION['components'][]=$comp;
+            $_SESSION['pages'][$i]->addComponent($comp);
         }
     }
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -251,10 +270,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         ?>
     </ul>
 </div>
-<div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
+<div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        showPage($_SESSION['pages'][$i],$_SESSION['actions']);
+        showPage($_SESSION['pages'][$i],$_SESSION['actions'],$implementedTypesOfComponents,$_SESSION['components']);
     }
     ?>
 </div>

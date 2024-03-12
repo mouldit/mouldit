@@ -4,7 +4,8 @@ class Page
 {
     public string $name;
     public string $url;
-    public string $action;
+    public ActionLink $actionLink;
+    public array $components;
     public bool $selected;
     function __construct($name,$url)
     {
@@ -18,7 +19,10 @@ class Page
     public function deselect(){
         $this->selected=false;
     }
-    public function linkWithAction($action){
-        $this->action=$action;
+    public function linkWithAction($action,$target=NULL){
+        $this->actionLink=new ActionLink($action,$target);
+    }
+    public function addComponent(Component $comp){
+        $this->components[]=$comp;
     }
 }
