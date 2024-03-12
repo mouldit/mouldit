@@ -96,6 +96,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $p->selected=true;
             $selected=true;
         }
+        $p->linkWithAction($a->name);
         $_SESSION['pages'][]=$p;
     }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -152,6 +153,14 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 $subFieldSetsToProcess = $newSubFieldSets;
                 $newSubFieldSets=[];
             }
+        }
+    }
+} else if (isset($_POST['page-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+        if ($_SESSION['pages'][$i]->selected) {
+            $_SESSION['pages'][$i]->name=$_POST['name'];
+            $_SESSION['pages'][$i]->url=$_POST['url'];
+            $_SESSION['pages'][$i]->action=$_POST['action'];
         }
     }
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -245,7 +254,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        showPage($_SESSION['pages'][$i]);
+        showPage($_SESSION['pages'][$i],$_SESSION['actions']);
     }
     ?>
 </div>

@@ -4,6 +4,7 @@ class Page
 {
     public string $name;
     public string $url;
+    public string $action;
     public bool $selected;
     function __construct($name,$url)
     {
@@ -16,5 +17,8 @@ class Page
     }
     public function deselect(){
         $this->selected=false;
+    }
+    public function linkWithAction($action){
+        $this->action=$action;
     }
 }
