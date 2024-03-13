@@ -95,7 +95,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
     $_SESSION['pages'] = [];
     $selected=false;
-    $main=new Page('main_page','');
+    $main=new Page('main_page','',true);
     $main->select();
     $_SESSION['pages'][]=$main;
     foreach ($_SESSION['actions'] as $a){
@@ -195,8 +195,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                         for ($k=0;$k<sizeof($_SESSION['actions']);$k++){
                             if($_SESSION['actions'][$k]->type==='Get_all'&&$_SESSION['actions'][$k]->concept===$_SESSION['concepts'][$j]->name){
                                 for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
-                                    if($_SESSION['pages'][$l]->actionLink->name===$_SESSION['actions'][$k]->name){
-                                        $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name,
+                                    //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
+                                    if(isset($_SESSION['pages'][$l]->actionLink->action)&&$_SESSION['pages'][$l]->actionLink->action===$_SESSION['actions'][$k]->name){
+                                        $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name.'s',
                                             $_SESSION['pages'][$l]->name
                                             ,$j+1);
                                         break;
