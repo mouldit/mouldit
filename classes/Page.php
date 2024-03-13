@@ -12,6 +12,7 @@ class Page
         $this->name=$name;
         $this->url=$url;
         $this->selected=false;
+        $this->components=[];
     }
     public function select(){
         $this->selected=true;

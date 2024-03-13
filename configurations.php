@@ -35,9 +35,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //echo '<pre>'.print_r($_SESSION['concepts'], true).'</pre>';
 
     $_SESSION['actions'] = [];
-
-    // todo construct default pages based in actions: begin met naam en in het detail een url
-
     $selected=false;
     foreach ($_SESSION['concepts'] as $concept){
         foreach ($implementedTypesOfActions as $actionType){
@@ -104,7 +101,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         $p->linkWithAction($a->name);
         $_SESSION['pages'][]=$p;
     }
-    $_SESSION['components']=[];
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
@@ -174,11 +170,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
         if ($_SESSION['pages'][$i]->selected) {
             $counter=0;
-            for ($j=0; $j<sizeof($_SESSION['components']);$j++){
-                if($_SESSION['components'][$j]->type==$_POST['add-component']) $counter++;
+            for ($j=0; $j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->type==$_POST['add-component']) $counter++;
             }
             $comp = new Component($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,$_POST['add-component']);
-            $_SESSION['components'][]=$comp;
             $_SESSION['pages'][$i]->addComponent($comp);
         }
     }
@@ -273,7 +268,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        showPage($_SESSION['pages'][$i],$_SESSION['actions'],$implementedTypesOfComponents,$_SESSION['components']);
+        showPage($_SESSION['pages'][$i],$_SESSION['actions'],$implementedTypesOfComponents);
     }
     ?>
 </div>

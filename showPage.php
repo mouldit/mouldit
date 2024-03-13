@@ -1,6 +1,7 @@
 <?php
-function showPage(Page $page,$actions,$implementedTypesOfComponents,$components){
+function showPage(Page $page,$actions,$implementedTypesOfComponents){
     $part = '';
+    // todo de pagina moet beschikken over zijn componenten
     if ($page->selected) {
         $part .=
             '<h2 style="margin: 0 0 8px 0;">Details of page: ' . $page->name . '</h2>
@@ -21,10 +22,11 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents,$components)
         }
         $part.='</select>
                 <label style="display:block; margin-bottom:8px;clear:left;float:left">target</label>';
-        if(sizeof($components)>0){
+
+        if(sizeof($page->components)>0){
             $part.='<select name="target" style="display:block; clear:right;float:right; min-width: 178px">';
             $part.='<option>selecteer een target component</option>';
-            foreach ($components as $c){
+            foreach ($page->components as $c){
                 $part.='<option value="'.$c->name.'">'.$c->name.'</option>';
             }
             $part.='<select>';
@@ -44,15 +46,15 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents,$components)
         }
 $part.='</select>
 </form>
-
 <div>';
-        if(sizeof($components)>0){
+
+        if(sizeof($page->components)>0){
             $part.='<ul style="margin:0">';
-            for ($i = 0; $i < sizeof($components); $i++) {
+            for ($i = 0; $i < sizeof($page->components); $i++) {
                 $part.= "<li style='overflow:auto'>
-                            <span style='float:left'>" . $components[$i]->name . "</span> 
+                            <span style='float:left'>" . $page->components[$i]->name . "</span> 
                              <form style='float:right' action=\"" . $_SERVER['PHP_SELF'] . "\" method='post'>
-                               <input  type='hidden' value='" . $components[$i]->name . "' name='component-name'>
+                               <input  type='hidden' value='" . $page->components[$i]->name . "' name='component-name'>
                                <button type='submit' name='new-component-selected'>edit</button>
                             </form>
                          </li>";
