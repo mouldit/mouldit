@@ -120,7 +120,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         if ($_SESSION['actions'][$i]->selected) {
-            //echo '<pre> dit is er aanwezig <br>'.print_r($_POST, true).'</pre>';
             $_SESSION['actions'][$i]->active = $_POST['isActive'];
             $subFieldSetsToProcess=[$_SESSION['actions'][$i]->fieldset];
             $newSubFieldSets=[];

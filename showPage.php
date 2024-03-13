@@ -14,7 +14,7 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
                     <label style="display:block; margin-bottom:8px; clear:left;float:left">on page load</label>
                     <select name="action" style="display:block; clear:right; float:right; min-width: 178px">';
         foreach ($actions as $a){
-            if($page->actionLink->action==$a->name){
+            if($page->actionLink->action===$a->name){
                 $part.='<option selected value="'.$a->name.'">'.$a->name.'</option>';
             } else{
                 $part.='<option value="'.$a->name.'">'.$a->name.'</option>';
@@ -22,12 +22,15 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
         }
         $part.='</select>
                 <label style="display:block; margin-bottom:8px;clear:left;float:left">target</label>';
-
         if(sizeof($page->components)>0){
             $part.='<select name="target" style="display:block; clear:right;float:right; min-width: 178px">';
             $part.='<option>selecteer een target component</option>';
             foreach ($page->components as $c){
-                $part.='<option value="'.$c->name.'">'.$c->name.'</option>';
+                if(isset($page->actionLink->component)  && $page->actionLink->component===$c->name){
+                    $part.='<option value="'.$c->name.'" selected>'.$c->name.'</option>';
+                } else{
+                    $part.='<option value="'.$c->name.'">'.$c->name.'</option>';
+                }
             }
             $part.='<select>';
         } else{
