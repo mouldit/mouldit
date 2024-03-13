@@ -6,6 +6,8 @@ spl_autoload_register(function () {
     include 'classes/Action.php';
     include 'classes/ActionLink.php';
     include 'classes/Component.php';
+    include 'classes/components/Menubar/Menubar.php';
+    include 'classes/components/Menubar/MenuItem.php';
     include 'classes/Page.php';
     include 'classes/Concept.php';
     include 'classes/Field.php';
@@ -42,7 +44,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $cpt=clone $concept;
             $name=$actionType[0].'_'.$cpt->name.'s';
             // todo sommige verbs daar moet nog /:id achter! hetgeen dan automtisch in de Mouldit frontend een id zal krijgen via de angular generated code
-            $action = new Action($name,$actionType[1],$actionType[0],$actionType[2].$cpt->name);
+            $action = new Action($name,$actionType[1],$actionType[0],$actionType[2].$cpt->name,$cpt->name);
             if(!$selected) {
                 $action->selected=true;
                 $selected=true;
@@ -184,8 +186,41 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             for ($j=0; $j<sizeof($_SESSION['pages'][$i]->components);$j++){
                 if($_SESSION['pages'][$i]->components[$j]->type==$_POST['add-component']) $counter++;
             }
-            $comp = new Component($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,$_POST['add-component']);
+            $comp=NULL;
+            switch ($_POST['add-component']){
+                case 'menubar':
+                if($_SESSION['pages'][$i]->main){
+                    $menuItems=[];
+                    for ($j=0;$j<sizeof($_SESSION['concepts']);$j++){
+                        for ($k=0;$k<sizeof($_SESSION['actions']);$k++){
+                            if($_SESSION['actions'][$k]->type==='Get_all'&&$_SESSION['actions'][$k]->concept===$_SESSION['concepts'][$j]->name){
+                                for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
+                                    if($_SESSION['pages'][$l]->actionLink->name===$_SESSION['actions'][$k]->name){
+                                        $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name,
+                                            $_SESSION['pages'][$l]->name
+                                            ,$j+1);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    $comp = new \components\Menubar\Menubar($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                        $_POST['add-component'], $menuItems
+                    );
+                } else{
+                    $comp = new \components\Menubar\Menubar($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                        $_POST['add-component']);
+                }
+                    break;
+                case 'table':
+                    break;
+                case 'card':
+                    break;
+            }
             $_SESSION['pages'][$i]->addComponent($comp);
+            break;
         }
     }
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){

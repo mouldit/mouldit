@@ -7,12 +7,14 @@ class Page
     public ActionLink $actionLink;
     public array $components;
     public bool $selected;
-    function __construct($name,$url)
+    public bool $main;
+    function __construct($name,$url,$main=NULL)
     {
         $this->name=$name;
         $this->url=$url;
         $this->selected=false;
         $this->components=[];
+        if(isset($main)) $this->main=$main; else $this->main=false;
     }
     public function select(){
         $this->selected=true;
