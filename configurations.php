@@ -319,13 +319,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     ?>
 </div>
-<div id="component-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
+<div id="component-detail" style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
         if ($_SESSION['pages'][$i]->selected) {
             for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
                 if($_SESSION['pages'][$i]->components[$j]->selected){
-                    showComponent($_SESSION['pages'][$i]->components[$j]);
+                    showComponent($_SESSION['pages'][$i]->components[$j],$_SESSION['pages']);
                     break;
                 }
             }
