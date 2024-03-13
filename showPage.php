@@ -13,8 +13,9 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
                     <input style="display:block; clear:right; float:right; min-width: 170px" type="text" name="url" value="'.$page->url.'">
                     <label style="display:block; margin-bottom:8px; clear:left;float:left">on page load</label>
                     <select name="action" style="display:block; clear:right; float:right; min-width: 178px">';
+        $part.='<option>selecteer een actie</option>';
         foreach ($actions as $a){
-            if($page->actionLink->action===$a->name){
+            if(isset($page->actionLink) && $page->actionLink->action===$a->name){
                 $part.='<option selected value="'.$a->name.'">'.$a->name.'</option>';
             } else{
                 $part.='<option value="'.$a->name.'">'.$a->name.'</option>';

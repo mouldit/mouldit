@@ -2,6 +2,7 @@
 spl_autoload_register(function () {
     include 'showAction.php';
     include 'showPage.php';
+    include 'showComponent.php';
     include 'classes/Action.php';
     include 'classes/ActionLink.php';
     include 'classes/Component.php';
@@ -92,12 +93,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
     $_SESSION['pages'] = [];
     $selected=false;
+    $main=new Page('main_page','');
+    $main->select();
+    $_SESSION['pages'][]=$main;
     foreach ($_SESSION['actions'] as $a){
         $p=new Page($a->name.'_page',$a->clientURL);
-        if(!$selected) {
-            $p->selected=true;
-            $selected=true;
-        }
         $p->linkWithAction($a->name);
         $_SESSION['pages'][]=$p;
     }
@@ -115,6 +115,18 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['pages'][$i]->selected = false;
         } else if ($_POST['page-name'] === $_SESSION['pages'][$i]->name) {
             $_SESSION['pages'][$i]->selected = true;
+        }
+    }
+} else if(isset($_POST['new-component-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+        if ($_SESSION['pages'][$i]->selected) {
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->name===$_POST['component-name']){
+                    $_SESSION['pages'][$i]->components[$j]->select();
+                    break;
+                }
+            }
+            break;
         }
     }
 } else if (isset($_POST['action-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -268,6 +280,21 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     <?php
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
         showPage($_SESSION['pages'][$i],$_SESSION['actions'],$implementedTypesOfComponents);
+    }
+    ?>
+</div>
+<div id="component-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
+    <?php
+    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
+        if ($_SESSION['pages'][$i]->selected) {
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->selected){
+                    showComponent($_SESSION['pages'][$i]->components[$j]);
+                    break;
+                }
+            }
+            break;
+        }
     }
     ?>
 </div>
