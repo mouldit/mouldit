@@ -15,4 +15,6 @@
   <li>Add component configuration for form and formcontrols of basic types</li>
   <li>Add generate function for "generate frontend" button</li>
   <li>Add general configuration shared by all components</li>
+  <li>create docs how to use Mouldit</li>
+  <li>make Mouldit UI better so it's ready for real customers and can be used in the docs</li>
 </ul>
