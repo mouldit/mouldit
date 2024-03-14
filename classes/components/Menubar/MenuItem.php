@@ -5,13 +5,13 @@ namespace components\Menubar;
 class MenuItem
 {
     public string $name;
-    public string $page;
+    public int $page;
     public int $number;
 
-    public function __construct($name,$page,$number)
+    public function __construct($name,$pageId,$number)
     {
         $this->name=$name;
-        $this->page=$page;
+        $this->page=$pageId;
         $this->number=$number;
     }
 }

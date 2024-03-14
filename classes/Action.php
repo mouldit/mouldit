@@ -16,7 +16,7 @@ class Action
         $this->active=true;
         $this->selected=false;
         $this->clientURL=$clientURL;
-        $this->concept=$concept;
+        $this->concept=$concept; // todo zoals hier is een id veel beter
     }
     function addField($name,$type,$checked,$subfields=NULL){
         if(isset($this->fieldset)){

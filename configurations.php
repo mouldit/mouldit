@@ -20,6 +20,8 @@ function fieldIsConcept($f){
     return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
 }
 global $implementedTypesOfComponents;
+global $pageCounter;
+$pageCounter=0;
 $implementedTypesOfComponents=['card','menubar','table'];
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
@@ -29,7 +31,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $implementedTypesOfActions= [
         ['Get_all','get','/get/all/']
     ];
-
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
@@ -95,11 +96,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
     $_SESSION['pages'] = [];
     $selected=false;
-    $main=new Page('main_page','',true);
+    $main=new Page($pageCounter++,'main_page','',true);
     $main->select();
     $_SESSION['pages'][]=$main;
     foreach ($_SESSION['actions'] as $a){
-        $p=new Page($a->name.'_page',$a->clientURL);
+        $p=new Page($pageCounter++,$a->name.'_page',$a->clientURL);
         $p->linkWithAction($a->name);
         $_SESSION['pages'][]=$p;
     }
@@ -179,6 +180,83 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
+}else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        for ($i=0;$i<sizeof($_SESSION['pages']);$i++){
+            if($_SESSION['pages'][$i]->selected){
+                for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                    if($_SESSION['pages'][$i]->components[$j]->selected){
+                        if(isset($_POST['component-name'])){
+                            $_SESSION['pages'][$i]->components[$j]->name=$_POST['component-name'];
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+    }
+} else if (isset($_POST['remove']) && isset($_POST['remove-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i=0;$i<sizeof($_SESSION['pages']);$i++){
+        if($_SESSION['pages'][$i]->selected){
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->selected){
+                    for ($k=0;$k<sizeof($_SESSION['pages'][$i]->components[$j]->menuItems);$k++){
+                        if($_SESSION['pages'][$i]->components[$j]->menuItems[$k]->name===$_POST['remove-item']){
+                            $rang = $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number;
+                            array_splice($_SESSION['pages'][$i]->components[$j]->menuItems,$k,1);
+                            for ($k=0;$k<sizeof($_SESSION['pages'][$i]->components[$j]->menuItems);$k++){
+                                if($_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number>$rang){
+                                    $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number--;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+} else if (isset($_POST['add-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i=0;$i<sizeof($_SESSION['pages']);$i++){
+        if($_SESSION['pages'][$i]->selected){
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->selected){
+                    if(isset($_POST['item-name']) &&isset($_POST['page'])){
+                        $nmbr = sizeof($_SESSION['pages'][$i]->components[$j]->menuItems)+1;
+                        $_SESSION['pages'][$i]->components[$j]->menuItems[]=new \components\Menubar\MenuItem($_POST['item-name'],$_POST['page'],$nmbr);
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+} else if (isset($_POST['save-item']) && isset($_POST['edit-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i=0;$i<sizeof($_SESSION['pages']);$i++){
+        if($_SESSION['pages'][$i]->selected){
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->selected){
+                    for ($k=0;$k<sizeof($_SESSION['pages'][$i]->components[$j]->menuItems);$k++){
+                        if($_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number==$_POST['edit-item']){
+                            if(isset($_POST['menu-item-number'])){
+                                $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number=$_POST['menu-item-number'];
+                            }
+                            if(isset($_POST['menu-item-name'])){
+                                $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->name=$_POST['menu-item-name'];
+                            }
+                            if(isset($_POST['page'])){
+                                $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->page=$_POST['page'];
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
 } else if (isset($_POST['add']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
         if ($_SESSION['pages'][$i]->selected) {
@@ -197,8 +275,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
                                     //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
                                     if(isset($_SESSION['pages'][$l]->actionLink->action)&&$_SESSION['pages'][$l]->actionLink->action===$_SESSION['actions'][$k]->name){
+                                        // todo zorg ook voor een concept id, en doe dit standaard overal waar je twee begrippen met elkaar linkt
                                         $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name.'s',
-                                            $_SESSION['pages'][$l]->name
+                                            $_SESSION['pages'][$l]->id
                                             ,$j+1);
                                         break;
                                     }
@@ -224,6 +303,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
+    // todo maak dat je een pagina kan toevoegen en verwijderen, nu enkel aanpassen
 } else if(isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
     generate($_SESSION['concepts'],$_SESSION['actions'],$_SESSION['pathToRootOfServer']);
 }else session_destroy();

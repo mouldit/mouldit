@@ -2,14 +2,16 @@
 
 class Page
 {
-    public string $name;
-    public string $url;
-    public ActionLink $actionLink;
-    public array $components;
-    public bool $selected;
-    public bool $main;
-    function __construct($name,$url,$main=NULL)
+    public readonly int $id; // statisch
+    public string $name; // wijzigt
+    public string $url; // wijzigt
+    public ActionLink $actionLink; //wijzigt
+    public array $components; // wijzigt
+    public bool $selected; // wijzigt
+    public bool $main; // wijzigt
+    function __construct($id,$name,$url,$main=NULL)
     {
+        $this->id=$id;
         $this->name=$name;
         $this->url=$url;
         $this->selected=false;
