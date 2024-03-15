@@ -1,7 +1,7 @@
 <?php
 function showPage(Page $page,$actions,$implementedTypesOfComponents){
     $part = '';
-    // todo de pagina moet beschikken over zijn componenten
+    // todo wijzig code zodat er onderscheid wordt gemaakt tussen de verschillend componenten waar nodig
     if ($page->selected) {
         $part .=
             '<h2 style="margin: 0 0 8px 0;">Details of page: ' . $page->name . '</h2>

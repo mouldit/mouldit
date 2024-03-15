@@ -8,6 +8,7 @@ spl_autoload_register(function () {
     include 'classes/Component.php';
     include 'classes/components/Menubar/Menubar.php';
     include 'classes/components/Menubar/MenuItem.php';
+    include 'classes/components/Card/Card.php';
     include 'classes/Page.php';
     include 'classes/Concept.php';
     include 'classes/Field.php';
@@ -123,6 +124,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 } else if(isset($_POST['new-component-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
         if ($_SESSION['pages'][$i]->selected) {
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->selected){
+                    $_SESSION['pages'][$i]->components[$j]->deselect();
+                    break;
+                }
+            }
             for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
                 if($_SESSION['pages'][$i]->components[$j]->name===$_POST['component-name']){
                     $_SESSION['pages'][$i]->components[$j]->select();
@@ -275,7 +282,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
                                     //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
                                     if(isset($_SESSION['pages'][$l]->actionLink->action)&&$_SESSION['pages'][$l]->actionLink->action===$_SESSION['actions'][$k]->name){
-                                        // todo zorg ook voor een concept id, en doe dit standaard overal waar je twee begrippen met elkaar linkt
                                         $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name.'s',
                                             $_SESSION['pages'][$l]->id
                                             ,$j+1);
@@ -297,6 +303,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 case 'table':
                     break;
                 case 'card':
+                    $comp = new \components\Card\Card($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                        $_POST['add-component']);
                     break;
             }
             $_SESSION['pages'][$i]->addComponent($comp);
