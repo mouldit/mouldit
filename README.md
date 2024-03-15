@@ -18,3 +18,6 @@
   <li>create docs how to use Mouldit</li>
   <li>make Mouldit UI better so it's ready for real customers and can be used in the docs</li>
 </ul>
+<span>EddeDB: 12.1 stars</span>
+<span>Amplication 13.2 stars</span>
+<span>Refine 23K</span>
