@@ -6,9 +6,9 @@ class Menubar extends \Component
 {
     public array $menuItems;
 
-    public function __construct($name, $type, $menuItems=NULL)
+    public function __construct($id,$name, $type, $menuItems=NULL)
     {
-        parent::__construct($name, $type);
+        parent::__construct($id,$name, $type);
         if(isset($menuItems)) $this->menuItems=$menuItems; else $this->menuItems=[];
     }
 

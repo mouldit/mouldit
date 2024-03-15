@@ -1,7 +1,7 @@
 <?php
 function showPage(Page $page,$actions,$implementedTypesOfComponents){
     $part = '';
-    // todo wijzig code zodat er onderscheid wordt gemaakt tussen de verschillend componenten waar nodig
+
     if ($page->selected) {
         $part .=
             '<h2 style="margin: 0 0 8px 0;">Details of page: ' . $page->name . '</h2>
@@ -27,10 +27,10 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
             $part.='<select name="target" style="display:block; clear:right;float:right; min-width: 178px">';
             $part.='<option>selecteer een target component</option>';
             foreach ($page->components as $c){
-                if(isset($page->actionLink->component)  && $page->actionLink->component===$c->name){
-                    $part.='<option value="'.$c->name.'" selected>'.$c->name.'</option>';
+                if(isset($page->actionLink->component)  && $page->actionLink->component===$c->id){
+                    $part.='<option value="'.$c->id.'" selected>'.$c->name.'</option>';
                 } else{
-                    $part.='<option value="'.$c->name.'">'.$c->name.'</option>';
+                    $part.='<option value="'.$c->id.'">'.$c->name.'</option>';
                 }
             }
             $part.='<select>';

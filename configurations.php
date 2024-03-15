@@ -23,6 +23,8 @@ function fieldIsConcept($f){
 global $implementedTypesOfComponents;
 global $pageCounter;
 $pageCounter=0;
+global $componentCounter;
+$componentCounter=0;
 $implementedTypesOfComponents=['card','menubar','table'];
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
@@ -292,18 +294,18 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             }
                         }
                     }
-                    $comp = new \components\Menubar\Menubar($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                    $comp = new \components\Menubar\Menubar($componentCounter++,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
                         $_POST['add-component'], $menuItems
                     );
                 } else{
-                    $comp = new \components\Menubar\Menubar($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                    $comp = new \components\Menubar\Menubar($componentCounter++,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
                         $_POST['add-component']);
                 }
                     break;
                 case 'table':
                     break;
                 case 'card':
-                    $comp = new \components\Card\Card($_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                    $comp = new \components\Card\Card($componentCounter++,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
                         $_POST['add-component']);
                     break;
             }

@@ -3,13 +3,13 @@
 class ActionLink
 {
     public string $action;
-    public string $component;
+    public int $component;
 
     function __construct($action,$component=NULL){
         $this->action=$action;
         if(isset($component))$this->component=$component;
     }
-    function linkComponent($name){
-        $this->component=$name;
+    function linkComponent($component){
+        $this->component=$component;
     }
 }
