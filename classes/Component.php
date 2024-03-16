@@ -5,6 +5,7 @@ class Component
     public readonly int $id;
     public string $name; // unique
     public string $type;
+    public Action $actionLink; //wijzigt
     public bool $selected;
 
     public function __construct($id,$name,$type)
@@ -20,6 +21,8 @@ class Component
     public function deselect(){
         $this->selected=false;
     }
-
+    public function linkWithAction($action){
+        $this->actionLink=$action;
+    }
 
 }

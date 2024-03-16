@@ -5,7 +5,6 @@ class Page
     public readonly int $id; // statisch
     public string $name; // wijzigt
     public string $url; // wijzigt
-    public ActionLink $actionLink; //wijzigt
     public array $components; // wijzigt
     public bool $selected; // wijzigt
     public bool $main; // wijzigt
@@ -24,9 +23,7 @@ class Page
     public function deselect(){
         $this->selected=false;
     }
-    public function linkWithAction($action,$target=NULL){
-        $this->actionLink=new ActionLink($action,$target);
-    }
+
     public function addComponent(Component $comp){
         $this->components[]=$comp;
     }

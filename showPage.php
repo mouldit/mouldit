@@ -1,7 +1,14 @@
 <?php
 function showPage(Page $page,$actions,$implementedTypesOfComponents){
     $part = '';
-
+    $compWithAction = null;
+    for ($i=0;$i<sizeof($page->components);$i++){
+        if(isset($page->components[$i]->actionLink)){
+            // todo voorlopig alleen 1 component maar de bedoeling is natuurlijk om er meer te zetten
+            $compWithAction = $page->components[$i];
+            break;
+        }
+    }
     if ($page->selected) {
         $part .=
             '<h2 style="margin: 0 0 8px 0;">Details of page: ' . $page->name . '</h2>
@@ -15,7 +22,7 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
                     <select name="action" style="display:block; clear:right; float:right; min-width: 178px">';
         $part.='<option>selecteer een actie</option>';
         foreach ($actions as $a){
-            if(isset($page->actionLink) && $page->actionLink->action===$a->name){
+            if(isset($compWithAction->actionLink) && $compWithAction->actionLink->name===$a->name){
                 $part.='<option selected value="'.$a->name.'">'.$a->name.'</option>';
             } else{
                 $part.='<option value="'.$a->name.'">'.$a->name.'</option>';
@@ -27,7 +34,7 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
             $part.='<select name="target" style="display:block; clear:right;float:right; min-width: 178px">';
             $part.='<option>selecteer een target component</option>';
             foreach ($page->components as $c){
-                if(isset($page->actionLink->component)  && $page->actionLink->component===$c->id){
+                if(isset($compWithAction->actionLink)  && $compWithAction->id===$c->id){
                     $part.='<option value="'.$c->id.'" selected>'.$c->name.'</option>';
                 } else{
                     $part.='<option value="'.$c->id.'">'.$c->name.'</option>';

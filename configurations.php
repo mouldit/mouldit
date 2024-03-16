@@ -4,7 +4,6 @@ spl_autoload_register(function () {
     include 'showPage.php';
     include 'showComponent.php';
     include 'classes/Action.php';
-    include 'classes/ActionLink.php';
     include 'classes/Component.php';
     include 'classes/components/Menubar/Menubar.php';
     include 'classes/components/Menubar/MenuItem.php';
@@ -104,7 +103,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['pages'][]=$main;
     foreach ($_SESSION['actions'] as $a){
         $p=new Page($pageCounter++,$a->name.'_page',$a->clientURL);
-        $p->linkWithAction($a->name);
         $_SESSION['pages'][]=$p;
     }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -185,7 +183,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['pages'][$i]->selected) {
             $_SESSION['pages'][$i]->name=$_POST['name'];
             $_SESSION['pages'][$i]->url=$_POST['url'];
-            if(isset($_POST['action'])&&isset($_POST['target']))$_SESSION['pages'][$i]->actionLink=new ActionLink($_POST['action'],$_POST['target']);
+            if(isset($_POST['action'])&&isset($_POST['target'])){
+                for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                    if($_SESSION['pages'][$i]->components[$j]->id===(int)$_POST['target']){
+                        for ($k=0;$k<sizeof($_SESSION['actions']);$k++){
+                            if($_SESSION['actions'][$k]->name===$_POST['action']){
+                                $_SESSION['pages'][$i]->components[$j]->linkWithAction($_SESSION['actions'][$k]);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
             break;
         }
     }
