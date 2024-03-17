@@ -19,7 +19,6 @@ class Action
         $this->concept=$concept; // todo zoals hier is een id veel beter
     }
     function getFullQualifiedFieldNames():array{
-        // todo test!
         $fullQualifiedFieldNames=[];
         $fieldsetsToProcess=[$this->fieldset];
         $newFieldsets=[];
@@ -29,6 +28,7 @@ class Action
                     if(!$f->hasSubfields()){
                         $fullQualifiedFieldNames[]=$f->fieldPath;
                     } else{
+                        if($fs instanceof FieldSet) $fullQualifiedFieldNames[]=$f->name;
                         $newFieldsets[]=$f->subfields;
                     }
                 }
