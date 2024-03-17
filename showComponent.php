@@ -41,6 +41,7 @@ function showComponent($c,$pages){
     $part.='<h2>General configuration</h2>';
     $part.='<h3>Data Mapping</h3>';
     if(isset($c->actionLink)){
+        // todo
         echo '<pre>'.print_r($c->actionLink->getFullQualifiedFieldNames(), true).'</pre>';
     }
     echo $part;
