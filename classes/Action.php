@@ -18,6 +18,9 @@ class Action
         $this->clientURL=$clientURL;
         $this->concept=$concept; // todo zoals hier is een id veel beter
     }
+    function getFullQualifiedFieldNames():array{
+
+    }
     function addField($name,$type,$checked,$subfields=NULL){
         if(isset($this->fieldset)){
             $f = new Field($name,$type,$this->fieldset);
