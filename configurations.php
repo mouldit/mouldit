@@ -152,7 +152,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             } else {
                                 $f->checked = false;
                             }
-                            if(fieldIsConcept($f)){
+                            if($f->isConcept()){
                                 $newSubFieldSets[]=$f->subfields;
                             }
                         }
@@ -164,7 +164,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             } else {
                                 $f->checked = false;
                             }
-                            if(fieldIsConcept($f)){
+                            if($f->isConcept()){
                                 $newSubFieldSets[]=$f->subfields;
                             }
                         }
@@ -290,6 +290,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             if($_SESSION['actions'][$k]->type==='Get_all'&&$_SESSION['actions'][$k]->concept===$_SESSION['concepts'][$j]->name){
                                 for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
                                     //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
+                                    // todo fix
                                     if(isset($_SESSION['pages'][$l]->actionLink->action)&&$_SESSION['pages'][$l]->actionLink->action===$_SESSION['actions'][$k]->name){
                                         $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name.'s',
                                             $_SESSION['pages'][$l]->id
