@@ -19,7 +19,24 @@ class Action
         $this->concept=$concept; // todo zoals hier is een id veel beter
     }
     function getFullQualifiedFieldNames():array{
-
+        // todo test!
+        $fullQualifiedFieldNames=[];
+        $fieldsetsToProcess=[$this->fieldset];
+        $newFieldsets=[];
+        while(sizeof($fieldsetsToProcess)>0){
+            foreach ($fieldsetsToProcess as $fs){
+                foreach ($fs->fields as $f){
+                    if(!$f->hasSubfields()){
+                        $fullQualifiedFieldNames[]=$f->fieldPath;
+                    } else{
+                        $newFieldsets[]=$f->subfields;
+                    }
+                }
+            }
+            $fieldsetsToProcess = $newFieldsets;
+            $newFieldsets=[];
+        }
+        return $fullQualifiedFieldNames;
     }
     function addField($name,$type,$checked,$subfields=NULL){
         if(isset($this->fieldset)){

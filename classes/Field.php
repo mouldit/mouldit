@@ -6,6 +6,7 @@ class Field
     public string $type;
     public bool $checked;
     public string $conceptName;
+    public string $fieldPath;
     public SubFieldSet $subfields;
     public function __construct($name,$type,$concept)
     {
@@ -17,6 +18,9 @@ class Field
         if(isset($this->subfields)){
             $this->subfields=clone $this->subfields;
         }
+    }
+    public function isConcept(){
+        return $this->type!=='str'&&$this->type!=='int32'&&!str_contains($this->type,'=');
     }
     public function addSubfield(Field $field){
         if(isset($this->subfields)){
@@ -30,7 +34,6 @@ class Field
         $this->checked=$checked;
     }
     public function hasSubfields(){
-        // todo controleer method
         return isset($this->subfields->fields) && sizeof($this->subfields->fields)>0;
     }
 

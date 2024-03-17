@@ -16,9 +16,6 @@ spl_autoload_register(function () {
     include 'generate.php';
 });
 session_start();
-function fieldIsConcept($f){
-    return $f->type!=='str'&&$f->type!=='int32'&&!str_contains($f->type,'=');
-}
 global $implementedTypesOfComponents;
 global $pageCounter;
 $pageCounter=0;
@@ -64,8 +61,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             while(sizeof($subFieldSetsToProcess)>0){
                 foreach ($subFieldSetsToProcess as $set){
                     foreach ($set->fields as $f){
+                        $f->fieldPath = $set->fieldPath.'_'.$f->name;
+                        // todo je zou een extra prop kunnen toevoegen aan Field met daarin het fieldpath met $set->fieldPath als waarde
+                        //      vervolgens ga je elk veld af, en neemt het fieldpath als waarde TENZIJ het nog een subset heeft , en dat zet je in de array
                         // dit zijn Fields
-                        if(fieldIsConcept($f)){
+                        if($f->isConcept()){
                             for ($i=0;$i<sizeof($_SESSION['concepts']);$i++){
                                 if($_SESSION['concepts'][$i]->name===$f->type){
                                     // het gaat hier om een fieldset instance $fs
