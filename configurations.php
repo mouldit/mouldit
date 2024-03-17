@@ -100,6 +100,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['pages'][]=$main;
     foreach ($_SESSION['actions'] as $a){
         $p=new Page($pageCounter++,$a->name.'_page',$a->clientURL);
+        $p->actionLink = $a->name;
         $_SESSION['pages'][]=$p;
     }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -193,6 +194,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     }
                 }
             }
+            if(isset($_POST['action'])) $_SESSION['pages'][$i]->actionLink=$_POST['action'];
             break;
         }
     }
@@ -286,12 +288,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 if($_SESSION['pages'][$i]->main){
                     $menuItems=[];
                     for ($j=0;$j<sizeof($_SESSION['concepts']);$j++){
+                        // per concept ga je indien er een getAllActie voor bestaat een default menu item krijgen
                         for ($k=0;$k<sizeof($_SESSION['actions']);$k++){
                             if($_SESSION['actions'][$k]->type==='Get_all'&&$_SESSION['actions'][$k]->concept===$_SESSION['concepts'][$j]->name){
                                 for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
                                     //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
-                                    // todo fix
-                                    if(isset($_SESSION['pages'][$l]->actionLink->action)&&$_SESSION['pages'][$l]->actionLink->action===$_SESSION['actions'][$k]->name){
+                                    if(isset($_SESSION['pages'][$l]->actionLink)&&$_SESSION['pages'][$l]->actionLink===$_SESSION['actions'][$k]->name){
                                         $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name.'s',
                                             $_SESSION['pages'][$l]->id
                                             ,$j+1);

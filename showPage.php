@@ -22,7 +22,7 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
                     <select name="action" style="display:block; clear:right; float:right; min-width: 178px">';
         $part.='<option>selecteer een actie</option>';
         foreach ($actions as $a){
-            if(isset($compWithAction->actionLink) && $compWithAction->actionLink->name===$a->name){
+            if(isset($page->actionLink) && $page->actionLink===$a->name){
                 $part.='<option selected value="'.$a->name.'">'.$a->name.'</option>';
             } else{
                 $part.='<option value="'.$a->name.'">'.$a->name.'</option>';
@@ -47,6 +47,7 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
         $part .=
             '</div><div><button type="submit" name="page-edited">save</button></div>
             </form><br>
+            
             <form style="width:500px;overflow:auto" action="' . $_SERVER['PHP_SELF'] . '" method="post">
             <label style="display:block; margin-bottom:8px;clear:left;float:left">components</label>
             <button style="display:block;clear:right;float:right" type="submit" name="add">add</button>

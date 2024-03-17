@@ -8,6 +8,7 @@ class Page
     public array $components; // wijzigt
     public bool $selected; // wijzigt
     public bool $main; // wijzigt
+    public string $actionLink;
     function __construct($id,$name,$url,$main=NULL)
     {
         $this->id=$id;
