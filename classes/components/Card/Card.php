@@ -2,15 +2,22 @@
 
 namespace components\Card;
 
-class Card extends \Component
+use IComponent;
+
+class Card extends \Component  implements IComponent
 {
     public string $title;
     public string $subtitle;
 
-    public function __construct($id,$name, $type,$title = NULL, $subtitle=NULL)
+    public function __construct($id,$pageId,$name, $type,$title = NULL, $subtitle=NULL)
     {
-        parent::__construct($id,$name, $type);
+        parent::__construct($id,$pageId,$name, $type);
         if(isset($title)) $this->title=$title;
         if(isset($subtitle)) $this->subtitle=$subtitle;
+    }
+
+    public function getAttributes()
+    {
+        return ['title','subtitle'];
     }
 }

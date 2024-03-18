@@ -2,13 +2,15 @@
 
 namespace components\Menubar;
 
-class Menubar extends \Component
+use IComponent;
+
+class Menubar extends \Component  implements IComponent
 {
     public array $menuItems;
 
-    public function __construct($id,$name, $type, $menuItems=NULL)
+    public function __construct($id,$pageId,$name, $type, $menuItems=NULL)
     {
-        parent::__construct($id,$name, $type);
+        parent::__construct($id,$pageId,$name, $type);
         if(isset($menuItems)) $this->menuItems=$menuItems; else $this->menuItems=[];
     }
 
@@ -18,6 +20,10 @@ class Menubar extends \Component
                 array_splice($this->menuItems,$i,1);
             }
         }
+    }
+    public function getAttributes()
+    {
+        return ['menuItems'];
     }
 
 

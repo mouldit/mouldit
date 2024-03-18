@@ -1,5 +1,6 @@
 <?php
-function showComponent($c,$pages){
+
+function showComponent($c, $pages){
 // todo wijzig code zodat er onderscheid wordt gemaakt tussen de verschillend componenten waar nodig
     $part='<h1>Component configuration of '.$c->type.'</h1>';
     $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><label>name</label><input value="'.$c->name.'" name="component-name"><button type="submit" name="component-edited">save</button></form>';
@@ -41,8 +42,31 @@ function showComponent($c,$pages){
     $part.='<h2>General configuration</h2>';
     $part.='<h3>Data Mapping</h3>';
     if(isset($c->actionLink)){
-        // todo
-        echo '<pre>'.print_r($c->actionLink->getFullQualifiedFieldNames(), true).'</pre>';
+        // todo er kan al een bestaande mapping zijn ook
+        $fqfn = $c->actionLink->getFullQualifiedFieldNames();
+        $props = $c->getAttributes();
+        foreach ($fqfn as $fieldName){
+            $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">
+<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
+<select style="display:block;float:right;" name="'.$fieldName.'"><option>-- Selecteer een render property --</option>';
+            for ($i=0;$i<sizeof($props);$i++){
+                if(str_contains($fieldName,'_')){
+                    $strEx = explode('_',$fieldName);
+                    if($strEx[sizeof($strEx)-1]===$props[$i]){
+                        $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
+                        break;
+                    }
+                } else if($fieldName===$props[$i]){
+                    $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
+                    break;
+                } else{
+                    $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
+                }
+            }
+            $part.='</select></li>';
+        }
+        $part.='</ul>
+<input type="hidden" name="component" value="'.$c->id.'"><input type="hidden" name="page" value="'.$c->pageId.'"><button type="submit" name="mapping">Save</button></form>';
     }
     echo $part;
 }

@@ -3,6 +3,7 @@ spl_autoload_register(function () {
     include 'showAction.php';
     include 'showPage.php';
     include 'showComponent.php';
+    include 'classes/IComponent.php';
     include 'classes/Action.php';
     include 'classes/Component.php';
     include 'classes/components/Menubar/Menubar.php';
@@ -212,7 +213,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 break;
             }
     }
-} else if (isset($_POST['remove']) && isset($_POST['remove-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+}else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i=0;$i<sizeof($_SESSION['pages']);$i++){
+        if($_SESSION['pages'][$i]->id===(int)$_POST['page']){
+            for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
+                if($_SESSION['pages'][$i]->components[$j]->id===(int)$_POST['component']){
+                    $fieldNames = $_SESSION['pages'][$i]->actionLink->getFullQualifiedFieldNames();
+                    foreach ($fieldNames as $fieldName){
+                        $_SESSION['pages'][$i]->components[$j]->mapping[]=[$fieldName,$_POST[$fieldName]];
+                    }
+                    //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+}
+else if (isset($_POST['remove']) && isset($_POST['remove-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i=0;$i<sizeof($_SESSION['pages']);$i++){
         if($_SESSION['pages'][$i]->selected){
             for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
@@ -292,7 +311,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                         for ($k=0;$k<sizeof($_SESSION['actions']);$k++){
                             if($_SESSION['actions'][$k]->type==='Get_all'&&$_SESSION['actions'][$k]->concept===$_SESSION['concepts'][$j]->name){
                                 for ($l=0;$l<sizeof($_SESSION['pages']);$l++){
-                                    //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
+
                                     if(isset($_SESSION['pages'][$l]->actionLink)&&$_SESSION['pages'][$l]->actionLink===$_SESSION['actions'][$k]->name){
                                         $menuItems[]=new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name.'s',
                                             $_SESSION['pages'][$l]->id
@@ -304,18 +323,18 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             }
                         }
                     }
-                    $comp = new \components\Menubar\Menubar($componentCounter++,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                    $comp = new \components\Menubar\Menubar($componentCounter++,$_SESSION['pages'][$i]->id,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
                         $_POST['add-component'], $menuItems
                     );
                 } else{
-                    $comp = new \components\Menubar\Menubar($componentCounter++,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                    $comp = new \components\Menubar\Menubar($componentCounter++,$_SESSION['pages'][$i]->id,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
                         $_POST['add-component']);
                 }
                     break;
                 case 'table':
                     break;
                 case 'card':
-                    $comp = new \components\Card\Card($componentCounter++,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
+                    $comp = new \components\Card\Card($componentCounter++,$_SESSION['pages'][$i]->id,$_SESSION['pages'][$i]->name.'_'.$_POST['add-component'].'_component_'.$counter,
                         $_POST['add-component']);
                     break;
             }
@@ -425,7 +444,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['pages'][$i]->selected) {
             for ($j=0;$j<sizeof($_SESSION['pages'][$i]->components);$j++){
                 if($_SESSION['pages'][$i]->components[$j]->selected){
-                    showComponent($_SESSION['pages'][$i]->components[$j],$_SESSION['pages']);
+                        showComponent($_SESSION['pages'][$i]->components[$j], $_SESSION['pages']);
                     break;
                 }
             }
