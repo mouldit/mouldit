@@ -41,32 +41,53 @@ function showComponent($c, $pages){
     }
     $part.='<h2>General configuration</h2>';
     $part.='<h3>Data Mapping</h3>';
-    if(isset($c->actionLink)){
         // todo er kan al een bestaande mapping zijn ook
-        $fqfn = $c->actionLink->getFullQualifiedFieldNames();
-        $props = $c->getAttributes();
-        foreach ($fqfn as $fieldName){
-            $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">
-<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
+
+    $props = $c->getAttributes();
+    //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
+        if(sizeof($c->mapping)>0){
+            $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+            foreach ($c->mapping as $m){
+$part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$m[0].'</span>
+<select style="display:block;float:right;" name="'.$m[0].'"><option>-- Selecteer een render property --</option>';
+                for ($i=0;$i<sizeof($props);$i++){
+                    if(isset($m[1]) && $props[$i]===$m[1]){
+                        $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
+                    } else{
+                        $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
+                    }
+
+                }
+                $part.='</select></li>';
+            }
+            $part.='</ul>
+<input type="hidden" name="component" value="'.$c->id.'"><input type="hidden" name="page" value="'.$c->pageId.'"><button type="submit" name="mapping">Save</button></form>';
+        } else if(isset($c->actionLink)){
+            $fqfn = $c->actionLink->getFullQualifiedFieldNames();
+            $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+            foreach ($fqfn as $fieldName){
+                $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
 <select style="display:block;float:right;" name="'.$fieldName.'"><option>-- Selecteer een render property --</option>';
-            for ($i=0;$i<sizeof($props);$i++){
-                if(str_contains($fieldName,'_')){
-                    $strEx = explode('_',$fieldName);
-                    if($strEx[sizeof($strEx)-1]===$props[$i]){
+                for ($i=0;$i<sizeof($props);$i++){
+                    if(str_contains($fieldName,'_')){
+                        $strEx = explode('_',$fieldName);
+                        if($strEx[sizeof($strEx)-1]===$props[$i]){
+                            $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
+                            break;
+                        }
+                    } else if($fieldName===$props[$i]){
                         $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
                         break;
+                    } else{
+                        $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
                     }
-                } else if($fieldName===$props[$i]){
-                    $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
-                    break;
-                } else{
-                    $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
                 }
+                $part.='</select></li>';
             }
-            $part.='</select></li>';
-        }
-        $part.='</ul>
+            $part.='</ul>
 <input type="hidden" name="component" value="'.$c->id.'"><input type="hidden" name="page" value="'.$c->pageId.'"><button type="submit" name="mapping">Save</button></form>';
-    }
+        } else{
+            $part.='<span>No action linked with this component</span>';
+        }
     echo $part;
 }
