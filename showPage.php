@@ -30,6 +30,9 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
         }
         $part.='</select>
                 <label style="display:block; margin-bottom:8px;clear:left;float:left">target</label>';
+        // todo fix: op het moment dat je een component toevoeget aan een pagina wordt deze automatisch genomen boven diegene die al gesaved was???
+        //           dus bij 'add' gaat de actionLink op de een of anderre manier gewijzigd worden??
+        //           dit zou kunnen
         if(sizeof($page->components)>0){
             $part.='<select name="target" style="display:block; clear:right;float:right; min-width: 178px">';
             $part.='<option>selecteer een target component</option>';

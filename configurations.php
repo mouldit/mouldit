@@ -18,15 +18,13 @@ spl_autoload_register(function () {
 });
 session_start();
 global $implementedTypesOfComponents;
-global $pageCounter;
-$pageCounter = 0;
-global $componentCounter;
-$componentCounter = 0;
 $implementedTypesOfComponents = ['card', 'menubar', 'table'];
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
+    $_SESSION['pageCounter']=0;
+    $_SESSION['componentCounter']=0;
     global $implementedTypesOfActions;
     $implementedTypesOfActions = [
         ['Get_all', 'get', '/get/all/']
@@ -96,11 +94,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
     $_SESSION['pages'] = [];
     $selected = false;
-    $main = new Page($pageCounter++, 'main_page', '', true);
+    $main = new Page($_SESSION['pageCounter']++, 'main_page', '', true);
     $main->select();
     $_SESSION['pages'][] = $main;
     foreach ($_SESSION['actions'] as $a) {
-        $p = new Page($pageCounter++, $a->name . '_page', $a->clientURL);
+        $p = new Page($_SESSION['pageCounter']++, $a->name . '_page', $a->clientURL);
         $p->actionLink = $a->name;
         $_SESSION['pages'][] = $p;
     }
@@ -315,7 +313,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                                 if ($_SESSION['actions'][$k]->type === 'Get_all' && $_SESSION['actions'][$k]->concept === $_SESSION['concepts'][$j]->name) {
                                     for ($l = 0; $l < sizeof($_SESSION['pages']); $l++) {
-
                                         if (isset($_SESSION['pages'][$l]->actionLink) && $_SESSION['pages'][$l]->actionLink === $_SESSION['actions'][$k]->name) {
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
                                                 $_SESSION['pages'][$l]->id
@@ -327,18 +324,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 }
                             }
                         }
-                        $comp = new \components\Menubar\Menubar($componentCounter++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                             $_POST['add-component'], $menuItems
                         );
                     } else {
-                        $comp = new \components\Menubar\Menubar($componentCounter++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                             $_POST['add-component']);
                     }
                     break;
                 case 'table':
                     break;
                 case 'card':
-                    $comp = new \components\Card\Card($componentCounter++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+
+                    $comp = new \components\Card\Card($_SESSION['componentCounter']++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                         $_POST['add-component']);
                     break;
             }
