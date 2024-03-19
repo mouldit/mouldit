@@ -221,6 +221,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                         if ($_SESSION['actions'][$k]->name === $_SESSION['pages'][$i]->actionLink) {
                             $fieldNames = $_SESSION['actions'][$k]->getFullQualifiedFieldNames();
+                            $_SESSION['pages'][$i]->components[$j]->mapping = [];
                             foreach ($fieldNames as $fieldName) {
                                 $_SESSION['pages'][$i]->components[$j]->mapping[] = [$fieldName, $_POST[$fieldName]];
                             }
@@ -234,7 +235,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
-
 } else if (isset($_POST['remove']) && isset($_POST['remove-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
         if ($_SESSION['pages'][$i]->selected) {

@@ -56,7 +56,6 @@ $part.='<li style="display:block;overflow:auto"><span style="display:block;float
                     } else{
                         $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
                     }
-
                 }
                 $part.='</select></li>';
             }
@@ -73,11 +72,11 @@ $part.='<li style="display:block;overflow:auto"><span style="display:block;float
                         $strEx = explode('_',$fieldName);
                         if($strEx[sizeof($strEx)-1]===$props[$i]){
                             $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
-                            break;
+                        } else {
+                            $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
                         }
                     } else if($fieldName===$props[$i]){
                         $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
-                        break;
                     } else{
                         $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
                     }
