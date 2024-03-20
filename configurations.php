@@ -14,15 +14,24 @@ spl_autoload_register(function () {
     include 'classes/Field.php';
     include 'classes/FieldSet.php';
     include 'classes/SubFieldSet.php';
-    include 'generate.php';
+    include 'generateBackend.php';
+    include 'generateFrontend.php';
 });
 session_start();
 global $implementedTypesOfComponents;
 $implementedTypesOfComponents = ['card', 'menubar', 'table'];
+// frontend
+if (isset($_SESSION['pathToRootOfClient'])) {
+    if (isset($_POST['generate-frontend']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+        generateFrontend($_SESSION['pathToRootOfClient'].'/src/app');
+    }
+}
+// backend
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
+    echo 'creating actions';
     $_SESSION['pageCounter']=0;
     $_SESSION['componentCounter']=0;
     global $implementedTypesOfActions;
@@ -345,9 +354,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     // todo maak dat je een pagina kan toevoegen en verwijderen, nu enkel aanpassen
-} else if (isset($_POST['generate']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    generate($_SESSION['concepts'], $_SESSION['actions'], $_SESSION['pathToRootOfServer']);
-} else session_destroy();
+    // todo maak dat je componenten een andere volgorde kan geven zodat je ze niet helemaal moet verwijderen en opnieuw bouwen
+} else if (isset($_POST['generate-backend']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    generateBackend($_SESSION['concepts'], $_SESSION['actions'], $_SESSION['pathToRootOfServer']);
+} else if(!isset($_POST['generate-frontend'])){
+    echo 'destroying session';
+    session_destroy();
+} else echo 'nothing happens ???';
 ?>
 <!doctype html>
 <html lang="en">

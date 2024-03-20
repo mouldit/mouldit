@@ -1,8 +1,9 @@
 <?php
 session_start();
-if(isset($_POST['path'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
-    $_SESSION['pathToRootOfServer']= trim($_POST['path-to-root-server-folder']);
-    echo $_SESSION['pathToRootOfServer'];
+if(isset($_POST['paths'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
+    if(isset($_POST['path-to-root-server-folder']))$_SESSION['pathToRootOfServer']= trim($_POST['path-to-root-server-folder']);
+    if(isset($_POST['path-to-root-client-folder']))$_SESSION['pathToRootOfClient']= trim($_POST['path-to-root-client-folder']);
+    echo 'from index '.$_SESSION['pathToRootOfClient'];
     header('Location: configurations.php');
 }
 ?>
@@ -21,7 +22,11 @@ if(isset($_POST['path'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
             Enter path of server root folder
         </label>
         <input id="path-to-root-server-folder" name="path-to-root-server-folder">
-        <button type="submit" name="path">Ok</button>
+        <label for="path-to-root-client-folder">
+            Enter path of client root folder
+        </label>
+        <input id="path-to-root-client-folder" name="path-to-root-client-folder">
+        <button type="submit" name="paths">Ok</button>
     </form>
 </body>
 </html>

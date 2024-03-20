@@ -2,6 +2,10 @@
 
 class Page
 {
+    // todo parent id zodat de compiler weet dat een bepaalde pagina als subpagina in angular geprint moet worden (=subfolder)
+    //      indien er geen parent id is dan is dit een main resource page, typisch voor get all RESOURCENAME actionpages
+    //      standaard zal een getByID actie een subpage zijn van een get all resource main page
+    //      idem voor update by id pages
     public readonly int $id; // statisch
     public string $name; // wijzigt
     public string $url; // wijzigt

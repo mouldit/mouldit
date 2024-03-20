@@ -36,7 +36,7 @@ function printSubFields(SubFieldSet $sfs){
     }
     return $printedSubFields;
 }
-function generate($concepts, $actions, $path): bool
+function generateBackend($concepts, $actions, $path): bool
 {
     if ($success = touch($path . '/app.ts')) {
         $fp = fopen($path . '/app.ts', 'w');

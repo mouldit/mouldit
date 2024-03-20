@@ -21,7 +21,7 @@ function showAction(Action $action)
             </form><br>
             <div>
                 <form style="float:right;" action="' . $_SERVER['PHP_SELF']. '" method="post">
-                    <input type="hidden" name="generate"><button type="submit">Generate backend</button>
+                    <input type="hidden" name="generate-backend"><button type="submit">Generate backend</button>
                 </form>
             </div>';
         echo $part;
