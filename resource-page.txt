@@ -1,0 +1,16 @@
+import {Component, OnInit} from '@angular/core';
+IMPORTS
+
+@Component({
+  selector: 'app-RESOURCE',
+  standalone: true,
+  imports: [],
+  templateUrl: './RESOURCE.component.html',
+  styleUrl: './RESOURCE.component.css'
+})
+export class COMPNAMEComponent implements OnInit{
+    VARS
+  ngOnInit(): void {
+    ONINIT
+  }
+}

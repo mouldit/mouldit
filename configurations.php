@@ -23,7 +23,7 @@ $implementedTypesOfComponents = ['card', 'menubar', 'table'];
 // frontend
 if (isset($_SESSION['pathToRootOfClient'])) {
     if (isset($_POST['generate-frontend']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-        generateFrontend($_SESSION['pathToRootOfClient'].'/src/app');
+        generateFrontend($_SESSION['pathToRootOfClient'].'/src/app',$_SESSION['pages']);
     }
 }
 // backend
