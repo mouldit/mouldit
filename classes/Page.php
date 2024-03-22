@@ -8,6 +8,7 @@ class Page
     //      idem voor update by id pages
     public readonly int $id; // statisch
     public string $name; // wijzigt
+    public int $parentId;
     public string $url; // wijzigt
     public array $components; // wijzigt
     public bool $selected; // wijzigt
@@ -21,6 +22,9 @@ class Page
         $this->selected=false;
         $this->components=[];
         if(isset($main)) $this->main=$main; else $this->main=false;
+    }
+    public function setParentId($id){
+        $this->parentId=$id;
     }
     public function select(){
         $this->selected=true;

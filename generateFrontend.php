@@ -1,14 +1,16 @@
 <?php
 function generateFrontend($dir,$pages){
-    // todo welke data heeft deze functie nodig?
 /*    chdir($dir); // getest = ok
     exec('npx ng g c main-page');*/
     for ($i=0;$i<sizeof($pages);$i++){
         if($pages[$i]->main){
-            printMainPage($pages[$i],$dir);
+            printMainPage($pages[$i],$dir,$pages);
             break;
+        } else{
+            printPage($pages[$i],$dir,$pages);
         }
     }
+    // app landingspage
     $f = fopen($dir.'/app.component.html','wb');
     $data = "<app-main-page></app-main-page>"."\n"."<router-outlet />";
     fwrite($f,$data);
@@ -32,14 +34,39 @@ export class AppComponent {
     fclose($f);
 }
 
-function printPage($p){
+function printPage($p,$dir, $pages){
+    if(isset($p->parentId)){
+        printSubPage($p,$dir,$pages);
+    } else{
+        $dirName = $dir.'/'.getPageFolderName($p);
+        if(!file_exists($dirName))mkdir($dirName);
+        $f = fopen($dirName.'/'.getPageFolderName($p).'.component.html','wb');
+        if($f){
+            $data = '';
+            foreach ($p->components as $c){
+                switch ($c->type){
+                    case 'menubar':
+                        $data.="<p-menubar [model]=\"items\"></p-menubar>"."\n";
+                        break;
+                    case 'card':
+                        $data.='<ng-container *ngFor="let card of cards; let i = index">
+            <p-card header="" subheader=""></p-card>
+          </ng-container>';
+                        break;
+                    case 'table':
+                        break;
+                }
+            }
+            fwrite($f,$data);
+            fclose($f);
+        }
+    }
+}
+function printSubPage($sp,$dir, $pages){
 
 }
-function printSubPage($sp){
-
-}
-function printMainPage($mp,$dir){
-    mkdir($dir.'/main-page');
+function printMainPage($mp,$dir, $pages){
+    if(!file_exists($dir.'/main-page'))mkdir($dir.'/main-page');
     $f = fopen($dir.'/main-page/main-page.component.html','wb');
     if($f){
         $data = '';
@@ -63,16 +90,29 @@ function printMainPage($mp,$dir){
         $data = str_replace(['RESOURCE','COMPNAME'],['main-page','MainPage'],$data);
         $vars='';
         $imports='';
+        $compImports = '';
         $oninit = '';
         foreach ($mp->components as $c){
             switch ($c->type){
                 case 'menubar':
-                    // todo add items to oninit
                     $vars.='items: MenuItem[] | undefined;'."\n";
                     $imports.='import { MenuItem } from \'primeng/api\';'."\n";
+                    $imports.='import { MenubarModule } from \'primeng/menubar\';'."\n";
+                    $compImports.='MenubarModule, ';
                     $oninit.="\n".'this.items=['."\n";
                     foreach ($c->menuItems as $menuItem){
-                        $oninit.="{\t".'label:\''.$menuItem->name.'\'},'."\n";
+                        if($menuItem->page){
+                            for ($i=0;$i<sizeof($pages);$i++){
+                                if($pages[$i]->id===$menuItem->page){
+                                    $compName = getPageComponentName($pages[$i]->name);
+                                    $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:'.$compName.'},'."\n";
+                                    $imports.='import { '.$compName.' } from \''.getPath($pages[$i],$mp,$pages).'\';'."\n";
+                                    break;
+                                }
+                            }
+                        } else{
+                            $oninit.="{\t".'label:\''.$menuItem->name.'\'},'."\n";
+                        }
                     }
                     $oninit.=']'."\n";
                     break;
@@ -82,8 +122,51 @@ function printMainPage($mp,$dir){
                     break;
             }
         }
-        $data = str_replace(['IMPORTS','VARS','ONINIT'],[$imports,$vars,$oninit],$data);
+        $data = str_replace(['IMPORTS','VARS','ONINIT','COMPMPRTS'],[$imports,$vars,$oninit,$compImports],$data);
         fwrite($f,$data);
         fclose($f);
     }
+}
+
+function getPageComponentName($pageName){
+    $componentName = explode('_',$pageName);
+    $componentName = array_slice($componentName,-2);
+    array_walk($componentName,function (&$el,$index){
+        $el = ucfirst($el);
+    });
+    return implode('',$componentName).'Component';
+}
+function getPageFolderName($pageName){
+    $folderName = explode('_',$pageName);
+    $folderName = array_slice($folderName,-2);
+    return implode('-',$folderName);
+}
+function getFolderPath(Page $p,$pages){
+    $path = getPageFolderName($p->name);
+    $comp = $p->parentId ?? NULL;
+    while($comp){
+        for ($i=0;$i<sizeof($pages);$i++){
+            if($pages[$i]->id===$comp){
+                $comp = $pages[$i]->parentId ?? NULL;
+                $path=getPageFolderName($pages[$i]->name).'/'.$path;
+                break;
+            }
+        }
+    }
+    return $path;
+}
+function getPath(Page $target,Page $current,$pages){
+    $levelDir = './../';
+    $parent = $current->parentId ?? NULL;
+    while($parent){
+        $levelDir.='../';
+        $parent=NULL;
+        for ($i=0;$i<sizeof($pages);$i++){
+            if($pages[$i]->id===$parent){
+                $parent=$pages[$i]->parentId ?? NULL;
+                break;
+            }
+        }
+    }
+    return $levelDir.getFolderPath($target,$pages);
 }
