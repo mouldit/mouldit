@@ -35,23 +35,21 @@ function showComponent($c, $pages){
         }
         $part.='</ul>';
     }
-    // todo fix bug: als je de naam van een component wijzigt, dan
     if($c->type==='card'){
 
     }
     $part.='<h2>General configuration</h2>';
     $part.='<h3>Data Mapping</h3>';
-        // todo er kan al een bestaande mapping zijn ook
-
     $props = $c->getAttributes();
     //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
         if(sizeof($c->mapping)>0){
+            // todo aanpassen, is niet langer met index maar met keys
             $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
-            foreach ($c->mapping as $m){
-$part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$m[0].'</span>
-<select style="display:block;float:right;" name="'.$m[0].'"><option>-- Selecteer een render property --</option>';
+            foreach ($c->mapping as $key => $value){
+$part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$value.'</span>
+<select style="display:block;float:right;" name="'.$value.'"><option>-- Selecteer een render property --</option>';
                 for ($i=0;$i<sizeof($props);$i++){
-                    if(isset($m[1]) && $props[$i]===$m[1]){
+                    if($props[$i]===$key && isset($value)){
                         $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
                     } else{
                         $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';

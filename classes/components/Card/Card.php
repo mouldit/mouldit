@@ -6,18 +6,18 @@ use IComponent;
 
 class Card extends \Component  implements IComponent
 {
-    public string $title;
-    public string $subtitle;
+    public string $header;
+    public string $subheader;
 
-    public function __construct($id,$pageId,$name, $type,$title = NULL, $subtitle=NULL)
+    public function __construct($id,$pageId,$name, $type,$header = NULL, $subheader=NULL)
     {
         parent::__construct($id,$pageId,$name, $type);
-        if(isset($title)) $this->title=$title;
-        if(isset($subtitle)) $this->subtitle=$subtitle;
+        if(isset($header)) $this->header=$header;
+        if(isset($subheader)) $this->subheader=$subheader;
     }
 
     public function getAttributes()
     {
-        return ['title','subtitle'];
+        return ['header','subheader'];
     }
 }

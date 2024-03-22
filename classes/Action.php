@@ -18,6 +18,9 @@ class Action
         $this->clientURL=$clientURL;
         $this->concept=$concept; // todo zoals hier is een id veel beter
     }
+    function getReturnType(){
+        if($this->type==='Get_all') return 'list';
+    }
     function getFullQualifiedFieldNames():array{
         $fullQualifiedFieldNames=[];
         $fieldsetsToProcess=[$this->fieldset];

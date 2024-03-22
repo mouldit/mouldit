@@ -1,4 +1,5 @@
 <?php
+// todo create model files? voorlopig gewoon array type
 function generateFrontend($dir,$pages){
 /*    chdir($dir); // getest = ok
     exec('npx ng g c main-page');*/
@@ -49,9 +50,15 @@ function printPage($p,$dir, $pages){
                         $data.="<p-menubar [model]=\"items\"></p-menubar>"."\n";
                         break;
                     case 'card':
-                        $data.='<ng-container *ngFor="let card of cards; let i = index">
-            <p-card header="" subheader=""></p-card>
+                        if(isset($c->actionLink) && $c->actionLink->getReturnType()==='list'){
+                            $data.='<ng-container *ngFor="let '.$c->actionLink->concept.' of '.$c->actionLink->concept.'s'.'; let i = index">
+            <p-card 
+            header="'.$c->actionLink->concept.'.'.$c->mapping->header.'" 
+            subheader="'.$c->actionLink->concept.'.'.$c->mapping->subheader.'"></p-card>
           </ng-container>';
+                        } else{
+
+                        }
                         break;
                     case 'table':
                         break;

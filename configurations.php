@@ -228,9 +228,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                         if ($_SESSION['actions'][$k]->name === $_SESSION['pages'][$i]->actionLink) {
                             $fieldNames = $_SESSION['actions'][$k]->getFullQualifiedFieldNames();
+                            // todo fix: alle renderporperties meten er zijn en zijn key, de values is wanneer er een mapping is met de fieldname van de data
                             $_SESSION['pages'][$i]->components[$j]->mapping = [];
                             foreach ($fieldNames as $fieldName) {
-                                $_SESSION['pages'][$i]->components[$j]->mapping[] = [$fieldName, $_POST[$fieldName]];
+                                if(isset($_POST[$fieldName]))$_SESSION['pages'][$i]->components[$j]->mapping[$_POST[$fieldName]] = $fieldName;
                             }
                             //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
                             break;
