@@ -42,17 +42,19 @@ function showComponent($c, $pages){
     $part.='<h3>Data Mapping</h3>';
     $props = $c->getAttributes();
     //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
-        if(sizeof($c->mapping)>0){
+        if(sizeof($c->mapping)>0 && $c->actionLink){
             // todo aanpassen, is niet langer met index maar met keys
             $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
-            foreach ($c->mapping as $key => $value){
-$part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$value.'</span>
-<select style="display:block;float:right;" name="'.$value.'"><option>-- Selecteer een render property --</option>';
-                for ($i=0;$i<sizeof($props);$i++){
-                    if($props[$i]===$key && isset($value)){
-                        $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
+            foreach ($c->actionLink->getFullQualifiedFieldNames() as $fieldName){
+                // todo het probleem hier is dat het weer omgekeerd moet:
+                //      je moet mappen op FQFNs
+$part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
+<select style="display:block;float:right;" name="'.$fieldName.'"><option>-- Selecteer een render property --</option>';
+                foreach ($c->mapping as $key=>$value){
+                    if(isset($value) && $fieldName===$value){
+                        $part.='<option selected value="'.$key.'">'.$key.'</option>';
                     } else{
-                        $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
+                        $part.='<option value="'.$key.'">'.$key.'</option>';
                     }
                 }
                 $part.='</select></li>';
