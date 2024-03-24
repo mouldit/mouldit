@@ -6,7 +6,6 @@ function generateFrontend($dir,$pages){
     for ($i=0;$i<sizeof($pages);$i++){
         if($pages[$i]->main){
             printMainPage($pages[$i],$dir,$pages);
-            break;
         } else{
             printPage($pages[$i],$dir,$pages);
         }
@@ -36,6 +35,7 @@ export class AppComponent {
 }
 
 function printPage($p,$dir, $pages){
+    echo 'printing '.$p->name;
     if(isset($p->parentId)){
         printSubPage($p,$dir,$pages);
     } else{
