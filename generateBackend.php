@@ -76,6 +76,7 @@ function generateBackend($concepts, $actions, $path): bool
                             for ($j = 0; $j < sizeof($actions); $j++) {
                                 if (str_contains($actions[$j]->name, $_SESSION['concepts'][$i]->name)) {
                                     $api1 = 'router.' . $actions[$j]->verb . '(\''
+                                        // todo getActionUrl method of bewaar die onmiddellijk in de actie
                                         . '/' . $_SESSION['concepts'][$i]->name . 's\', async (req:any,res:any,next:any)=>{' . "\n\t";
                                     $api2 = "\n" . '}});' . "\n";
                                     fwrite($fp, $api1, strlen($api1));

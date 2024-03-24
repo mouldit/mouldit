@@ -8,8 +8,9 @@ IMPORTS
   templateUrl: './RESOURCE.component.html',
   styleUrl: './RESOURCE.component.css'
 })
-export class COMPNAMEComponent implements OnInit{
+export class COMPNAME implements OnInit{
     VARS
+    CONSTRUCTOR
   ngOnInit(): void {
     ONINIT
   }

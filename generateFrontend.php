@@ -18,12 +18,12 @@ function generateFrontend($dir,$pages){
     $f = fopen($dir.'/app.component.ts','wb');
     $data="import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {MainPageComponent} from \"./main-page/main-page.component\";
+import {MainPage} from \"./main-page/main-page.component\";
 
 @Component({
   selector: 'app-root',
   standalone:true,
-  imports: [RouterOutlet, MainPageComponent],
+  imports: [RouterOutlet, MainPage],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -35,13 +35,13 @@ export class AppComponent {
 }
 
 function printPage($p,$dir, $pages){
-    echo 'printing '.$p->name;
     if(isset($p->parentId)){
         printSubPage($p,$dir,$pages);
     } else{
-        $dirName = $dir.'/'.getPageFolderName($p);
+        $dirName = $dir.'/'.getPageFolderName($p->name);
         if(!file_exists($dirName))mkdir($dirName);
-        $f = fopen($dirName.'/'.getPageFolderName($p).'.component.html','wb');
+        touch($dirName.'/'.getPageFolderName($p->name).'.component.css');
+        $f = fopen($dirName.'/'.getPageFolderName($p->name).'.component.html','wb');
         if($f){
             $data = '';
             foreach ($p->components as $c){
@@ -51,10 +51,11 @@ function printPage($p,$dir, $pages){
                         break;
                     case 'card':
                         if(isset($c->actionLink) && $c->actionLink->getReturnType()==='list'){
+                            echo '<pre>'.print_r($c->mapping, true).'</pre>';
                             $data.='<ng-container *ngFor="let '.$c->actionLink->concept.' of '.$c->actionLink->concept.'s'.'; let i = index">
             <p-card 
-            header="'.$c->actionLink->concept.'.'.$c->mapping->header.'" 
-            subheader="'.$c->actionLink->concept.'.'.$c->mapping->subheader.'"></p-card>
+            header="'.$c->actionLink->concept.'.'.$c->mapping['header'].'" 
+            subheader="'.$c->actionLink->concept.'.'.$c->mapping['subheader'].'"></p-card>
           </ng-container>';
                         } else{
 
@@ -64,6 +65,62 @@ function printPage($p,$dir, $pages){
                         break;
                 }
             }
+            fwrite($f,$data);
+            fclose($f);
+        }
+        $f = fopen($dirName.'/'.getPageFolderName($p->name).'.component.ts','wb');
+        if($f){
+            $data = file_get_contents('resource-page.txt');
+            $data = str_replace(['RESOURCE','COMPNAME'],[getPageFolderName($p->name),getPageComponentName($p->name)],$data);
+            $vars='';
+            $imports='';
+            $compImports = '';
+            $oninit = '';
+            $constructor='';
+            foreach ($p->components as $c){
+                switch ($c->type){
+                    case 'menubar':
+                        $vars.='items: MenuItem[] | undefined;'."\n";
+                        $imports.='import { MenuItem } from \'primeng/api\';'."\n";
+                        $imports.='import { MenubarModule } from \'primeng/menubar\';'."\n";
+                        $compImports.='MenubarModule, ';
+                        $oninit.="\n".'this.items=['."\n";
+                        foreach ($c->menuItems as $menuItem){
+                            if($menuItem->page){
+                                for ($i=0;$i<sizeof($pages);$i++){
+                                    if($pages[$i]->id===$menuItem->page){
+                                        $compName = getPageComponentName($pages[$i]->name);
+                                        $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:'.$compName.'},'."\n";
+                                        $imports.='import { '.$compName.' } from \''.getPath($pages[$i],$p,$pages).'\';'."\n";
+                                        break;
+                                    }
+                                }
+                            } else{
+                                $oninit.="{\t".'label:\''.$menuItem->name.'\'},'."\n";
+                            }
+                        }
+                        $oninit.=']'."\n";
+                        break;
+                    case 'card':
+                        // todo voorlopig hardcoded meervoud van concept bij actie
+                        // todo voeg modellen toe zodat je dit naderhand kan typescripten
+                        $vars = $c->actionLink->concept.'s:any=undefined;';
+                        $constructor.='constructor(private http: HttpClient) {}';
+                        $imports.='import { CardModule } from \'primeng/card\';'."\n";
+                        $imports.='import { HttpClient } from \'@angular/common/http\';'."\n";
+                        $imports.='import { Observable, throwError } from \'rxjs\';'."\n";
+                        $imports.='import { catchError, map } from \'rxjs/operators\';'."\n";
+                        $compImports.='CardModule, ';
+                        // todo url er dynamisch uithalen is nu hardcoded
+                        $oninit.='this.http.'.$c->actionLink->verb.'(\'http://localhost:5000/'.$c->actionLink->concept.'s\').pipe(map((err, res) => {
+            this.'.$c->actionLink->concept.'s=res;
+        }));';
+                        break;
+                    case 'table':
+                        break;
+                }
+            }
+            $data = str_replace(['IMPORTS','VARS','ONINIT','COMPMPRTS','CONSTRUCTOR'],[$imports,$vars,$oninit,$compImports,$constructor],$data);
             fwrite($f,$data);
             fclose($f);
         }
@@ -100,6 +157,7 @@ function printMainPage($mp,$dir, $pages){
         $imports='';
         $compImports = '';
         $oninit = '';
+        $constructor='';
         foreach ($mp->components as $c){
             switch ($c->type){
                 case 'menubar':
@@ -114,7 +172,8 @@ function printMainPage($mp,$dir, $pages){
                                 if($pages[$i]->id===$menuItem->page){
                                     $compName = getPageComponentName($pages[$i]->name);
                                     $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:'.$compName.'},'."\n";
-                                    $imports.='import { '.$compName.' } from \''.getPath($pages[$i],$mp,$pages).'\';'."\n";
+                                    // todo test import { ContentsPageComponent} from "../contents-page/contents-page.component";
+                                    $imports.='import { '.$compName.' } from \''.getPath($pages[$i],$mp,$pages).'/'.getPageFolderName($pages[$i]->name).'.component\';'."\n";
                                     break;
                                 }
                             }
@@ -130,7 +189,7 @@ function printMainPage($mp,$dir, $pages){
                     break;
             }
         }
-        $data = str_replace(['IMPORTS','VARS','ONINIT','COMPMPRTS'],[$imports,$vars,$oninit,$compImports],$data);
+        $data = str_replace(['IMPORTS','VARS','ONINIT','COMPMPRTS','CONSTRUCTOR'],[$imports,$vars,$oninit,$compImports,$constructor],$data);
         fwrite($f,$data);
         fclose($f);
     }
@@ -164,7 +223,7 @@ function getFolderPath(Page $p,$pages){
     return $path;
 }
 function getPath(Page $target,Page $current,$pages){
-    $levelDir = './../';
+    $levelDir = '../';
     $parent = $current->parentId ?? NULL;
     while($parent){
         $levelDir.='../';
