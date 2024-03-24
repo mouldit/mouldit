@@ -234,14 +234,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 $val = NULL;
                                 for ($l=0;$l<sizeof($fieldNames);$l++){
                                     if(isset($_POST[$fieldNames[$l]]) && $_POST[$fieldNames[$l]]===$prop){
-                                        $val = $_POST[$fieldNames[$l]];
+                                        $val = $fieldNames[$l];
                                         break;
                                     }
                                 }
                                 $_SESSION['pages'][$i]->components[$j]->mapping[$prop]=$val;
                             }
-                            // todo controleer of dit werkt
-                            //echo '<pre>'.print_r($_SESSION['pages'][$l], true).'</pre>';
+                            //echo '<pre>'.print_r($_SESSION['pages'][$i]->components[$j]->mapping, true).'</pre>';
                             break;
                         }
                     }
