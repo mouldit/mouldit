@@ -74,6 +74,7 @@ function printSubPage($sp,$dir, $pages){
 }
 function printMainPage($mp,$dir, $pages){
     if(!file_exists($dir.'/main-page'))mkdir($dir.'/main-page');
+    touch($dir.'/main-page/main-page.component.css');
     $f = fopen($dir.'/main-page/main-page.component.html','wb');
     if($f){
         $data = '';
