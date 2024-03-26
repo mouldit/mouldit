@@ -4,6 +4,9 @@ function generateFrontend($dir,$pages){
 /*    chdir($dir); // getest = ok
     exec('npx ng g c main-page');*/
     for ($i=0;$i<sizeof($pages);$i++){
+        // todo print method in pagina zelf please!
+        //      de app.module.ts file passer je vervolgens hier door naar deze pagina
+        //      deze pagina roept dan mogelijks de verschillende components op die ook hun methods hebben
         if($pages[$i]->main){
             printMainPage($pages[$i],$dir,$pages);
         } else{
@@ -71,7 +74,7 @@ function printPage($p,$dir, $pages){
             $compName = getPageComponentName($p->name);
             $appModule = fopen($dir.'/app-module.txt','wb');
             $modData = file_get_contents('app-module.txt');
-            if($modData){
+            if($appModule && $modData){
                 // todo fix: in deze file zit er ook imports wat een fout genereert
                 $importIndex = strpos($modData,'import');
                 $nextImportIndex = strpos($modData,'import',$importIndex+1);
@@ -85,6 +88,7 @@ function printPage($p,$dir, $pages){
                 $part2 = substr($modData,$nextImportIndex);
                 $part1 = strstr($modData,$part2,true);
                 $modData = $part1."\n".'import {'.$compName.' } from '.getPath($p,$p,$pages)."\n".$part2;
+                // todo declarations not working yet not added!
                 $declIndex = strpos($modData,'declarations');
                 $splitIndex = strpos($modData,']',$declIndex);
                 $part2 = substr($modData,$splitIndex);
@@ -105,11 +109,17 @@ function printPage($p,$dir, $pages){
                         $imports.='import { MenuItem } from \'primeng/api\';'."\n";
                         // todo add modules to imports of app.module.ts
                         $appModule = fopen($dir.'/app.module.ts','wb');
-                        if($appModule){
+                        $modData = file_get_contents('app-module.txt');
+                        if($appModule && $modData){
                             $modData = file_get_contents($dir.'/app.module.ts');
                             // todo fix bug import - imports
-                            $lastImportIndex = strrpos($modData,'import');
-                            $nextImportIndex = strpos($modData,';',$lastImportIndex);
+                            $importIndex = strpos($modData,'import');
+                            $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                            $importsIndex = strpos($modData,'imports');
+                            while(($nextImportIndex)&&$nextImportIndex<$importsIndex){
+                                $importsIndex = $nextImportIndex;
+                                $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                            }
                             $part2 = substr($modData,$nextImportIndex);
                             $part1 = strstr($modData,$part2,true);
                             $modData = $part1."\n"
@@ -117,11 +127,11 @@ function printPage($p,$dir, $pages){
                                 .'import { MenuModule } from \'primeng/menu\';'
                                 ."\n".$part2;
                             // todo fix bug import - imports
-                            $importsIndex = strpos($modData,'imports');
+                            //      dit wordt niet getest omdat dit niet in de pag zit maar in de main page
                             $splitIndex = strpos($modData,']',$importsIndex);
                             $part2 = substr($modData,$splitIndex);
                             $part1 = strstr($modData,$part2,true);
-                            fwrite($appModule,$part1."MenubarModule,\nMenuModule,\n".$part2);
+                            fwrite($appModule,$part1.",\nMenubarModule,\nMenuModule,\n".$part2);
                             fclose($appModule);
                         }
                         $oninit.="\n".'this.items=['."\n";
@@ -144,6 +154,27 @@ function printPage($p,$dir, $pages){
                     case 'card':
                         // todo voorlopig hardcoded meervoud van concept bij actie
                         // todo voeg modellen toe zodat je dit naderhand kan typescripten
+                        $appModule = fopen($dir.'/app.module.ts','wb');
+                        $modData = file_get_contents('app-module.txt');
+                        if($appModule && $modData){
+                            $importIndex = strpos($modData,'import');
+                            $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                            $importsIndex = strpos($modData,'imports');
+                            while(($nextImportIndex)&&$nextImportIndex<$importsIndex){
+                                $importsIndex = $nextImportIndex;
+                                $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                            }
+                            $part2 = substr($modData,$nextImportIndex);
+                            $part1 = strstr($modData,$part2,true);
+                            $modData = $part1."\n"
+                                .'import { CardModule } from \'primeng/card\';'
+                                ."\n".$part2;
+                            $splitIndex = strpos($modData,']',$importsIndex);
+                            $part2 = substr($modData,$splitIndex);
+                            $part1 = strstr($modData,$part2,true);
+                            fwrite($appModule,$part1.",\nCardModule,\n".$part2);
+                            fclose($appModule);
+                        }
                         $vars = $c->actionLink->concept.'s:any=undefined;';
                         $constructor.='constructor(private http: HttpClient) {}';
                         $imports.='import { CardModule } from \'primeng/card\';'."\n";
@@ -194,16 +225,32 @@ function printMainPage($mp,$dir, $pages){
     if($f){
         $compName = 'MainPage';
         $appModule = fopen($dir.'/app.module.ts','wb');
-        if($appModule){
-            $modData = file_get_contents($dir.'/app.module.ts');
-            // todo fix bug import - imports
-            $lastImportIndex = strrpos($modData,'import');
-            // ik veronderstel voor het gemak dat alle imports afgesloten worden met een ;
-            $nextImportIndex = strpos($modData,';',$lastImportIndex);
+        $modData = file_get_contents('app-module.txt');
+        if($appModule && $modData){
+            // todo fix bug import - imports => nu werkt dit niet meer waarschijnlijk omdat het door andere pagina's overschreven wordt
+            //      strategie: je maakt een app.module.ts file
+            //                 voor elk der import, declarauiont, imports etc gebruik je een uniek symbool dat je na het schijrven telkens toevoegt
+            //                 nadat alles gescrheven is wis je deze symbolen => is vele malen eenvoudiger!
+            // todo zorg ook voor een controle mechanisme dat bijhoudt welke modules en imports er al zijn
+            // todo zet alle writes voor een file html, css of ts in de overeenkomstige component klasse
+            //      bv. Menubar => writing module file, ts of component file, alsook html en css?
+            // todo doe hetzelfde voor een page klasse met onderscheid in de page tussen main en niet main (in principe aparte pagina's maar goed)
+            $importIndex = strpos($modData,'import');
+            $nextImportIndex = strpos($modData,'import',$importIndex+1);
+            $importsIndex = strpos($modData,'imports');
+            while(($nextImportIndex)&&$nextImportIndex<$importsIndex){
+                $importsIndex = $nextImportIndex;
+                $nextImportIndex = strpos($modData,'import',$importIndex+1);
+            }
             $part2 = substr($modData,$nextImportIndex);
             $part1 = strstr($modData,$part2,true);
-            $modData = $part1."\n".'import {'.$compName.' } from ./main-page/main-page.component;'."\n".$part2;
-            fwrite($appModule,$part1."\n".', '.$compName.$part2);
+            $modData = $part1."\n".'import {'.$compName.' } from \'./main-page/main-page.component\';'."\n".$part2;
+            $declIndex = strpos($modData,'declarations');
+            $splitIndex = strpos($modData,']',$declIndex);
+            $part2 = substr($modData,$splitIndex);
+            $part1 = strstr($modData,$part2,true);
+            // todo add to app.module.ts => imports
+            fwrite($appModule,$part1.",\nMainPage\n".$part2);
             fclose($appModule);
         }
         $data = file_get_contents('resource-page.txt');
@@ -216,6 +263,30 @@ function printMainPage($mp,$dir, $pages){
         foreach ($mp->components as $c){
             switch ($c->type){
                 case 'menubar':
+                    // todo => MenubarModule adding
+                    $appModule = fopen($dir.'/app.module.ts','wb');
+                    $modData = file_get_contents('app-module.txt');
+                    if($appModule && $modData){
+                        // todo fix bug import - imports
+                        $importIndex = strpos($modData,'import');
+                        $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                        $importsIndex = strpos($modData,'imports');
+                        while(($nextImportIndex)&&$nextImportIndex<$importsIndex){
+                            $importsIndex = $nextImportIndex;
+                            $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                        }
+                        $part2 = substr($modData,$nextImportIndex);
+                        $part1 = strstr($modData,$part2,true);
+                        $modData = $part1."\n"
+                            .'import { MenubarModule } from \'primeng/menubar\';'
+                            .'import { MenuModule } from \'primeng/menu\';'
+                            ."\n".$part2;
+                        $splitIndex = strpos($modData,']',$importsIndex);
+                        $part2 = substr($modData,$splitIndex);
+                        $part1 = strstr($modData,$part2,true);
+                        fwrite($appModule,$part1.",\nMenubarModule,\nMenuModule,\n".$part2);
+                        fclose($appModule);
+                    }
                     $vars.='items: MenuItem[] | undefined;'."\n";
                     $imports.='import { MenuItem } from \'primeng/api\';'."\n";
                     $oninit.="\n".'this.items=['."\n";
@@ -246,7 +317,6 @@ function printMainPage($mp,$dir, $pages){
         fclose($f);
     }
 }
-
 function getPageComponentName($pageName){
     $componentName = explode('_',$pageName);
     $componentName = array_slice($componentName,-2);
