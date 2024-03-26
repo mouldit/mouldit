@@ -17,13 +17,10 @@ function generateFrontend($dir,$pages){
     fclose($f);
     $f = fopen($dir.'/app.component.ts','wb');
     $data="import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import {MainPage} from \"./main-page/main-page.component\";
 
 @Component({
   selector: 'app-root',
-  standalone:true,
-  imports: [RouterOutlet, MainPage],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -51,7 +48,7 @@ function printPage($p,$dir, $pages){
                         break;
                     case 'card':
                         if(isset($c->actionLink) && $c->actionLink->getReturnType()==='list'){
-                            echo '<pre>'.print_r($c->mapping, true).'</pre>';
+                            //echo '<pre>'.print_r($c->mapping, true).'</pre>';
                             $data.='<ng-container *ngFor="let '.$c->actionLink->concept.' of '.$c->actionLink->concept.'s'.'; let i = index">
             <p-card 
             header="'.$c->actionLink->concept.'.'.$c->mapping['header'].'" 
@@ -70,6 +67,7 @@ function printPage($p,$dir, $pages){
         }
         $f = fopen($dirName.'/'.getPageFolderName($p->name).'.component.ts','wb');
         if($f){
+            // todo add component to app.module.ts
             $data = file_get_contents('resource-page.txt');
             $data = str_replace(['RESOURCE','COMPNAME'],[getPageFolderName($p->name),getPageComponentName($p->name)],$data);
             $vars='';
@@ -83,7 +81,8 @@ function printPage($p,$dir, $pages){
                         $vars.='items: MenuItem[] | undefined;'."\n";
                         $imports.='import { MenuItem } from \'primeng/api\';'."\n";
                         $imports.='import { MenubarModule } from \'primeng/menubar\';'."\n";
-                        $compImports.='MenubarModule, ';
+                        // todo add modules to imports of app.module.ts
+                        //$compImports.='MenubarModule, ';
                         $oninit.="\n".'this.items=['."\n";
                         foreach ($c->menuItems as $menuItem){
                             if($menuItem->page){
@@ -164,7 +163,8 @@ function printMainPage($mp,$dir, $pages){
                     $vars.='items: MenuItem[] | undefined;'."\n";
                     $imports.='import { MenuItem } from \'primeng/api\';'."\n";
                     $imports.='import { MenubarModule } from \'primeng/menubar\';'."\n";
-                    $compImports.='MenubarModule, ';
+                    // todo add modules to imports of app.module.ts
+                    //$compImports.='MenubarModule, ';
                     $oninit.="\n".'this.items=['."\n";
                     foreach ($c->menuItems as $menuItem){
                         if($menuItem->page){
