@@ -67,9 +67,25 @@ function printPage($p,$dir, $pages){
         }
         $f = fopen($dirName.'/'.getPageFolderName($p->name).'.component.ts','wb');
         if($f){
-            // todo add component to app.module.ts
             $data = file_get_contents('resource-page.txt');
-            $data = str_replace(['RESOURCE','COMPNAME'],[getPageFolderName($p->name),getPageComponentName($p->name)],$data);
+            $compName = getPageComponentName($p->name);
+            $appModule = fopen($dir.'/app.module.ts','wb');
+            if($appModule){
+                $modData = file_get_contents($dir.'/app.module.ts');
+                $lastImportIndex = strrpos($modData,'import');
+                // ik veronderstel voor het gemak dat alle imports afgesloten worden met een ;
+                $nextImportIndex = strpos($modData,';',$lastImportIndex);
+                $part2 = substr($modData,$nextImportIndex);
+                $part1 = strstr($modData,$part2,true);
+                $modData = $part1."\n".'import {'.$compName.' } from '.getPath($p,$p,$pages)."\n".$part2;
+                $declIndex = strpos($modData,'declarations');
+                $splitIndex = strpos($modData,']',$declIndex);
+                $part2 = substr($modData,$splitIndex);
+                $part1 = strstr($modData,$part2,true);
+                fwrite($appModule,$part1."\n".', '.$compName.$part2);
+                fclose($appModule);
+            }
+            $data = str_replace(['RESOURCE','COMPNAME'],[getPageFolderName($p->name),$compName],$data);
             $vars='';
             $imports='';
             $compImports = '';
@@ -80,9 +96,25 @@ function printPage($p,$dir, $pages){
                     case 'menubar':
                         $vars.='items: MenuItem[] | undefined;'."\n";
                         $imports.='import { MenuItem } from \'primeng/api\';'."\n";
-                        $imports.='import { MenubarModule } from \'primeng/menubar\';'."\n";
                         // todo add modules to imports of app.module.ts
-                        //$compImports.='MenubarModule, ';
+                        $appModule = fopen($dir.'/app.module.ts','wb');
+                        if($appModule){
+                            $modData = file_get_contents($dir.'/app.module.ts');
+                            $lastImportIndex = strrpos($modData,'import');
+                            $nextImportIndex = strpos($modData,';',$lastImportIndex);
+                            $part2 = substr($modData,$nextImportIndex);
+                            $part1 = strstr($modData,$part2,true);
+                            $modData = $part1."\n"
+                                .'import { MenubarModule } from \'primeng/menubar\';'
+                                .'import { MenuModule } from \'primeng/menu\';'
+                                ."\n".$part2;
+                            $importsIndex = strpos($modData,'imports');
+                            $splitIndex = strpos($modData,']',$importsIndex);
+                            $part2 = substr($modData,$splitIndex);
+                            $part1 = strstr($modData,$part2,true);
+                            fwrite($appModule,$part1."MenubarModule,\nMenuModule,\n".$part2);
+                            fclose($appModule);
+                        }
                         $oninit.="\n".'this.items=['."\n";
                         foreach ($c->menuItems as $menuItem){
                             if($menuItem->page){
@@ -122,6 +154,7 @@ function printPage($p,$dir, $pages){
             $data = str_replace(['IMPORTS','VARS','ONINIT','COMPMPRTS','CONSTRUCTOR'],[$imports,$vars,$oninit,$compImports,$constructor],$data);
             fwrite($f,$data);
             fclose($f);
+
         }
     }
 }
@@ -150,6 +183,19 @@ function printMainPage($mp,$dir, $pages){
     }
     $f = fopen($dir.'/main-page/main-page.component.ts','wb');
     if($f){
+        $compName = 'MainPage';
+        $appModule = fopen($dir.'/app.module.ts','wb');
+        if($appModule){
+            $modData = file_get_contents($dir.'/app.module.ts');
+            $lastImportIndex = strrpos($modData,'import');
+            // ik veronderstel voor het gemak dat alle imports afgesloten worden met een ;
+            $nextImportIndex = strpos($modData,';',$lastImportIndex);
+            $part2 = substr($modData,$nextImportIndex);
+            $part1 = strstr($modData,$part2,true);
+            $modData = $part1."\n".'import {'.$compName.' } from ./main-page/main-page.component;'."\n".$part2;
+            fwrite($appModule,$part1."\n".', '.$compName.$part2);
+            fclose($appModule);
+        }
         $data = file_get_contents('resource-page.txt');
         $data = str_replace(['RESOURCE','COMPNAME'],['main-page','MainPage'],$data);
         $vars='';
@@ -162,9 +208,6 @@ function printMainPage($mp,$dir, $pages){
                 case 'menubar':
                     $vars.='items: MenuItem[] | undefined;'."\n";
                     $imports.='import { MenuItem } from \'primeng/api\';'."\n";
-                    $imports.='import { MenubarModule } from \'primeng/menubar\';'."\n";
-                    // todo add modules to imports of app.module.ts
-                    //$compImports.='MenubarModule, ';
                     $oninit.="\n".'this.items=['."\n";
                     foreach ($c->menuItems as $menuItem){
                         if($menuItem->page){
@@ -172,7 +215,6 @@ function printMainPage($mp,$dir, $pages){
                                 if($pages[$i]->id===$menuItem->page){
                                     $compName = getPageComponentName($pages[$i]->name);
                                     $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:'.$compName.'},'."\n";
-                                    // todo test import { ContentsPageComponent} from "../contents-page/contents-page.component";
                                     $imports.='import { '.$compName.' } from \''.getPath($pages[$i],$mp,$pages).'/'.getPageFolderName($pages[$i]->name).'.component\';'."\n";
                                     break;
                                 }
