@@ -3,8 +3,6 @@ IMPORTS
 
 @Component({
   selector: 'app-RESOURCE',
-  standalone: true,
-  imports: [COMPMPRTS],
   templateUrl: './RESOURCE.component.html',
   styleUrl: './RESOURCE.component.css'
 })

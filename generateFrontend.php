@@ -69,12 +69,19 @@ function printPage($p,$dir, $pages){
         if($f){
             $data = file_get_contents('resource-page.txt');
             $compName = getPageComponentName($p->name);
-            $appModule = fopen($dir.'/app.module.ts','wb');
-            if($appModule){
-                $modData = file_get_contents($dir.'/app.module.ts');
-                $lastImportIndex = strrpos($modData,'import');
+            $appModule = fopen($dir.'/app-module.txt','wb');
+            $modData = file_get_contents('app-module.txt');
+            if($modData){
+                // todo fix: in deze file zit er ook imports wat een fout genereert
+                $importIndex = strpos($modData,'import');
+                $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                $importsIndex = strpos($modData,'imports');
+                while(($nextImportIndex)&&$nextImportIndex<$importsIndex){
+                    $importsIndex = $nextImportIndex;
+                    $nextImportIndex = strpos($modData,'import',$importIndex+1);
+                }
                 // ik veronderstel voor het gemak dat alle imports afgesloten worden met een ;
-                $nextImportIndex = strpos($modData,';',$lastImportIndex);
+                $nextImportIndex = strpos($modData,';',$importsIndex);
                 $part2 = substr($modData,$nextImportIndex);
                 $part1 = strstr($modData,$part2,true);
                 $modData = $part1."\n".'import {'.$compName.' } from '.getPath($p,$p,$pages)."\n".$part2;
@@ -100,6 +107,7 @@ function printPage($p,$dir, $pages){
                         $appModule = fopen($dir.'/app.module.ts','wb');
                         if($appModule){
                             $modData = file_get_contents($dir.'/app.module.ts');
+                            // todo fix bug import - imports
                             $lastImportIndex = strrpos($modData,'import');
                             $nextImportIndex = strpos($modData,';',$lastImportIndex);
                             $part2 = substr($modData,$nextImportIndex);
@@ -108,6 +116,7 @@ function printPage($p,$dir, $pages){
                                 .'import { MenubarModule } from \'primeng/menubar\';'
                                 .'import { MenuModule } from \'primeng/menu\';'
                                 ."\n".$part2;
+                            // todo fix bug import - imports
                             $importsIndex = strpos($modData,'imports');
                             $splitIndex = strpos($modData,']',$importsIndex);
                             $part2 = substr($modData,$splitIndex);
@@ -187,6 +196,7 @@ function printMainPage($mp,$dir, $pages){
         $appModule = fopen($dir.'/app.module.ts','wb');
         if($appModule){
             $modData = file_get_contents($dir.'/app.module.ts');
+            // todo fix bug import - imports
             $lastImportIndex = strrpos($modData,'import');
             // ik veronderstel voor het gemak dat alle imports afgesloten worden met een ;
             $nextImportIndex = strpos($modData,';',$lastImportIndex);
