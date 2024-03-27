@@ -74,7 +74,9 @@ class Frontend
         return $this->pageExist($page->id) && !$this->isResourcePage($page) && !$this->isMainPage($page);
     }
     public function getPath(int $id):string{
-        // todo strategie:
+        // todo strategie: per pagina startende van een resourcepagina voeg je de folder naam toe
+        //      en dat doe je natuurlijk in omgekeerde volgorde en je eindigt met een / of ./
+
     }
 
     /**
