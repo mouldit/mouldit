@@ -54,13 +54,13 @@ class Page implements IPage
         $this->components[]=$comp;
     }
 
-    function getImportStatement()
+    function getImportStatement(string $path)
     {
-        // TODO: Implement getImportStatement() method.  't hangt ervan af waar het gebeurt namelijk qua folderpath
+        return 'import {'.$this->getPageComponentName().'} from \''.$path.'\';';
     }
 
     function getDeclarationsStatement()
     {
-        // TODO: Implement getDeclarationsStatement() method.
+        return "\n{$this->getPageComponentName()},";
     }
 }

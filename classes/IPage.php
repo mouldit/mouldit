@@ -1,5 +1,5 @@
 <?php
 interface IPage{
-    function getImportStatement();
+    function getImportStatement(string $path);
     function getDeclarationsStatement();
 }

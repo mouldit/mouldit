@@ -73,6 +73,9 @@ class Frontend
     public function isSubPage(Page $page):bool{
         return $this->pageExist($page->id) && !$this->isResourcePage($page) && !$this->isMainPage($page);
     }
+    public function getPath(int $id):string{
+        // todo strategie:
+    }
 
     /**
      * @throws Exception
@@ -107,8 +110,10 @@ export class AppComponent {
         $data = file_get_contents('/app-module.txt');
         if($data){
             foreach ($this->pages as $p){
+                // todo get path
                 $data=str_replace(['COMPONENT_IMPORT_STATEMENT','COMPONENT_DECLARATIONS_STATEMENT'],
-                    [$p->getImportStatement()."\nMODULE_IMPORT_STATEMENT",$p->getDeclarationsStatement()."\nMODULE_IMPORTS_STATEMENT"],$data);
+                    [$p->getImportStatement($this->getPath($p->id))."\nCOMPONENT_IMPORT_STATEMENT",
+                        $p->getDeclarationsStatement()."\nCOMPONENT_DECLARATIONS_STATEMENT"],$data);
                 foreach ($p->components as $c){
                     if(array_search($c->type,$declared)===false){
                         $declared[]=$c->type;
