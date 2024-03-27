@@ -20,4 +20,14 @@ class Card extends \Component  implements IComponent
     {
         return ['header','subheader'];
     }
+
+    function getImportStatement()
+    {
+        return "\n".'import {CardModule} from "primeng/card";';
+    }
+
+    function getImportsStatement()
+    {
+        return "\n".'CardModule,';
+    }
 }

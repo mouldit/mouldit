@@ -73,4 +73,58 @@ class Frontend
     public function isSubPage(Page $page):bool{
         return $this->pageExist($page->id) && !$this->isResourcePage($page) && !$this->isMainPage($page);
     }
+
+    /**
+     * @throws Exception
+     */
+    public function generate(string $dir){
+        touch($dir.'/app.component.css');
+        $f = fopen($dir.'/app.component.html','wb');
+        $mp = $this->getMainPage();
+        $data = $mp->getHTMLSelector();
+        // todo later router outlet component toevoegen aan main page by default
+        $data.="\n<router-outlet/>";
+        fwrite($f,$data);
+        fclose($f);
+        $f = fopen($dir.'/app.component.ts','wb');
+        // todo toevoegen van import en andere variabelen aan de app.component.ts file
+        $data=" 
+import { Component } from '@angular/core';
+import {{$mp->getPageComponentName()}} from \"{$mp->getPageFolderName()}/{$mp->getPageFolderName()}.component\";         
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
+})
+export class AppComponent {
+  title = 'client';
+}";
+        fwrite($f,$data);
+        fclose($f);
+        // todo app.module.ts: declaration(s) + import(s),
+        $declared=[];
+        $f = fopen($dir.'/app.module.ts','wb');
+        $data = file_get_contents('/app-module.txt');
+        if($data){
+            foreach ($this->pages as $p){
+                $data=str_replace(['COMPONENT_IMPORT_STATEMENT','COMPONENT_DECLARATIONS_STATEMENT'],
+                    [$p->getImportStatement()."\nMODULE_IMPORT_STATEMENT",$p->getDeclarationsStatement()."\nMODULE_IMPORTS_STATEMENT"],$data);
+                foreach ($p->components as $c){
+                    if(array_search($c->type,$declared)===false){
+                        $declared[]=$c->type;
+                        $data = str_replace(['MODULE_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT'],
+                            [$c->getImportStatement()."\nMODULE_IMPORT_STATEMENT",$c->getImportsStatement()."\nMODULE_IMPORTS_STATEMENT"],$data);
+                    }
+                }
+            }
+            fwrite($f,$data);
+            fclose($f);
+        }
+
+        // todo app.routes.ts
+
+        // todo main page
+        // todo each resourcepage
+        // todo for each resource page every subpage etc.
+    }
 }

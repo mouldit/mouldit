@@ -1,6 +1,6 @@
 <?php
 
-class Page
+class Page implements IPage
 {
     // todo parent id zodat de compiler weet dat een bepaalde pagina als subpagina in angular geprint moet worden (=subfolder)
     //      indien er geen parent id is dan is dit een main resource page, typisch voor get all RESOURCENAME actionpages
@@ -32,8 +32,35 @@ class Page
     public function deselect(){
         $this->selected=false;
     }
+    public function getHTMLSelector(){
+        $fn = $this->getPageFolderName();
+        return '<app-'.$fn.'></ app-'.$fn.'>';
+    }
+    function getPageComponentName(){
+        $componentName = explode('_',$this->name);
+        $componentName = array_slice($componentName,-2);
+        array_walk($componentName,function (&$el,$index){
+            $el = ucfirst($el);
+        });
+        return implode('',$componentName).'Component';
+    }
+    function getPageFolderName(){
+        $folderName = explode('_',$this->name);
+        $folderName = array_slice($folderName,-2);
+        return implode('-',$folderName);
+    }
 
     public function addComponent(Component $comp){
         $this->components[]=$comp;
+    }
+
+    function getImportStatement()
+    {
+        // TODO: Implement getImportStatement() method.  't hangt ervan af waar het gebeurt namelijk qua folderpath
+    }
+
+    function getDeclarationsStatement()
+    {
+        // TODO: Implement getDeclarationsStatement() method.
     }
 }

@@ -15,7 +15,8 @@ spl_autoload_register(function () {
     include 'classes/FieldSet.php';
     include 'classes/SubFieldSet.php';
     include 'generateBackend.php';
-    include 'generateFrontend.php';
+    include 'classes/Frontend.php';
+    include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
 });
 session_start();
 global $implementedTypesOfComponents;
@@ -23,7 +24,7 @@ $implementedTypesOfComponents = ['card', 'menubar', 'table'];
 // frontend
 if (isset($_SESSION['pathToRootOfClient'])) {
     if (isset($_POST['generate-frontend']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-        generateFrontend($_SESSION['pathToRootOfClient'].'/src/app',$_SESSION['frontend']->pages);
+        $_SESSION['frontend']->generate($_SESSION['pathToRootOfClient'].'/src/app');
     }
 }
 // backend
@@ -105,6 +106,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $selected = false;
     $main = new Page($_SESSION['pageCounter']++, 'main_page', '', true);
     $main->select();
+    // todo add a router outlet component by default
     $_SESSION['frontend']->pages[] = $main;
     foreach ($_SESSION['actions'] as $a) {
         $p = new Page($_SESSION['pageCounter']++, $a->name . '_page', $a->clientURL);

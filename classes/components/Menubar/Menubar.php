@@ -27,4 +27,13 @@ class Menubar extends \Component  implements IComponent
     }
 
 
+    function getImportStatement()
+    {
+        return "\n".'import {MenubarModule} from "primeng/menubar";'."\n".'import {MenuModule} from "primeng/menu";';
+    }
+
+    function getImportsStatement()
+    {
+        return "\n".'MenubarModule,'. "\n".'MenuModule,';
+    }
 }
