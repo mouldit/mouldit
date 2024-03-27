@@ -23,7 +23,7 @@ $implementedTypesOfComponents = ['card', 'menubar', 'table'];
 // frontend
 if (isset($_SESSION['pathToRootOfClient'])) {
     if (isset($_POST['generate-frontend']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-        generateFrontend($_SESSION['pathToRootOfClient'].'/src/app',$_SESSION['pages']);
+        generateFrontend($_SESSION['pathToRootOfClient'].'/src/app',$_SESSION['frontend']->pages);
     }
 }
 // backend
@@ -101,15 +101,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
-    $_SESSION['pages'] = [];
+    $_SESSION['frontend']  = new Frontend() ;
     $selected = false;
     $main = new Page($_SESSION['pageCounter']++, 'main_page', '', true);
     $main->select();
-    $_SESSION['pages'][] = $main;
+    $_SESSION['frontend']->pages[] = $main;
     foreach ($_SESSION['actions'] as $a) {
         $p = new Page($_SESSION['pageCounter']++, $a->name . '_page', $a->clientURL);
         $p->actionLink = $a->name;
-        $_SESSION['pages'][] = $p;
+        $p->parentId=$main->id;
+        $_SESSION['frontend']->pages[] = $p;
     }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
@@ -120,25 +121,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['new-page-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            $_SESSION['pages'][$i]->selected = false;
-        } else if ($_POST['page-name'] === $_SESSION['pages'][$i]->name) {
-            $_SESSION['pages'][$i]->selected = true;
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            $_SESSION['frontend']->pages[$i]->selected = false;
+        } else if ($_POST['page-name'] === $_SESSION['frontend']->pages[$i]->name) {
+            $_SESSION['frontend']->pages[$i]->selected = true;
         }
     }
 } else if (isset($_POST['new-component-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->selected) {
-                    $_SESSION['pages'][$i]->components[$j]->deselect();
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                    $_SESSION['frontend']->pages[$i]->components[$j]->deselect();
                     break;
                 }
             }
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->name === $_POST['component-name']) {
-                    $_SESSION['pages'][$i]->components[$j]->select();
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->name === $_POST['component-name']) {
+                    $_SESSION['frontend']->pages[$i]->components[$j]->select();
                     break;
                 }
             }
@@ -185,16 +186,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['page-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            $_SESSION['pages'][$i]->name = $_POST['name'];
-            $_SESSION['pages'][$i]->url = $_POST['url'];
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            $_SESSION['frontend']->pages[$i]->name = $_POST['name'];
+            $_SESSION['frontend']->pages[$i]->url = $_POST['url'];
             if (isset($_POST['action']) && isset($_POST['target'])) {
-                for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                    if ($_SESSION['pages'][$i]->components[$j]->id === (int)$_POST['target']) {
+                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                    if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['target']) {
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action']) {
-                                $_SESSION['pages'][$i]->components[$j]->linkWithAction($_SESSION['actions'][$k]);
+                                $_SESSION['frontend']->pages[$i]->components[$j]->linkWithAction($_SESSION['actions'][$k]);
                                 break;
                             }
                         }
@@ -202,17 +203,17 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     }
                 }
             }
-            if (isset($_POST['action'])) $_SESSION['pages'][$i]->actionLink = $_POST['action'];
+            if (isset($_POST['action'])) $_SESSION['frontend']->pages[$i]->actionLink = $_POST['action'];
             break;
         }
     }
 } else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->selected) {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     if (isset($_POST['component-name'])) {
-                        $_SESSION['pages'][$i]->components[$j]->name = $_POST['component-name'];
+                        $_SESSION['frontend']->pages[$i]->components[$j]->name = $_POST['component-name'];
                     }
                     break;
                 }
@@ -221,14 +222,14 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->id === (int)$_POST['page']) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->id === (int)$_POST['component']) {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->id === (int)$_POST['page']) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['component']) {
                     for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
-                        if ($_SESSION['actions'][$k]->name === $_SESSION['pages'][$i]->actionLink) {
-                            $props = $_SESSION['pages'][$i]->components[$j]->getAttributes();
-                            $_SESSION['pages'][$i]->components[$j]->mapping = [];
+                        if ($_SESSION['actions'][$k]->name === $_SESSION['frontend']->pages[$i]->actionLink) {
+                            $props = $_SESSION['frontend']->pages[$i]->components[$j]->getAttributes();
+                            $_SESSION['frontend']->pages[$i]->components[$j]->mapping = [];
                             $fieldNames = $_SESSION['actions'][$k]->getFullQualifiedFieldNames();
                             foreach ($props as $prop){
                                 $val = NULL;
@@ -238,9 +239,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         break;
                                     }
                                 }
-                                $_SESSION['pages'][$i]->components[$j]->mapping[$prop]=$val;
+                                $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$prop]=$val;
                             }
-                            //echo '<pre>'.print_r($_SESSION['pages'][$i]->components[$j]->mapping, true).'</pre>';
+                            //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->mapping, true).'</pre>';
                             break;
                         }
                     }
@@ -251,17 +252,17 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['remove']) && isset($_POST['remove-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->selected) {
-                    for ($k = 0; $k < sizeof($_SESSION['pages'][$i]->components[$j]->menuItems); $k++) {
-                        if ($_SESSION['pages'][$i]->components[$j]->menuItems[$k]->name === $_POST['remove-item']) {
-                            $rang = $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number;
-                            array_splice($_SESSION['pages'][$i]->components[$j]->menuItems, $k, 1);
-                            for ($k = 0; $k < sizeof($_SESSION['pages'][$i]->components[$j]->menuItems); $k++) {
-                                if ($_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number > $rang) {
-                                    $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number--;
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                    for ($k = 0; $k < sizeof($_SESSION['frontend']->pages[$i]->components[$j]->menuItems); $k++) {
+                        if ($_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->name === $_POST['remove-item']) {
+                            $rang = $_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->number;
+                            array_splice($_SESSION['frontend']->pages[$i]->components[$j]->menuItems, $k, 1);
+                            for ($k = 0; $k < sizeof($_SESSION['frontend']->pages[$i]->components[$j]->menuItems); $k++) {
+                                if ($_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->number > $rang) {
+                                    $_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->number--;
                                 }
                             }
                             break;
@@ -274,13 +275,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['add-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->selected) {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     if (isset($_POST['item-name']) && isset($_POST['page'])) {
-                        $nmbr = sizeof($_SESSION['pages'][$i]->components[$j]->menuItems) + 1;
-                        $_SESSION['pages'][$i]->components[$j]->menuItems[] = new \components\Menubar\MenuItem($_POST['item-name'], $_POST['page'], $nmbr);
+                        $nmbr = sizeof($_SESSION['frontend']->pages[$i]->components[$j]->menuItems) + 1;
+                        $_SESSION['frontend']->pages[$i]->components[$j]->menuItems[] = new \components\Menubar\MenuItem($_POST['item-name'], $_POST['page'], $nmbr);
                     }
                     break;
                 }
@@ -289,20 +290,20 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['save-item']) && isset($_POST['edit-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->selected) {
-                    for ($k = 0; $k < sizeof($_SESSION['pages'][$i]->components[$j]->menuItems); $k++) {
-                        if ($_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number == $_POST['edit-item']) {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                    for ($k = 0; $k < sizeof($_SESSION['frontend']->pages[$i]->components[$j]->menuItems); $k++) {
+                        if ($_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->number == $_POST['edit-item']) {
                             if (isset($_POST['menu-item-number'])) {
-                                $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->number = $_POST['menu-item-number'];
+                                $_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->number = $_POST['menu-item-number'];
                             }
                             if (isset($_POST['menu-item-name'])) {
-                                $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->name = $_POST['menu-item-name'];
+                                $_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->name = $_POST['menu-item-name'];
                             }
                             if (isset($_POST['page'])) {
-                                $_SESSION['pages'][$i]->components[$j]->menuItems[$k]->page = $_POST['page'];
+                                $_SESSION['frontend']->pages[$i]->components[$j]->menuItems[$k]->page = $_POST['page'];
                             }
                             break;
                         }
@@ -314,25 +315,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['add']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
             $counter = 0;
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->type == $_POST['add-component']) $counter++;
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->type == $_POST['add-component']) $counter++;
             }
             $comp = NULL;
             switch ($_POST['add-component']) {
                 case 'menubar':
-                    if ($_SESSION['pages'][$i]->main) {
+                    if ($_SESSION['frontend']->pages[$i]->main) {
                         $menuItems = [];
                         for ($j = 0; $j < sizeof($_SESSION['concepts']); $j++) {
                             // per concept ga je indien er een getAllActie voor bestaat een default menu item krijgen
                             for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                                 if ($_SESSION['actions'][$k]->type === 'Get_all' && $_SESSION['actions'][$k]->concept === $_SESSION['concepts'][$j]->name) {
-                                    for ($l = 0; $l < sizeof($_SESSION['pages']); $l++) {
-                                        if (isset($_SESSION['pages'][$l]->actionLink) && $_SESSION['pages'][$l]->actionLink === $_SESSION['actions'][$k]->name) {
+                                    for ($l = 0; $l < sizeof($_SESSION['frontend']->pages); $l++) {
+                                        if (isset($_SESSION['frontend']->pages[$l]->actionLink) && $_SESSION['frontend']->pages[$l]->actionLink === $_SESSION['actions'][$k]->name) {
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
-                                                $_SESSION['pages'][$l]->id
+                                                $_SESSION['frontend']->pages[$l]->id
                                                 , $j + 1);
                                             break;
                                         }
@@ -341,11 +342,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 }
                             }
                         }
-                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                             $_POST['add-component'], $menuItems
                         );
                     } else {
-                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                             $_POST['add-component']);
                     }
                     break;
@@ -353,11 +354,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     break;
                 case 'card':
 
-                    $comp = new \components\Card\Card($_SESSION['componentCounter']++, $_SESSION['pages'][$i]->id, $_SESSION['pages'][$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                    $comp = new \components\Card\Card($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                         $_POST['add-component']);
                     break;
             }
-            $_SESSION['pages'][$i]->addComponent($comp);
+            $_SESSION['frontend']->pages[$i]->addComponent($comp);
             break;
         }
     }
@@ -441,13 +442,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 <div id="pages" style="float:left; min-width: 200px;border:1px solid red">
     <ul style="margin:0">
         <?php
-        for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-            if ($_SESSION['pages'][$i]->selected) {
-                echo "<li class='selected'>" . $_SESSION['pages'][$i]->name . "</li>";
+        for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+            if ($_SESSION['frontend']->pages[$i]->selected) {
+                echo "<li class='selected'>" . $_SESSION['frontend']->pages[$i]->name . "</li>";
             } else echo "<li style='overflow:auto'>
-                            <span style='float:left'>" . $_SESSION['pages'][$i]->name . "</span> 
+                            <span style='float:left'>" . $_SESSION['frontend']->pages[$i]->name . "</span> 
                              <form style='float:right' action=\"" . $_SERVER['PHP_SELF'] . "\" method='post'>
-                               <input  type='hidden' value='" . $_SESSION['pages'][$i]->name . "' name='page-name'>
+                               <input  type='hidden' value='" . $_SESSION['frontend']->pages[$i]->name . "' name='page-name'>
                                <button type='submit' name='new-page-selected'>edit</button>
                             </form>
                          </li>";
@@ -457,18 +458,18 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 </div>
 <div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        showPage($_SESSION['pages'][$i], $_SESSION['actions'], $implementedTypesOfComponents);
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        showPage($_SESSION['frontend']->pages[$i], $_SESSION['actions'], $implementedTypesOfComponents);
     }
     ?>
 </div>
 <div id="component-detail" style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
-    for ($i = 0; $i < sizeof($_SESSION['pages']); $i++) {
-        if ($_SESSION['pages'][$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['pages'][$i]->components); $j++) {
-                if ($_SESSION['pages'][$i]->components[$j]->selected) {
-                    showComponent($_SESSION['pages'][$i]->components[$j], $_SESSION['pages']);
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                    showComponent($_SESSION['frontend']->pages[$i]->components[$j], $_SESSION['frontend']->pages);
                     break;
                 }
             }

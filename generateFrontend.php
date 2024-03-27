@@ -35,6 +35,8 @@ export class AppComponent {
 }
 
 function printPage($p,$dir, $pages){
+    // todo subpages moeten genest zijn in een parent page
+    //      $p => $subpage array page id of de volledige page? zoals bij fieldset/subfieldset ?
     if(isset($p->parentId)){
         printSubPage($p,$dir,$pages);
     } else{
