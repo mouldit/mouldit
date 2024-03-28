@@ -36,4 +36,22 @@ class Menubar extends \Component  implements IComponent
     {
         return "\n".'MenubarModule,'. "\n".'MenuModule,';
     }
+
+    function getComponentImportStatements(int $levelsOfNesting):string
+    {
+        echo 'hi from '.$this->name;
+        $importStatements = '';
+        echo '<pre>'.print_r($this->pages, true).'</pre>';
+        foreach ($this->menuItems as $mi){
+            // todo fix: je beschikt wel over de methodes maar niet over de waarde pages!
+
+            for ($i=0;$i<sizeof($this->pages);$i++){
+                if($this->pages[$i]->id===$mi->page){
+                    $importStatements.="\n".$this->pages[$i]->getRelativeImportStatement($levelsOfNesting);
+                    break;
+                }
+            }
+        }
+        return $importStatements;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class Component
+class Component extends Frontend
 {
     public readonly int $id;
     public readonly int $pageId;

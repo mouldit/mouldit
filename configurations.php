@@ -3,6 +3,7 @@ spl_autoload_register(function () {
     include 'showAction.php';
     include 'showPage.php';
     include 'showComponent.php';
+    include 'classes/Frontend.php';
     include 'classes/IComponent.php';
     include 'classes/IPage.php';
     include 'classes/Action.php';
@@ -16,7 +17,6 @@ spl_autoload_register(function () {
     include 'classes/FieldSet.php';
     include 'classes/SubFieldSet.php';
     include 'generateBackend.php';
-    include 'classes/Frontend.php';
    // include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
 });
 session_start();

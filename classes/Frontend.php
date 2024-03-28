@@ -89,6 +89,10 @@ class Frontend
     {
         return $this->pageExist($page->id) && !$this->isResourcePage($page) && !$this->isMainPage($page);
     }
+    public function getLevelOfNesting(Page $page):int{
+        // todo
+        return 1;
+    }
 
     /**
      * @throws Exception
@@ -98,7 +102,7 @@ class Frontend
         $path = '';
         while (isset($id) && $current = $this->getPageFor($id)) {
             $path = $current->getPageFolderName() . '/' . $path;
-            $id = isset($current->parentId) && !$this->isMainPage($this->getPageFor($current->parentId)) ? $current->parentId :  NULL;
+            $id = isset($current->parentId) && !$this->isMainPage($this->getPageFor($current->parentId)) ? $current->parentId : NULL;
         }
         return '/' . $path;
     }
@@ -118,8 +122,7 @@ class Frontend
         fclose($f);
         $f = fopen($dir . '/app.component.ts', 'wb');
         // todo toevoegen van import en andere variabelen aan de app.component.ts file
-        $data = "import { Component } from '@angular/core';
-import {{$mp->getPageComponentName()}} from \"{$mp->getPageFolderName()}/{$mp->getPageFolderName()}.component\";         
+        $data = "import { Component } from '@angular/core';    
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -132,29 +135,76 @@ export class AppComponent {
         fclose($f);
         $declared = [];
         $f = fopen($dir . '/app.module.ts', 'wb');
-        $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '\app-module.txt');
-        if ($data) {
+        $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '\text-files\app-module.txt');
+        if ($f && $data) {
             foreach ($this->pages as $p) {
                 $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT'],
-                    [$p->getImportStatement($this->getPath($p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
+                    [$p->getImportStatement('.'.$this->getPath($p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
                         $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT"], $data);
                 foreach ($p->components as $c) {
                     if (!in_array($c->type, $declared)) {
                         $declared[] = $c->type;
                         $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
-                            [$c->getImportStatement() . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement() . "\nMODULE_IMPORTS_STATEMENT"], $data);
+                            ['.'.$c->getImportStatement() . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement() . "\nMODULE_IMPORTS_STATEMENT"], $data);
                     }
                 }
             }
-            $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT','COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT'],
-                ['','','',''], $data);
+            $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT', 'COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT'],
+                ['', '', '', ''], $data);
             fwrite($f, $data);
-            fclose($f);
         }
+        if ($f) fclose($f);
 
+        foreach ($this->pages as $p) {
+            if ($this->isResourcePage($p)||$this->isMainPage($p)) {
+                // create directory
+                if(!file_exists($dir . $this->getPath($p->id)))mkdir($dir . $this->getPath($p->id));
+                // create html
+                // todo
+                $f = fopen($dir . $this->getPath($p->id) . $p->getPageFolderName() . '.component.ts', 'wb');
+                $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '\text-files\resource-page.txt');
+                if ($f && $data) {
+                    echo 'page is '.$p->name;
+                    $declared = [];
+                    $lon = $this->getLevelOfNesting($p);
+                    foreach ($p->components as $c) {
+                        // todo fix bv card aan movies pages wordt blijkbaar NIET TOEGEVOEGD!
+                        if (!in_array($c->type, $declared)) {
+                            $declared[] = $c->type; // todo fix: dat mag wel, enkel de imports moeten uniek zijn
+                            // todo fix: de imports van de verschillende menu items gebeuren niet
+                            $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT'],
+                                ["MODULE_IMPORT_STATEMENT", $c->getComponentImportStatements($lon)
+                                    . "\nCOMPONENT_IMPORT_STATEMENT"], $data);
+                        }
+                    }
+                             /*
+         *
+
+        COMPONENT_SELECTOR
+        HTML_FILE_NAME
+        CSS_FILE_NAME
+        COMPONENT_VARIABLES
+        COMPONENT_CONSTRUCTOR
+        NG_ON_INIT_BODY
+         *
+         *
+         * */
+                    $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT','COMPONENT_CLASS_NAME',
+                        'COMPONENT_SELECTOR',
+                        'HTML_FILE_NAME',
+                        'CSS_FILE_NAME',
+                        'COMPONENT_VARIABLES',
+                        'COMPONENT_CONSTRUCTOR',
+                        'NG_ON_INIT_BODY'],
+                        ['', '', '', '', '', '', '', '',''], $data);
+                    fwrite($f, $data);
+                }
+                if ($f) fclose($f);
+                touch($dir . $this->getPath($p->id) . $p->getPageFolderName() . '.component.css');
+            } else if ($this->isSubPage($p)) {
+                // todo
+            }
+        }
         // todo app.routes.ts
-        // todo main page
-        // todo each resourcepage
-        // todo for each resource page every subpage etc.
     }
 }

@@ -1,0 +1,18 @@
+import {Component, OnInit} from '@angular/core';
+MODULE_IMPORT_STATEMENT
+COMPONENT_IMPORT_STATEMENT
+
+@Component({
+  selector: 'COMPONENT_SELECTOR',
+  templateUrl: './HTML_FILE_NAME',
+  styleUrl: './CSS_FILE_NAME'
+})
+export class COMPONENT_CLASS_NAME implements OnInit{
+    COMPONENT_VARIABLES
+
+    COMPONENT_CONSTRUCTOR
+
+  ngOnInit(): void {
+    NG_ON_INIT_BODY
+  }
+}

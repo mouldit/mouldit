@@ -20,7 +20,7 @@ class Card extends \Component  implements IComponent
     {
         return ['header','subheader'];
     }
-
+    // todo sommige componenten maken gebruik van pagina componenten die dan ook geïmporteerd worden
     function getImportStatement()
     {
         return "\n".'import {CardModule} from "primeng/card";';
@@ -29,5 +29,10 @@ class Card extends \Component  implements IComponent
     function getImportsStatement()
     {
         return "\n".'CardModule,';
+    }
+
+    function getComponentImportStatements( int $levelsOfNesting)
+    {
+        return '';
     }
 }
