@@ -73,16 +73,24 @@ class Frontend
     public function isSubPage(Page $page):bool{
         return $this->pageExist($page->id) && !$this->isResourcePage($page) && !$this->isMainPage($page);
     }
-    public function getPath(int $id):string{
-        // todo strategie: per pagina startende van een resourcepagina voeg je de folder naam toe
-        //      en dat doe je natuurlijk in omgekeerde volgorde en je eindigt met een / of ./
 
+    /**
+     * @throws Exception
+     */
+    public function getPath($id):string{
+        $path='';
+        while(isset($id) && $current = $this->getPageFor($id)){
+            $path=$current->getPageFolderName().'/'.$path;
+            $id=$current->parentId;
+        }
+        return '/'.$path;
     }
 
     /**
      * @throws Exception
      */
-    public function generate(string $dir){
+    public function generate(string $dir): void
+    {
         touch($dir.'/app.component.css');
         $f = fopen($dir.'/app.component.html','wb');
         $mp = $this->getMainPage();
@@ -106,18 +114,16 @@ export class AppComponent {
 }";
         fwrite($f,$data);
         fclose($f);
-        // todo app.module.ts: declaration(s) + import(s),
         $declared=[];
         $f = fopen($dir.'/app.module.ts','wb');
         $data = file_get_contents('/app-module.txt');
         if($data){
             foreach ($this->pages as $p){
-                // todo get path
                 $data=str_replace(['COMPONENT_IMPORT_STATEMENT','COMPONENT_DECLARATIONS_STATEMENT'],
                     [$p->getImportStatement($this->getPath($p->id))."\nCOMPONENT_IMPORT_STATEMENT",
                         $p->getDeclarationsStatement()."\nCOMPONENT_DECLARATIONS_STATEMENT"],$data);
                 foreach ($p->components as $c){
-                    if(array_search($c->type,$declared)===false){
+                    if(!in_array($c->type, $declared)){
                         $declared[]=$c->type;
                         $data = str_replace(['MODULE_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT'],
                             [$c->getImportStatement()."\nMODULE_IMPORT_STATEMENT",$c->getImportsStatement()."\nMODULE_IMPORTS_STATEMENT"],$data);
@@ -129,7 +135,6 @@ export class AppComponent {
         }
 
         // todo app.routes.ts
-
         // todo main page
         // todo each resourcepage
         // todo for each resource page every subpage etc.

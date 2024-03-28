@@ -56,7 +56,7 @@ class Page implements IPage
 
     function getImportStatement(string $path)
     {
-        return 'import {'.$this->getPageComponentName().'} from \''.$path.'\';';
+        return 'import {'.$this->getPageComponentName().'} from \''.$path.'/'.$this->getPageFolderName().'.component\';';
     }
 
     function getDeclarationsStatement()
