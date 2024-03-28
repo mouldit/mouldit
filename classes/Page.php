@@ -34,7 +34,7 @@ class Page implements IPage
     }
     public function getHTMLSelector(){
         $fn = $this->getPageFolderName();
-        return '<app-'.$fn.'></ app-'.$fn.'>';
+        return '<app-'.$fn.'></app-'.$fn.'>';
     }
     function getPageComponentName(){
         $componentName = explode('_',$this->name);
@@ -44,7 +44,8 @@ class Page implements IPage
         });
         return implode('',$componentName).'Component';
     }
-    function getPageFolderName(){
+    function getPageFolderName(): string
+    {
         $folderName = explode('_',$this->name);
         $folderName = array_slice($folderName,-2);
         return implode('-',$folderName);
@@ -53,10 +54,9 @@ class Page implements IPage
     public function addComponent(Component $comp){
         $this->components[]=$comp;
     }
-
     function getImportStatement(string $path)
     {
-        return 'import {'.$this->getPageComponentName().'} from \''.$path.'/'.$this->getPageFolderName().'.component\';';
+        return 'import {'.$this->getPageComponentName().'} from \''.$path.$this->getPageFolderName().'.component\';';
     }
 
     function getDeclarationsStatement()

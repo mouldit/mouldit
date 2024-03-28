@@ -4,6 +4,7 @@ spl_autoload_register(function () {
     include 'showPage.php';
     include 'showComponent.php';
     include 'classes/IComponent.php';
+    include 'classes/IPage.php';
     include 'classes/Action.php';
     include 'classes/Component.php';
     include 'classes/components/Menubar/Menubar.php';
@@ -16,7 +17,7 @@ spl_autoload_register(function () {
     include 'classes/SubFieldSet.php';
     include 'generateBackend.php';
     include 'classes/Frontend.php';
-    include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
+   // include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
 });
 session_start();
 global $implementedTypesOfComponents;

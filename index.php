@@ -21,11 +21,11 @@ if(isset($_POST['paths'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
         <label for="path-to-root-server-folder">
             Enter path of server root folder
         </label>
-        <input id="path-to-root-server-folder" name="path-to-root-server-folder">
+        <input value="D:\mouldit-test-project-1/server" id="path-to-root-server-folder" name="path-to-root-server-folder">
         <label for="path-to-root-client-folder">
             Enter path of client root folder
         </label>
-        <input id="path-to-root-client-folder" name="path-to-root-client-folder">
+        <input value="D:\mouldit-test-project-1/client" id="path-to-root-client-folder" name="path-to-root-client-folder">
         <button type="submit" name="paths">Ok</button>
     </form>
 </body>
