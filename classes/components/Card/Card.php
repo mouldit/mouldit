@@ -31,7 +31,7 @@ class Card extends \Component  implements IComponent
         return "\n".'CardModule,';
     }
 
-    function getComponentImportStatements( int $levelsOfNesting)
+    function getComponentImportStatements( int $levelsOfNesting,array $pages)
     {
         return '';
     }

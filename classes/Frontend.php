@@ -46,6 +46,8 @@ class Frontend
     public function getAllResourcePages(): array
     {
         $rp = [];
+        // todo het probleem is dat je in frontend een pages object hebt maar door de extends ook in elke page maar daar is die leeg!
+        //      oplossing: page mag niet extenden en component ook niet maar toch over de noodzakelijke methodes beschikkenén over de pages waarde
         for ($i = 0; $i < sizeof($this->pages); $i++) {
             if ($this->isResourcePage($this->pages[$i])) $rp[] = $this->pages[$i];
         }
@@ -57,8 +59,9 @@ class Frontend
      */
     public function getPageFor($id): Page
     {
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->pages[$i]->id === $id) return $this->pages[$i];
+        echo '<pre>'.print_r($this->pages, true).'</pre>';
+        for ($i = 1; $i <= sizeof($this->pages); $i++) {
+            if ($this->pages[$i-1]->id === $id) return $this->pages[$i-1];
         }
         throw new Exception('Page was not found in $pages');
     }
@@ -171,9 +174,10 @@ export class AppComponent {
                         // todo fix bv card aan movies pages wordt blijkbaar NIET TOEGEVOEGD!
                         if (!in_array($c->type, $declared)) {
                             $declared[] = $c->type; // todo fix: dat mag wel, enkel de imports moeten uniek zijn
+
                             // todo fix: de imports van de verschillende menu items gebeuren niet
                             $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT'],
-                                ["MODULE_IMPORT_STATEMENT", $c->getComponentImportStatements($lon)
+                                ["MODULE_IMPORT_STATEMENT", $c->getComponentImportStatements($lon,$this->pages)
                                     . "\nCOMPONENT_IMPORT_STATEMENT"], $data);
                         }
                     }
