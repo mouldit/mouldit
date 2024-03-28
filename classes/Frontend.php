@@ -48,6 +48,7 @@ class Frontend
         $rp = [];
         // todo het probleem is dat je in frontend een pages object hebt maar door de extends ook in elke page maar daar is die leeg!
         //      oplossing: page mag niet extenden en component ook niet maar toch over de noodzakelijke methodes beschikkenén over de pages waarde
+        //                  => Traits!!!
         for ($i = 0; $i < sizeof($this->pages); $i++) {
             if ($this->isResourcePage($this->pages[$i])) $rp[] = $this->pages[$i];
         }
