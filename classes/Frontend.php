@@ -62,11 +62,9 @@ export class AppComponent {
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
                 $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
-                    $declared = [];
                     $lon = $this->getLevelOfNesting($p);
                     foreach ($p->components as $c) {
-                        if (!in_array($c->type, $declared)) {
-                            $declared[] = $c->type; // todo fix: dat mag wel, enkel de imports moeten uniek zijn
+                        if (!str_contains($data,$c->getComponentImportStatements($lon,$this->pages))) {
                             $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT'],
                                 ["MODULE_IMPORT_STATEMENT", $c->getComponentImportStatements($lon,$this->pages)
                                     . "\nCOMPONENT_IMPORT_STATEMENT"], $data);
@@ -95,7 +93,7 @@ export class AppComponent {
                     fwrite($f, $data);
                 }
                 if ($f) fclose($f);
-                touch($dir . $this->getPath($this->pages,$p->id) . $p->getPageFolderName() . '.component.css');
+                touch($dir . $this->getPath($this->pages,$p->id) . '/'.$p->getPageFolderName() . '.component.css');
             } else if ($this->isSubPage($this->pages,$p)) {
                 // todo
             }
