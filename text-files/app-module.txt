@@ -16,7 +16,7 @@ COMPONENT_IMPORT_STATEMENT
     AppRoutingModule,
     MODULE_IMPORTS_STATEMENT
   ],
-  providers: [],
+  providers: [MODULE_PROVIDER_STATEMENT],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

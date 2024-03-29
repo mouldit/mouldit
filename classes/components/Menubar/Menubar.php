@@ -65,8 +65,7 @@ class Menubar extends \Component  implements IComponent
             if($menuItem->page){
                 for ($i=0;$i<sizeof($pages);$i++){
                     if($pages[$i]->id===$menuItem->page){
-                        $compName = $pages[$i]->getPageComponentName();
-                        $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:'.$compName.'},'."\n";
+                        $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:\''.$pages[$i]->url.'\'},'."\n";
                         break;
                     }
                 }

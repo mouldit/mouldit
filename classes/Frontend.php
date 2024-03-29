@@ -35,10 +35,13 @@ export class AppComponent {
         $f = fopen($dir . '/app.module.ts', 'wb');
         $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-module.txt');
         if ($f && $data) {
+            $data = str_replace(['COMPONENT_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT', 'MODULE_PROVIDER_STATEMENT'],
+                ["\nimport { HttpClientModule } from '@angular/common/http';\nCOMPONENT_IMPORT_STATEMENT",
+                    "\nHttpClientModule,\nMODULE_IMPORTS_STATEMENT",""], $data);
             foreach ($this->pages as $p) {
-                $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT'],
+                $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT','MODULE_PROVIDER_STATEMENT'],
                     [$p->getImportStatement('.'.$this->getPath($this->pages,$p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
-                        $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT"], $data);
+                       $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT",""], $data);
                 foreach ($p->components as $c) {
                     if (!in_array($c->type, $declared)) {
                         $declared[] = $c->type;
@@ -52,14 +55,19 @@ export class AppComponent {
             fwrite($f, $data);
         }
         if ($f) fclose($f);
-        foreach ($this->pages as $p) {
-            $f = fopen($dir . '/app-routing.module.ts', 'wb');
-            $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-routing.txt');
-            if($f && $data){
-                // todo routes!!!
-                fwrite($f, $data);
+        $f = fopen($dir . '/app-routing.module.ts', 'wb');
+        $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-routing.txt');
+        if($f && $data){
+            foreach($this->pages as $p){
+                $data = str_replace(['APP_ROUTES','COMPONENT_IMPORT_STATEMENT'],
+                    [$p->getRouteObj() . "\nAPP_ROUTES",$p->getImportStatement('.'.$this->getPath($this->pages,$p->id)) . "\nCOMPONENT_IMPORT_STATEMENT"], $data);
             }
-            if ($f) fclose($f);
+            $data = str_replace(['APP_ROUTES','COMPONENT_IMPORT_STATEMENT'],
+                ['', ''], $data);
+            fwrite($f, $data);
+        }
+        if ($f) fclose($f);
+        foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');

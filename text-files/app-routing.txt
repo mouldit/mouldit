@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+COMPONENT_IMPORT_STATEMENT
 
 const routes: Routes = [
     APP_ROUTES

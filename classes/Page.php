@@ -34,10 +34,10 @@ class Page implements IPage
         return '<app-'.$fn.'></app-'.$fn.'>';
     }
     public function getHTMLFilePath(){
-        return  './'.$this->getPageFolderName().'/'.$this->getPageFolderName().'.component.html';
+        return  './'.$this->getPageFolderName().'.component.html';
     }
     public function getCSSFilePath(){
-        return  './'.$this->getPageFolderName().'/'.$this->getPageFolderName().'.component.css';
+        return  './'.$this->getPageFolderName().'.component.css';
     }
     function getPageComponentName(){
         $componentName = explode('_',$this->name);
@@ -75,5 +75,10 @@ class Page implements IPage
         $nesting = str_repeat('/..', $nestingLevel);
         $nesting=substr($nesting,1);
         return 'import {'.$this->getPageComponentName().'} from \''.$nesting.$this->getPath($pages,$this->id).'/'.$this->getPageFolderName().'.component\';';
+    }
+    function getRouteObj(){
+        if(str_starts_with($this->url, '/')){
+            return "{path: '".substr($this->url,1)."',component:{$this->getPageComponentName()}},\n";
+        } else return "{path: '".$this->url."',component:{$this->getPageComponentName()}},\n";
     }
 }
