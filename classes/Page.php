@@ -77,8 +77,8 @@ class Page implements IPage
         return 'import {'.$this->getPageComponentName().'} from \''.$nesting.$this->getPath($pages,$this->id).'/'.$this->getPageFolderName().'.component\';';
     }
     function getRouteObj(){
-        if(str_starts_with($this->url, '/')){
+        if(isset($this->parentId) && str_starts_with($this->url, '/')){
             return "{path: '".substr($this->url,1)."',component:{$this->getPageComponentName()}},\n";
-        } else return "{path: '".$this->url."',component:{$this->getPageComponentName()}},\n";
+        } else if(isset($this->parentId))return "{path: '".$this->url."',component:{$this->getPageComponentName()}},\n";else return "";
     }
 }
