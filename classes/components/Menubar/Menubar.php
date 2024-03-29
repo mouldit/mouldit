@@ -45,7 +45,7 @@ class Menubar extends \Component  implements IComponent
             // todo fix: je beschikt wel over de methodes maar niet over de waarde pages!
             for ($i=0;$i<sizeof($pages);$i++){
                 if($pages[$i]->id===$mi->page){
-                    $importStatements.="\n".$pages[$i]->getRelativeImportStatement($levelsOfNesting);
+                    $importStatements.="\n".$pages[$i]->getRelativeImportStatement($pages,$levelsOfNesting);
                     break;
                 }
             }

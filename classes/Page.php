@@ -1,11 +1,8 @@
 <?php
 
-class Page extends Frontend implements IPage
+class Page implements IPage
 {
-    // todo parent id zodat de compiler weet dat een bepaalde pagina als subpagina in angular geprint moet worden (=subfolder)
-    //      indien er geen parent id is dan is dit een main resource page, typisch voor get all RESOURCENAME actionpages
-    //      standaard zal een getByID actie een subpage zijn van een get all resource main page
-    //      idem voor update by id pages
+    use FrontendMethods;
     public readonly int $id; // statisch
     public string $name; // wijzigt
     public int $parentId;
@@ -56,7 +53,7 @@ class Page extends Frontend implements IPage
     }
     function getImportStatement(string $path)
     {
-        return 'import {'.$this->getPageComponentName().'} from \''.$path.$this->getPageFolderName().'.component\';';
+        return 'import {'.$this->getPageComponentName().'} from \''.$path.'/'.$this->getPageFolderName().'.component\';';
     }
 
     function getDeclarationsStatement()
@@ -67,9 +64,9 @@ class Page extends Frontend implements IPage
     /**
      * @throws Exception
      */
-    function getRelativeImportStatement(int $nestingLevel)
+    function getRelativeImportStatement($pages,int $nestingLevel)
     {
         $nesting = str_repeat('/..', $nestingLevel);
-        return 'import {'.$this->getPageComponentName().'} from \''.$nesting.$this->getPath($this->id).$this->getPageFolderName().'.component\';';
+        return 'import {'.$this->getPageComponentName().'} from \'.'.$nesting.$this->getPath($pages,$this->id).'/'.$this->getPageFolderName().'.component\';';
     }
 }

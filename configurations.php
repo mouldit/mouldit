@@ -3,6 +3,7 @@ spl_autoload_register(function () {
     include 'showAction.php';
     include 'showPage.php';
     include 'showComponent.php';
+    include 'classes/frontend-methods.php';
     include 'classes/Frontend.php';
     include 'classes/IComponent.php';
     include 'classes/IPage.php';

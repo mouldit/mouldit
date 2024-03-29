@@ -2,114 +2,8 @@
 
 class Frontend
 {
+    use FrontendMethods;
     public array $pages = [];
-
-    /**
-     * @throws Exception
-     */
-    public function getParentFor(int $pageId): Page
-    {
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->pages[$i]->id === $pageId) return $this->pages[$i];
-        }
-        throw new Exception('Page not found in $pages');
-    }
-
-    public function pageExist($pageId): bool
-    {
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->pages[$i]->id === $pageId) return true;
-        }
-        return false;
-    }
-
-    public function getSubPagesFor(int $pageId): array
-    {
-        $subpages = [];
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->pages[$i]->parentId === $pageId) $subpages[] = $this->pages[$i];
-        }
-        return $subpages;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getMainPage(): Page
-    {
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->isMainPage($this->pages[$i])) return $this->pages[$i];
-        }
-        throw new Exception('A Main Page was not found in $pages');
-    }
-
-    public function getAllResourcePages(): array
-    {
-        $rp = [];
-        // todo het probleem is dat je in frontend een pages object hebt maar door de extends ook in elke page maar daar is die leeg!
-        //      oplossing: page mag niet extenden en component ook niet maar toch over de noodzakelijke methodes beschikkenén over de pages waarde
-        //                  => Traits!!!
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->isResourcePage($this->pages[$i])) $rp[] = $this->pages[$i];
-        }
-        return $rp;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getPageFor($id): Page
-    {
-        echo '<pre>'.print_r($this->pages, true).'</pre>';
-        for ($i = 1; $i <= sizeof($this->pages); $i++) {
-            if ($this->pages[$i-1]->id === $id) return $this->pages[$i-1];
-        }
-        throw new Exception('Page was not found in $pages');
-    }
-
-    public function getPageType($id): string
-    {
-        $p = $this->getPageFor($id);
-        if ($this->isMainPage($p)) return 'main page';
-        if ($this->isResourcePage($p)) return 'resource page';
-        return 'subpage';
-    }
-
-    public function isResourcePage(Page $page): bool
-    {
-        if (!$this->pageExist($page->id) || !isset($page->parentId)) return false;
-        for ($i = 0; $i < sizeof($this->pages); $i++) {
-            if ($this->pages[$i]->id === $page->parentId && $this->isMainPage($this->pages[$i])) return true;
-        }
-        return false;
-    }
-
-    public function isMainPage(Page $page): bool
-    {
-        return $this->pageExist($page->id) && !isset($page->parentId);
-    }
-
-    public function isSubPage(Page $page): bool
-    {
-        return $this->pageExist($page->id) && !$this->isResourcePage($page) && !$this->isMainPage($page);
-    }
-    public function getLevelOfNesting(Page $page):int{
-        // todo
-        return 1;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getPath($id): string
-    {
-        $path = '';
-        while (isset($id) && $current = $this->getPageFor($id)) {
-            $path = $current->getPageFolderName() . '/' . $path;
-            $id = isset($current->parentId) && !$this->isMainPage($this->getPageFor($current->parentId)) ? $current->parentId : NULL;
-        }
-        return '/' . $path;
-    }
 
     /**
      * @throws Exception
@@ -118,7 +12,7 @@ class Frontend
     {
         touch($dir . '/app.component.css');
         $f = fopen($dir . '/app.component.html', 'wb');
-        $mp = $this->getMainPage();
+        $mp = $this->getMainPage($this->pages);
         $data = $mp->getHTMLSelector();
         // todo later router outlet component toevoegen aan main page by default
         $data .= "\n<router-outlet/>";
@@ -139,17 +33,17 @@ export class AppComponent {
         fclose($f);
         $declared = [];
         $f = fopen($dir . '/app.module.ts', 'wb');
-        $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '\text-files\app-module.txt');
+        $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-module.txt');
         if ($f && $data) {
             foreach ($this->pages as $p) {
                 $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT'],
-                    [$p->getImportStatement('.'.$this->getPath($p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
+                    [$p->getImportStatement('.'.$this->getPath($this->pages,$p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
                         $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT"], $data);
                 foreach ($p->components as $c) {
                     if (!in_array($c->type, $declared)) {
                         $declared[] = $c->type;
                         $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
-                            ['.'.$c->getImportStatement() . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement() . "\nMODULE_IMPORTS_STATEMENT"], $data);
+                            [$c->getImportStatement() . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement() . "\nMODULE_IMPORTS_STATEMENT"], $data);
                     }
                 }
             }
@@ -160,23 +54,19 @@ export class AppComponent {
         if ($f) fclose($f);
 
         foreach ($this->pages as $p) {
-            if ($this->isResourcePage($p)||$this->isMainPage($p)) {
-                // create directory
-                if(!file_exists($dir . $this->getPath($p->id)))mkdir($dir . $this->getPath($p->id));
+            if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
+                // create directory: todo fix!
+                if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 // create html
                 // todo
-                $f = fopen($dir . $this->getPath($p->id) . $p->getPageFolderName() . '.component.ts', 'wb');
-                $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '\text-files\resource-page.txt');
+                $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
+                $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
-                    echo 'page is '.$p->name;
                     $declared = [];
                     $lon = $this->getLevelOfNesting($p);
                     foreach ($p->components as $c) {
-                        // todo fix bv card aan movies pages wordt blijkbaar NIET TOEGEVOEGD!
                         if (!in_array($c->type, $declared)) {
                             $declared[] = $c->type; // todo fix: dat mag wel, enkel de imports moeten uniek zijn
-
-                            // todo fix: de imports van de verschillende menu items gebeuren niet
                             $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT'],
                                 ["MODULE_IMPORT_STATEMENT", $c->getComponentImportStatements($lon,$this->pages)
                                     . "\nCOMPONENT_IMPORT_STATEMENT"], $data);
@@ -205,8 +95,8 @@ export class AppComponent {
                     fwrite($f, $data);
                 }
                 if ($f) fclose($f);
-                touch($dir . $this->getPath($p->id) . $p->getPageFolderName() . '.component.css');
-            } else if ($this->isSubPage($p)) {
+                touch($dir . $this->getPath($this->pages,$p->id) . $p->getPageFolderName() . '.component.css');
+            } else if ($this->isSubPage($this->pages,$p)) {
                 // todo
             }
         }

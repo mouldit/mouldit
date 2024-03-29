@@ -1,7 +1,8 @@
 <?php
 
-class Component extends Frontend
+class Component
 {
+    use FrontendMethods;
     public readonly int $id;
     public readonly int $pageId;
     public string $name; // unique
