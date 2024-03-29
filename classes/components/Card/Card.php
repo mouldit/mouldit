@@ -35,4 +35,25 @@ class Card extends \Component  implements IComponent
     {
         return '';
     }
+
+    function getVariables()
+    {
+        return $this->actionLink->concept.'s:any=undefined;';
+    }
+
+    function getInit($pages)
+    {
+        return 'this.http.'.$this->actionLink->verb.'(\'http://localhost:5000/'.$this->actionLink->concept.'s\').pipe(map((err, res) => {
+            this.'.$this->actionLink->concept.'s=res;
+        }));';
+    }
+
+    function getConstructor()
+    {
+       return ['constructor(private http: HttpClient) {}',
+           [ 'import { HttpClient } from \'@angular/common/http\';'."\n",
+        'import { Observable, throwError } from \'rxjs\';'."\n",
+        'import { catchError, map } from \'rxjs/operators\';'."\n"]
+       ];
+    }
 }

@@ -107,6 +107,7 @@ function printPage($p,$dir, $pages){
             foreach ($p->components as $c){
                 switch ($c->type){
                     case 'menubar':
+                        // todo dit voor bij menubar
                         $vars.='items: MenuItem[] | undefined;'."\n";
                         $imports.='import { MenuItem } from \'primeng/api\';'."\n";
                         // todo add modules to imports of app.module.ts
@@ -156,6 +157,8 @@ function printPage($p,$dir, $pages){
                     case 'card':
                         // todo voorlopig hardcoded meervoud van concept bij actie
                         // todo voeg modellen toe zodat je dit naderhand kan typescripten
+
+                        // todo dit voor bij card getVariables()
                         $appModule = fopen($dir.'/app.module.ts','wb');
                         $modData = file_get_contents('app-module.txt');
                         if($appModule && $modData){

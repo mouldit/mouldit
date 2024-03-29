@@ -52,4 +52,34 @@ class Menubar extends \Component  implements IComponent
         }
         return $importStatements;
     }
+
+    function getVariables()
+    {
+        return ["\n".'items: MenuItem[] | undefined;'."\n",['import {MenuItem} from "primeng/api";']];
+    }
+
+    function getInit($pages)
+    {
+        $oninit = "\n".'this.items=['."\n";
+        foreach ($this->menuItems as $menuItem){
+            if($menuItem->page){
+                for ($i=0;$i<sizeof($pages);$i++){
+                    if($pages[$i]->id===$menuItem->page){
+                        $compName = $pages[$i]->getPageComponentName();
+                        $oninit.="{\t".'label:\''.$menuItem->name.'\', routerLink:'.$compName.'},'."\n";
+                        break;
+                    }
+                }
+            } else{
+                $oninit.="{\t".'label:\''.$menuItem->name.'\'},'."\n";
+            }
+        }
+        $oninit.=']'."\n";
+        return $oninit;
+    }
+
+    function getConstructor()
+    {
+        return '';
+    }
 }
