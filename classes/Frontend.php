@@ -55,13 +55,14 @@ export class AppComponent {
 
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
-                // create directory: todo fix!
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 // create html
                 // todo
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
                 $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
+                    $data = str_replace(['COMPONENT_CLASS_NAME'],
+                        [$p->getPageComponentName()], $data);
                     $lon = $this->getLevelOfNesting($p);
                     foreach ($p->components as $c) {
                         if (!str_contains($data,$c->getComponentImportStatements($lon,$this->pages))) {
@@ -73,7 +74,7 @@ export class AppComponent {
                              /*
          *
 
-        COMPONENT_SELECTOR
+
         HTML_FILE_NAME
         CSS_FILE_NAME
         COMPONENT_VARIABLES

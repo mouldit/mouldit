@@ -67,6 +67,7 @@ class Page implements IPage
     function getRelativeImportStatement($pages,int $nestingLevel)
     {
         $nesting = str_repeat('/..', $nestingLevel);
-        return 'import {'.$this->getPageComponentName().'} from \'.'.$nesting.$this->getPath($pages,$this->id).'/'.$this->getPageFolderName().'.component\';';
+        $nesting=substr($nesting,1);
+        return 'import {'.$this->getPageComponentName().'} from \''.$nesting.$this->getPath($pages,$this->id).'/'.$this->getPageFolderName().'.component\';';
     }
 }
