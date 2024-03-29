@@ -82,4 +82,9 @@ class Menubar extends \Component  implements IComponent
     {
         return '';
     }
+
+    function getHTML()
+    {
+        return "<p-menubar [model]=\"items\"></p-menubar>\n";
+    }
 }

@@ -49,7 +49,7 @@ function printPage($p,$dir, $pages){
             foreach ($p->components as $c){
                 switch ($c->type){
                     case 'menubar':
-                        $data.="<p-menubar [model]=\"items\"></p-menubar>"."\n";
+                        $data.="<p-menubar [model]=\"items\"></p-menubar>\n";
                         break;
                     case 'card':
                         if(isset($c->actionLink) && $c->actionLink->getReturnType()==='list'){

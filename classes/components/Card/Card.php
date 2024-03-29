@@ -56,4 +56,17 @@ class Card extends \Component  implements IComponent
         'import { catchError, map } from \'rxjs/operators\';'."\n"]
        ];
     }
+
+    function getHTML()
+    {
+        if(isset($this->actionLink) && $this->actionLink->getReturnType()==='list'){
+            return '<ng-container *ngFor="let '.$this->actionLink->concept.' of '.$this->actionLink->concept.'s'.'; let i = index">
+            <p-card 
+            header="{{'.$this->actionLink->concept.'.'.$this->mapping['header'].'}}" 
+            subheader="{{'.$this->actionLink->concept.'.'.$this->mapping['subheader'].'}}"></p-card>
+          </ng-container>';
+        } else{
+            return '';
+        }
+    }
 }

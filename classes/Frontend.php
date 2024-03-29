@@ -56,8 +56,16 @@ export class AppComponent {
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
-                // create html
-                // todo
+                $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
+                if($f){
+                    $data = '';
+                    foreach ($p->components as $c){
+                        $data.=$c->getHTML()."\n";
+                    }
+                    fwrite($f, $data);
+                    fclose($f);
+                }
+                // todo app.routes.ts
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
                 $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
@@ -127,18 +135,6 @@ export class AppComponent {
                             }
                         }
                     }
-                             /*
-         *
-
-
-        HTML_FILE_NAME
-        CSS_FILE_NAME
-        COMPONENT_VARIABLES
-        COMPONENT_CONSTRUCTOR
-        NG_ON_INIT_BODY
-         *
-         *
-         * */
                     $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT','COMPONENT_CLASS_NAME',
                         'COMPONENT_SELECTOR',
                         'HTML_FILE_NAME',
@@ -155,6 +151,6 @@ export class AppComponent {
                 // todo
             }
         }
-        // todo app.routes.ts
+
     }
 }
