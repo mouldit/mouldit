@@ -4,8 +4,8 @@ COMPONENT_IMPORT_STATEMENT
 
 @Component({
   selector: 'COMPONENT_SELECTOR',
-  templateUrl: './HTML_FILE_NAME',
-  styleUrl: './CSS_FILE_NAME'
+  templateUrl: 'HTML_FILE_NAME',
+  styleUrl: 'CSS_FILE_NAME'
 })
 export class COMPONENT_CLASS_NAME implements OnInit{
     COMPONENT_VARIABLES

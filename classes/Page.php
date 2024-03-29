@@ -33,6 +33,12 @@ class Page implements IPage
         $fn = $this->getPageFolderName();
         return '<app-'.$fn.'></app-'.$fn.'>';
     }
+    public function getHTMLFilePath(){
+        return  './'.$this->getPageFolderName().'/'.$this->getPageFolderName().'.component.html';
+    }
+    public function getCSSFilePath(){
+        return  './'.$this->getPageFolderName().'/'.$this->getPageFolderName().'.component.css';
+    }
     function getPageComponentName(){
         $componentName = explode('_',$this->name);
         $componentName = array_slice($componentName,-2);

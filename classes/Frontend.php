@@ -61,8 +61,8 @@ export class AppComponent {
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
                 $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
-                    $data = str_replace(['COMPONENT_CLASS_NAME'],
-                        [$p->getPageComponentName()], $data);
+                    $data = str_replace(['COMPONENT_CLASS_NAME','COMPONENT_SELECTOR','HTML_FILE_NAME','CSS_FILE_NAME'],
+                        [$p->getPageComponentName(),$p->getHTMLSelector(),$p->getHTMLFilePath(),$p->getCSSFilePath()], $data);
                     $lon = $this->getLevelOfNesting($p);
                     foreach ($p->components as $c) {
                         if (!str_contains($data,$c->getComponentImportStatements($lon,$this->pages))) {
