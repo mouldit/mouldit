@@ -20,7 +20,7 @@ class Frontend
         fclose($f);
         $f = fopen($dir . '/app.component.ts', 'wb');
         // todo toevoegen van import en andere variabelen aan de app.component.ts file
-        $data = "import { Component } from '@angular/core';    
+$data = "import { Component } from '@angular/core';    
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -52,8 +52,14 @@ export class AppComponent {
             fwrite($f, $data);
         }
         if ($f) fclose($f);
-
         foreach ($this->pages as $p) {
+            $f = fopen($dir . '/app-routing.module.ts', 'wb');
+            $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-routing.txt');
+            if($f && $data){
+                // todo routes!!!
+                fwrite($f, $data);
+            }
+            if ($f) fclose($f);
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
@@ -65,7 +71,6 @@ export class AppComponent {
                     fwrite($f, $data);
                     fclose($f);
                 }
-                // todo app.routes.ts
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
                 $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
