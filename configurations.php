@@ -196,6 +196,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['frontend']->pages[$i]->url = $_POST['url'];
             if (isset($_POST['action']) && isset($_POST['target'])) {
                 for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                    if(isset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink)){
+                        unset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink);
+                        break;
+                    }
+                }
+                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                     if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['target']) {
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action']) {

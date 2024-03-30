@@ -40,15 +40,14 @@ class Menubar extends \Component  implements IComponent
     function getComponentImportStatements(int $levelsOfNesting,array $pages):string
     {
         $importStatements = '';
-        foreach ($this->menuItems as $mi){
-            // todo fix: je beschikt wel over de methodes maar niet over de waarde pages!
+/*        foreach ($this->menuItems as $mi){
             for ($i=0;$i<sizeof($pages);$i++){
                 if($pages[$i]->id===$mi->page){
                     $importStatements.="\n".$pages[$i]->getRelativeImportStatement($pages,$levelsOfNesting);
                     break;
                 }
             }
-        }
+        }*/
         return $importStatements;
     }
 
