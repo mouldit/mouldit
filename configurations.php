@@ -373,7 +373,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
 } else if(!isset($_POST['generate-frontend'])){
     echo 'destroying session';
     session_destroy();
-} else echo 'nothing happens ???';
+}
 ?>
 <!doctype html>
 <html lang="en">

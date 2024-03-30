@@ -39,7 +39,6 @@ class Menubar extends \Component  implements IComponent
 
     function getComponentImportStatements(int $levelsOfNesting,array $pages):string
     {
-        echo 'hi from '.$this->name;
         $importStatements = '';
         foreach ($this->menuItems as $mi){
             // todo fix: je beschikt wel over de methodes maar niet over de waarde pages!
