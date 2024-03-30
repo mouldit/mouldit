@@ -68,11 +68,16 @@ class Card extends \Component  implements IComponent
     function getHTML()
     {
         if(isset($this->actionLink) && $this->actionLink->getReturnType()==='list'){
-            return '<ng-container *ngFor="let '.$this->actionLink->concept.' of '.$this->actionLink->concept.'s'.'; let i = index">
-            <p-card 
-            header="{{'.$this->actionLink->concept.'.'.$this->mapping['header'].'}}" 
-            subheader="{{'.$this->actionLink->concept.'.'.$this->mapping['subheader'].'}}"></p-card>
-          </ng-container>';
+            $html =  '<ng-container *ngFor="let '.$this->actionLink->concept.' of '.$this->actionLink->concept.'s'.'; let i = index">
+            <p-card ';
+            if(isset($this->mapping['header'])){
+               $html.='header="{{'.$this->actionLink->concept.'.'.$this->mapping['header'].'}}" ';
+            }
+            if(isset($this->mapping['subheader'])){
+                $html.='subheader="{{'.$this->actionLink->concept.'.'.$this->mapping['subheader'].'}}" ';
+            }
+            $html.='></p-card></ng-container>';
+            return $html;
         } else{
             return '';
         }
