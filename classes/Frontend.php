@@ -89,7 +89,7 @@ export class AppComponent {
                         $importStatements = strlen($c->getComponentImportStatements($lon,$this->pages))===0||!str_contains($data,$c->getComponentImportStatements($lon,$this->pages));
                             $cstr = $c->getConstructor();
                             $vars= $c->getVariables();
-                            // todo gelijkaardige bug ngoninit
+                            // todo  fix constructor werkt niet bij tweede compon"ent
                             if (is_array($cstr)){
                                 if(is_array($vars)){
                                     $data = str_replace([
@@ -105,9 +105,9 @@ export class AppComponent {
                                             . "\nCOMPONENT_IMPORT_STATEMENT":implode("\n",$cstr[1])
                                               .implode("\n",$vars[1])
                                               . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages),
+                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages) . "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
-                                            $cstr[0]], $data);
+                                            $cstr[0]. "\nCOMPONENT_CONSTRUCTOR"], $data);
                                 } else{
                                     $data = str_replace([
                                         'MODULE_IMPORT_STATEMENT',
@@ -120,8 +120,9 @@ export class AppComponent {
                                             .implode("\n",$cstr[1])
                                             . "\nCOMPONENT_IMPORT_STATEMENT":implode("\n",$cstr[1])
                                                . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages),
-                                            $cstr[0]], $data);
+                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
+                                            // todo verschillende constrcutor samenvoegen!
+                                            $cstr[0]. "\nCOMPONENT_CONSTRUCTOR"], $data);
                                 }
                             } else{
                                 if(is_array($vars)){
@@ -136,8 +137,9 @@ export class AppComponent {
                                             .implode("\n",$vars[1])
                                             . "\nCOMPONENT_IMPORT_STATEMENT":implode("\n",$vars[1])
                                               . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages),
-                                            $cstr], $data);
+                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
+                                            // todo verschillende constrcutor samenvoegen!
+                                            $cstr. "\nCOMPONENT_CONSTRUCTOR"], $data);
                                 } else{
                                     $data = str_replace([
                                         'MODULE_IMPORT_STATEMENT',
@@ -148,8 +150,9 @@ export class AppComponent {
                                         ["MODULE_IMPORT_STATEMENT",
                                           $importStatements ?  $c->getComponentImportStatements($lon,$this->pages)
                                             . "\nCOMPONENT_IMPORT_STATEMENT":"COMPONENT_IMPORT_STATEMENT",
-                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages),
-                                            $cstr], $data);
+                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
+                                            // todo verschillende constrcutor samenvoegen!
+                                            $cstr. "\nCOMPONENT_CONSTRUCTOR"], $data);
                                 }
                             }
                     }
