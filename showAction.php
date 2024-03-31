@@ -18,12 +18,7 @@ function showAction(Action $action)
         $part.='</ul>';
         $part .=
                 '<div><button type="submit" name="action-edited">save</button></div>
-            </form><br>
-            <div>
-                <form style="float:right;" action="' . $_SERVER['PHP_SELF']. '" method="post">
-                    <input type="hidden" name="generate-backend"><button type="submit">Generate backend</button>
-                </form>
-            </div>';
+            </form>';
         echo $part;
     }
 }

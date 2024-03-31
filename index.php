@@ -16,7 +16,7 @@ if(isset($_POST['paths'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mouldit code generator</title>
 </head>
-<body>
+<body style="background: slategray">
     <form action="<?php $_SERVER['PHP_SELF']?>" method="post">
         <label for="path-to-root-server-folder">
             Enter path of server root folder

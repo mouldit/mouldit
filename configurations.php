@@ -5,28 +5,33 @@ spl_autoload_register(function () {
     include 'showComponent.php';
     include 'classes/frontend-methods.php';
     include 'classes/Frontend.php';
-    include 'classes/IComponent.php';
+    include 'classes/components/IComponent.php';
     include 'classes/IPage.php';
     include 'classes/Action.php';
-    include 'classes/Component.php';
+    include 'classes/components/Component.php';
+    include 'classes/Enums/IconPositionType.php';
+    include 'classes/Enums/IconType.php';
+    include 'classes/components/Icon.php';
+    include 'classes/components/ContentInjection.php';
     include 'classes/components/Menubar/Menubar.php';
     include 'classes/components/Menubar/MenuItem.php';
     include 'classes/components/Card/Card.php';
+    include "classes/components/Button/Button.php";
     include 'classes/Page.php';
     include 'classes/Concept.php';
     include 'classes/Field.php';
     include 'classes/FieldSet.php';
     include 'classes/SubFieldSet.php';
     include 'generateBackend.php';
-   // include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
+    // include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
 });
 session_start();
 global $implementedTypesOfComponents;
-$implementedTypesOfComponents = ['card', 'menubar', 'table'];
+$implementedTypesOfComponents = ['card', 'menubar', 'table', 'button'];
 // frontend
 if (isset($_SESSION['pathToRootOfClient'])) {
-    if (isset($_POST['generate-frontend']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-        $_SESSION['frontend']->generate($_SESSION['pathToRootOfClient'].'/src/app');
+    if (isset($_POST['generate-frontend']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $_SESSION['frontend']->generate($_SESSION['pathToRootOfClient'] . '/src/app');
     }
 }
 // backend
@@ -35,8 +40,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
     echo 'creating actions';
-    $_SESSION['pageCounter']=0;
-    $_SESSION['componentCounter']=0;
+    $_SESSION['pageCounter'] = 0;
+    $_SESSION['componentCounter'] = 0;
     global $implementedTypesOfActions;
     $implementedTypesOfActions = [
         ['Get_all', 'get', '/get/all/']
@@ -104,7 +109,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';
-    $_SESSION['frontend']  = new Frontend() ;
+    $_SESSION['frontend'] = new Frontend();
     $selected = false;
     $main = new Page($_SESSION['pageCounter']++, 'main_page', '', true);
     $main->select();
@@ -113,7 +118,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     foreach ($_SESSION['actions'] as $a) {
         $p = new Page($_SESSION['pageCounter']++, $a->name . '_page', $a->clientURL);
         $p->actionLink = $a->name;
-        $p->parentId=$main->id;
+        $p->parentId = $main->id;
         $_SESSION['frontend']->pages[] = $p;
     }
 } else if (isset($_POST['new-action-selected']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -196,7 +201,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $_SESSION['frontend']->pages[$i]->url = $_POST['url'];
             if (isset($_POST['action']) && isset($_POST['target'])) {
                 for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                    if(isset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink)){
+                    if (isset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink)) {
                         unset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink);
                         break;
                     }
@@ -218,6 +223,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo test for button
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
@@ -232,6 +238,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo test for button
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->id === (int)$_POST['page']) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
@@ -241,15 +248,15 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             $props = $_SESSION['frontend']->pages[$i]->components[$j]->getAttributes();
                             $_SESSION['frontend']->pages[$i]->components[$j]->mapping = [];
                             $fieldNames = $_SESSION['actions'][$k]->getFullQualifiedFieldNames();
-                            foreach ($props as $prop){
+                            foreach ($props as $prop) {
                                 $val = NULL;
-                                for ($l=0;$l<sizeof($fieldNames);$l++){
-                                    if(isset($_POST[$fieldNames[$l]]) && $_POST[$fieldNames[$l]]===$prop){
+                                for ($l = 0; $l < sizeof($fieldNames); $l++) {
+                                    if (isset($_POST[$fieldNames[$l]]) && $_POST[$fieldNames[$l]] === $prop) {
                                         $val = $fieldNames[$l];
                                         break;
                                     }
                                 }
-                                $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$prop]=$val;
+                                $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$prop] = $val;
                             }
                             //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->mapping, true).'</pre>';
                             break;
@@ -324,6 +331,28 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
+} else if (isset($_POST['button-general-properties']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo refactor zodat alle sop de component gebeurt en de code identiek is voor save of update?
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                    if (isset($_POST['text'])) {
+                        $_SESSION['frontend']->pages[$i]->components[$j]->label=$_POST['text'];
+                    }
+                    if (isset($_POST['disabled'])) {
+                        $_SESSION['frontend']->pages[$i]->components[$j]->disabled=(bool)$_POST['disabled'];
+                    }
+
+                    if (isset($_POST['icon'])||isset($_POST['position'])) {
+                        $_SESSION['frontend']->pages[$i]->components[$j]->setIcon($_POST['icon'],$_POST['position']);
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
 } else if (isset($_POST['add']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
@@ -352,7 +381,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 }
                             }
                         }
-                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                        $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
+                            $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
                             $_POST['add-component'], $menuItems
                         );
                     } else {
@@ -362,11 +392,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     break;
                 case 'table':
                     break;
-                case 'card':
-
-                    $comp = new \components\Card\Card($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
-                        $_POST['add-component']);
+                case 'button':
+                    $comp = new \components\Button\Button($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
+                        $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter, $_POST['add-component']);
                     break;
+                case 'card':
+                    try {
+                        $comp = new \components\Card\Card($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
+                            $_POST['add-component']);
+                    } catch (Exception $e) {
+                    }
+                    break;
+                default:
+                    throw new Exception('not implemented');
             }
             $_SESSION['frontend']->pages[$i]->addComponent($comp);
             break;
@@ -376,7 +414,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     // todo maak dat je componenten een andere volgorde kan geven zodat je ze niet helemaal moet verwijderen en opnieuw bouwen
 } else if (isset($_POST['generate-backend']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     generateBackend($_SESSION['concepts'], $_SESSION['actions'], $_SESSION['pathToRootOfServer']);
-} else if(!isset($_POST['generate-frontend'])){
+} else if (!isset($_POST['generate-frontend'])) {
     echo 'destroying session';
     session_destroy();
 }
@@ -389,6 +427,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mouldit Code Generator</title>
+    <link rel="stylesheet" href="configurations.css">
 </head>
 <style>
     ul {
@@ -401,8 +440,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         color: antiquewhite;
     }
 </style>
-<body>
-<div id="actions" style="float:left; min-width: 200px;border:1px solid red">
+<body style="background: black">
+<!---->
+<div id="actions" class="screen" style="float:left; min-width: 200px;border:1px solid red">
     <ul style="margin:0">
         <?php
         for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
@@ -419,7 +459,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         ?>
     </ul>
 </div>
-<div id="action-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
+<div class="screen" id="action-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         showAction($_SESSION['actions'][$i]);
@@ -449,7 +489,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 </script>
-<div id="pages" style="float:left; min-width: 200px;border:1px solid red">
+<div class="screen" id="pages" style="float:left; min-width: 200px;border:1px solid red">
     <ul style="margin:0">
         <?php
         for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
@@ -466,14 +506,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         ?>
     </ul>
 </div>
-<div id="page-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
+<div class="screen" id="page-detail"
+     style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         showPage($_SESSION['frontend']->pages[$i], $_SESSION['actions'], $implementedTypesOfComponents);
     }
     ?>
 </div>
-<div id="component-detail" style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
+<div class="screen" id="component-detail"
+     style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
@@ -487,6 +529,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
     ?>
+</div>
+<div style="clear:left;float:none; margin-top: 4px;text-align: center">
+    <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">
+        <input type="hidden" name="generate-backend">
+        <button type="submit">Generate backend</button>
+    </form>
+    <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">
+        <input type="hidden" name="generate-frontend">
+        <button type="submit">Generate frontend</button>
+    </form>
 </div>
 </body>
 </html>

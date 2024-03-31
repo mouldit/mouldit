@@ -22,7 +22,7 @@ class Card extends \components\Component  implements IComponent
         parent::__construct($id,$pageId,$name, $type);
         if(isset($header)) $this->header=$header;
         if(isset($subheader)) $this->subheader=$subheader;
-        $this->ci=new ContentInjection(['content','header','footer']);
+        $this->ci=new ContentInjection('content','header','footer');
     }
     public function getAttributes(){
         return ['header','subheader'];

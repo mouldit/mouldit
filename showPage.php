@@ -79,12 +79,7 @@ $part.='</select>
         $part.='<span>Added components will be shown here</span>';
     }
     $part.='
-</div>
-            <div>
-                <form style="float:right;" action="' . $_SERVER['PHP_SELF']. '" method="post">
-                    <input type="hidden" name="generate-frontend"><button type="submit">Generate frontend</button>
-                </form>
-            </div>';
+</div>';
         echo $part;
     }
 }
