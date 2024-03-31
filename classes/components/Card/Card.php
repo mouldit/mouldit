@@ -1,23 +1,30 @@
 <?php
 
 namespace components\Card;
+use components\ContentInjection;
+use components\IComponent;
+use Exception;
 
-use IComponent;
-
-class Card extends \Component  implements IComponent
+class Card extends \components\Component  implements IComponent
 {
+    // todo: zet nu de contentInjection in de Component Config GUI
     public string $header;
     public string $subheader;
-
-    public function __construct($id,$pageId,$name, $type,$header = NULL, $subheader=NULL)
-    {
+    public ContentInjection $ci;
+    /**
+     * @throws Exception
+     */
+    public function __construct($id, $pageId, $name, $type, $header = NULL, $subheader=NULL){
+        //      technisch kan je nagaan of er maar één type is ContentInjection , het wijzigen van de waarden kan door alles en iedereen,
+        //      wat niet per se fout is, maar je kan het wel maar door één methode nu, namelijk de changeContentInjection method in de klasse
+        //      van het type zelf, dus de waardes kunnen enkel gewijzigd worden op een correcte manier, d.w.z. o.a. overeenkomstig
+        //      de definitie zoals bepaald in de constructor
         parent::__construct($id,$pageId,$name, $type);
         if(isset($header)) $this->header=$header;
         if(isset($subheader)) $this->subheader=$subheader;
+        $this->ci=new ContentInjection(['content','header','footer']);
     }
-
-    public function getAttributes()
-    {
+    public function getAttributes(){
         return ['header','subheader'];
     }
     // todo sommige componenten maken gebruik van pagina componenten die dan ook geïmporteerd worden
@@ -82,4 +89,6 @@ class Card extends \Component  implements IComponent
             return '';
         }
     }
+
+
 }

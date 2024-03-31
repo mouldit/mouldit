@@ -1,5 +1,7 @@
 <?php
 
+use components\Component;
+
 class Page implements IPage
 {
     use FrontendMethods;

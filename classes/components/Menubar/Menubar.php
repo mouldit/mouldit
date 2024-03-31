@@ -2,9 +2,9 @@
 
 namespace components\Menubar;
 
-use IComponent;
+use components\IComponent;
 
-class Menubar extends \Component  implements IComponent
+class Menubar extends \components\Component  implements IComponent
 {
     public array $menuItems;
 
