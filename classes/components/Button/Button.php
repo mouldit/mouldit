@@ -25,6 +25,7 @@ class Button extends Component
      */
     public function setIcon($icon, $position)
     {
+        // todo shorten
         if (isset($this->icon)) {
             if (isset($icon)) {
                 $icons = \Enums\IconType::cases();

@@ -42,29 +42,30 @@ function showComponent($c, $pages){
     }
     if($c->type==='button'){
         $part.='<h3>General properties</h3>';
-        $part.='<form  action="' . $_SERVER['PHP_SELF'] . '" method="post">
-            <label>text</label><input name="button-text">
-            <label>disabled</label>
-            <input type="radio" name="disabled" value="1">
-            <input type="radio" name="disabled" value="0" checked>
-            <label>icon</label>
+        $part.='<form  action="' . $_SERVER['PHP_SELF'] . '" method="post" style="display: inline">
+            <label>text</label>';
+        isset($c->label) ? $part.='<input name="text" value="'.$c->label.'">':$part.='<input name="text">';
+            $part.=' <label>disabled</label>';
+        isset($c->disabled) && $c->disabled===true ?
+            $part.='<input type="radio" name="disabled" value="1" checked>yes<input type="radio" name="disabled" value="0">no':
+            $part.='<input type="radio" name="disabled" value="1">yes<input type="radio" name="disabled" value="0" checked>no';
+        $part.=' <label>icon</label>
             <select name="icon"><option>--select icon--</option>';
         $icons = array_column(\Enums\IconType::cases(), 'name');
         foreach ($icons as $icon){
-            $part.='<option value="'.$icon.'">'.$icon.'</option>';
+           isset($c->icon->icon) && $c->icon->icon->name===$icon ? $part.='<option value="'.$icon.'" selected>'.$icon.'</option>':
+               $part.='<option value="'.$icon.'">'.$icon.'</option>';
         }
         $part.='</select>
             <select name="position"><option>--select icon position--</option>';
         $iconPosTypes = array_column(\Enums\IconPositionType::cases(), 'name');
         foreach ($iconPosTypes as $pos){
-            $part.='<option value="'.$pos.'">'.$pos.'</option>';
+            isset($c->icon->position) && $c->icon->position->name===$pos ? $part.='<option value="'.$pos.'" selected>'.$pos.'</option>':
+                $part.='<option value="'.$pos.'">'.$pos.'</option>';
         }
         $part.='</select>
             <button type="submit" name="button-general-properties">save</button></form>';
     }
-
-
-
     $part.='<h2>General configuration</h2>';
     $part.='<h3>Data Mapping</h3>';
     $props = $c->getAttributes();

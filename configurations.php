@@ -332,21 +332,21 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['button-general-properties']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo refactor zodat alle sop de component gebeurt en de code identiek is voor save of update?
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
+
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     if (isset($_POST['text'])) {
                         $_SESSION['frontend']->pages[$i]->components[$j]->label=$_POST['text'];
                     }
                     if (isset($_POST['disabled'])) {
-                        $_SESSION['frontend']->pages[$i]->components[$j]->disabled=(bool)$_POST['disabled'];
+                        $_SESSION['frontend']->pages[$i]->components[$j]->disabled= (bool)$_POST['disabled'];
                     }
-
                     if (isset($_POST['icon'])||isset($_POST['position'])) {
                         $_SESSION['frontend']->pages[$i]->components[$j]->setIcon($_POST['icon'],$_POST['position']);
                     }
+                    //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j], true).'</pre>';
                     break;
                 }
             }
@@ -439,8 +439,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         background: blue;
         color: antiquewhite;
     }
+    label{
+        font-weight: bold;
+    }
 </style>
-<body style="background: black">
+<body style="background: white">
 <!---->
 <div id="actions" class="screen" style="float:left; min-width: 200px;border:1px solid red">
     <ul style="margin:0">
