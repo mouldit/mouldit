@@ -3,10 +3,11 @@
 namespace components\Button;
 
 use components\Component;
+use components\IComponent;
 use components\Icon;
 use Enums\IconType;
 
-class Button extends Component
+class Button extends Component implements IComponent
 {
     public string $label;
     public Icon $icon;
@@ -73,5 +74,35 @@ class Button extends Component
     {
         return ['label', 'icon', 'disabled'];
     }
-
+    function getImportStatement()
+    {
+        return "\nimport {ButtonModule} from \"primeng/button\";";
+    }
+    function getComponentImportStatements(int $levelsOfNesting, array $pages)
+    {
+        return '';
+    }
+    function getImportsStatement()
+    {
+        return "\n".'ButtonModule,';
+    }
+    function getVariables()
+    {
+        return "";
+    }
+    function getInit($pages)
+    {
+        return '';
+    }
+    function getConstructor()
+    {
+        return '';
+    }
+    function getHTML()
+    {
+        if($this->disabled){
+            return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
+        }
+        return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
+    }
 }

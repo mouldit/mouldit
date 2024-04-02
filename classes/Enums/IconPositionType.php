@@ -2,8 +2,8 @@
 
 namespace Enums;
 
-enum IconPositionType
+enum IconPositionType: string
 {
-    case Left;
-    case Right;
+    case Left='left';
+    case Right='right';
 }
