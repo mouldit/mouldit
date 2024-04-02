@@ -2,6 +2,8 @@
 
 namespace components;
 use Action;
+use Effect;
+use Enums\TriggerType;
 use FrontendMethods;
 
 class Component
@@ -13,6 +15,7 @@ class Component
     public string $name; // unique
     public string $type;
     public Action $actionLink; //wijzigt
+    public array $effects;
     public bool $selected;
     public array $mapping;
 
@@ -24,8 +27,11 @@ class Component
         $this->type = $type;
         $this->selected = false;
         $this->mapping = [];
+        $this->effects=[];
     }
-
+    public function addEffect(int $id,TriggerType $t){
+        $this->effects[]=new Effect($t,$id);
+    }
     public function select()
     {
         $this->selected = true;

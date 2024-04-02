@@ -1,9 +1,10 @@
 <?php
 
-use components\Button\Button;
+use components\Card\Card;
 
 function showComponent($c, $pages){
-// todo wijzig code zodat er onderscheid wordt gemaakt tussen de verschillend componenten waar nodig
+// todo datamapping is niet opportuun voor elk type component
+
     $part='<h1>Component configuration of '.$c->type.'</h1>';
     $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><label>name</label><input value="'.$c->name.'" name="component-name"><button type="submit" name="component-edited">save</button></form>';
     $part.='<h2>Specific configuration</h2>';
@@ -67,16 +68,18 @@ function showComponent($c, $pages){
             <button type="submit" name="button-general-properties">save</button></form>';
     }
     $part.='<h2>General configuration</h2>';
-    $part.='<h3>Data Mapping</h3>';
-    $props = $c->getAttributes();
-    //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
-        if(sizeof($c->mapping)>0 && $c->actionLink){
+    if($c instanceof Card){
+        // todo voeg hier op termijn ook de button aan toe
+        $part.='<h3>Data Mapping</h3>';
+        $props = $c->getAttributes();
+        //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
+        if(sizeof($c->mapping)>0){
             // todo aanpassen, is niet langer met index maar met keys
             $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
             foreach ($c->actionLink->getFullQualifiedFieldNames() as $fieldName){
                 // todo het probleem hier is dat het weer omgekeerd moet:
                 //      je moet mappen op FQFNs
-$part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
+                $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
 <select style="display:block;float:right;" name="'.$fieldName.'"><option>-- Selecteer een render property --</option>';
                 foreach ($c->mapping as $key=>$value){
                     if(isset($value) && $fieldName===$value){
@@ -116,5 +119,6 @@ $part.='<li style="display:block;overflow:auto"><span style="display:block;float
         } else{
             $part.='<span>No action linked with this component</span>';
         }
+    }
     echo $part;
 }

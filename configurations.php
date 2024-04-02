@@ -1,29 +1,37 @@
 <?php
 spl_autoload_register(function () {
-    include 'showAction.php';
-    include 'showPage.php';
-    include 'showComponent.php';
-    include 'classes/frontend-methods.php';
-    include 'classes/Frontend.php';
-    include 'classes/components/IComponent.php';
-    include 'classes/IPage.php';
-    include 'classes/Action.php';
-    include 'classes/components/Component.php';
-    include 'classes/Enums/IconPositionType.php';
-    include 'classes/Enums/IconType.php';
-    include 'classes/components/Icon.php';
-    include 'classes/components/ContentInjection.php';
-    include 'classes/components/Menubar/Menubar.php';
-    include 'classes/components/Menubar/MenuItem.php';
-    include 'classes/components/Card/Card.php';
-    include "classes/components/Button/Button.php";
-    include 'classes/Page.php';
-    include 'classes/Concept.php';
-    include 'classes/Field.php';
-    include 'classes/FieldSet.php';
-    include 'classes/SubFieldSet.php';
-    include 'generateBackend.php';
-    // include 'generateFrontend.php'; // todo deze moet uiteindelijk wegzijn
+    require_once('showAction.php');
+    require_once('showPage.php');
+    require_once('classes/frontend-methods.php');
+    require_once('classes/Frontend.php');
+    require_once('showComponent.php');
+    require_once('classes/Enums/IconPositionType.php');
+    require_once('classes/Enums/IconType.php');
+    require_once('classes/Enums/DisplayType.php');
+    require_once('classes/Enums/TriggerType.php');
+    require_once('classes/Enums/OverflowType.php');
+    require_once('classes/Enums/UnitType.php');
+    require_once('classes/Action.php');
+    require_once('classes/Effect.php');
+    require_once('classes/components/Component.php');
+    require_once('classes/components/IComponent.php');
+    require_once('classes/components/Icon.php');
+    require_once('classes/components/groups/Dimensioning.php');
+    require_once('classes/components/groups/Visibility.php');
+    require_once('classes/components/Menubar/Menubar.php');
+    require_once('classes/components/Menubar/MenuItem.php');
+    require_once('classes/components/Card/Card.php');
+    require_once("classes/components/Button/Button.php");
+    require_once('classes/components/groups/ContentInjection.php');
+    require_once('classes/components/groups/Dimension.php');
+    require_once('classes/components/groups/ContentInjection.php');
+    require_once('classes/IPage.php');
+    require_once('classes/Page.php');
+    require_once('classes/Concept.php');
+    require_once('classes/Field.php');
+    require_once('classes/FieldSet.php');
+    require_once('classes/SubFieldSet.php');
+    require_once('generateBackend.php');
 });
 session_start();
 global $implementedTypesOfComponents;
@@ -195,6 +203,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['page-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo verhuis actionLink naar de component ONLY dwz op showComponent screen ipv showPageScreen
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             $_SESSION['frontend']->pages[$i]->name = $_POST['name'];

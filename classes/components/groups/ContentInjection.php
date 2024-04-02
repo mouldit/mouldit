@@ -1,9 +1,8 @@
 <?php
 
-namespace components;
+namespace components\groups;
 
 use Exception;
-use http\Message;
 
 class ContentInjection
 {
@@ -21,7 +20,6 @@ class ContentInjection
             $this->contentInjection[$arg]=null;
         }
     }
-
     public function changeContentInjection(string $key,int $componentId=NULL)
     {
         try {

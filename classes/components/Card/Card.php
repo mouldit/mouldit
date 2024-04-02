@@ -1,7 +1,9 @@
 <?php
 
 namespace components\Card;
-use components\ContentInjection;
+use components\groups\ContentInjection;
+use components\groups\Dimensioning;
+use components\groups\Visibility;
 use components\IComponent;
 use Exception;
 
@@ -11,6 +13,8 @@ class Card extends \components\Component  implements IComponent
     public string $header;
     public string $subheader;
     public ContentInjection $ci;
+    use Visibility;
+    use Dimensioning;
     /**
      * @throws Exception
      */

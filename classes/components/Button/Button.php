@@ -3,15 +3,18 @@
 namespace components\Button;
 
 use components\Component;
+use components\groups\Dimensioning;
+use components\groups\Visibility;
 use components\IComponent;
 use components\Icon;
-use Enums\IconType;
 
 class Button extends Component implements IComponent
 {
-    public string $label;
-    public Icon $icon;
-    public bool $disabled;
+    public string $label;// structural
+    public Icon $icon;//structural
+    public bool $disabled;//structural
+    use Visibility;
+    use Dimensioning;
 
     public function __construct($id, $pageId, $name, $type, $label = null, $icon = null, $disabled = false)
     {
@@ -100,9 +103,17 @@ class Button extends Component implements IComponent
     }
     function getHTML()
     {
+        // data mapping is niet voor elke component opportuun
+        // maar voor een button in principe wel, edoch niet per se nodig
         if($this->disabled){
-            return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
+            if(isset($this->icon)){
+                return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
+            }
+            return '<p-button label="'.$this->label.'" [disabled]="true"></p-button>';
         }
-        return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
+        if(isset($this->icon)){
+            return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
+        }
+        return '<p-button label="'.$this->label.'"></p-button>';
     }
 }
