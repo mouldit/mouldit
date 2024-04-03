@@ -59,10 +59,7 @@ class Card extends \components\Component  implements IComponent
     {
         // todo implement activated route on menubar
         if(isset($this->actionLink)){
-            return 'this.http.'.$this->actionLink->verb.'(\'http://localhost:5000/'
-                .$this->actionLink->concept.'/'.$this->actionLink->concept.'s\').subscribe(res => {
-            this.'.$this->actionLink->concept.'s=res;
-        });';
+            return $this->actionLink->getFrontendCode($this->actionLink->concept.'s');
         }
         return '';
     }
