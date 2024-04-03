@@ -151,5 +151,7 @@ function showComponent($c, $pages){
     $part.='</select>';
 
     $part.='<button type="submit" name="add-effect">add effect</button></form>';
+    // todo table to show effects
+
     echo $part;
 }
