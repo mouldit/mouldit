@@ -9,6 +9,7 @@ class Effect
     public Action $action;
     public int $target;
     // todo conditional trigger
+    // todo add Trigger class with getHTML($methodName) als methode
     public function __construct($id,string $trigger,$action,$target)
     {
         $this->id=$id;

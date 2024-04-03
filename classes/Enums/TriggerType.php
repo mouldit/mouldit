@@ -4,7 +4,7 @@ namespace Enums;
 
 enum TriggerType:string
 {
-    case OnClick='OnClick';
+    case OnClick='(click)';
     case OnComponentReady='OnComponentReady';
     case OnComponentInit='OnComponentInit';
     case OnCursorLeave='OnCursorLeave';

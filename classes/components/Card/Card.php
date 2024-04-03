@@ -47,6 +47,10 @@ class Card extends \components\Component  implements IComponent
         return '';
     }
 
+    function getMethods(){
+
+    }
+
     function getVariables()
     {
         if(isset($this->actionLink)){
@@ -75,9 +79,13 @@ class Card extends \components\Component  implements IComponent
 
     function getHTML()
     {
+        $methods='';
+        foreach ($this->effects as $e){
+            $methods.=$e->trigger->value.'="'.$this->actionLink->name.'()"';
+        }
         if(isset($this->actionLink) && $this->actionLink->getReturnType()==='list'){
             $html =  '<ng-container *ngFor="let '.$this->actionLink->concept.' of '.$this->actionLink->concept.'s'.'; let i = index">
-            <p-card ';
+            <p-card '.$methods.' ';
             if(isset($this->mapping['header'])){
                $html.='header="{{'.$this->actionLink->concept.'.'.$this->mapping['header'].'}}" ';
             }
