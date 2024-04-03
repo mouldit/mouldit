@@ -2,11 +2,11 @@
 
 namespace Enums;
 
-enum TriggerType
+enum TriggerType:string
 {
-    case OnClick;
-    case OnComponentReady;
-    case OnComponentInit;
-    case OnCursorLeave;
-    case OnCursorEnter;
+    case OnClick='OnClick';
+    case OnComponentReady='OnComponentReady';
+    case OnComponentInit='OnComponentInit';
+    case OnCursorLeave='OnCursorLeave';
+    case OnCursorEnter='OnCursorEnter';
 }

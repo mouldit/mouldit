@@ -331,7 +331,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                                             $_POST['trigger-name'],
                                                             $_SESSION['actions'][$i],
                                                         (int)$_POST['component-id']));
-                                            echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->effects, true).'</pre>';
                                 break;
                             }
                         }
@@ -477,6 +476,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     label{
         font-weight: bold;
+    }
+    th,td{
+        padding:8px;
+        border:1px solid black;
     }
 </style>
 <body style="background: white">

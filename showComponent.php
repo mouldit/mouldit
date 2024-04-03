@@ -145,13 +145,25 @@ function showComponent($c, $pages){
     foreach ($_SESSION['frontend']->pages as $p){
         $components+=$p->components;
     }
-    foreach ($components as $c){
-        $part.='<option value="'.$c->id.'">'.$c->name.'</option>';
+    foreach ($components as $ct){
+        $part.='<option value="'.$ct->id.'">'.$ct->name.'</option>';
     }
     $part.='</select>';
 
     $part.='<button type="submit" name="add-effect">add effect</button></form>';
-    // todo table to show effects
-
+    $part.='<table><thead><th>Trigger</th><th>Action</th><th>Component</th><th></th></thead>';
+    foreach ($c->effects as $e){
+        for ($i=0;$i<sizeof($components);$i++) {
+            if ($components[$i]->id === $e->target) {
+                $part .= "<tr><td>" . $e->trigger->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
+<form action='" . $_SERVER['PHP_SELF'] . "' method=''post'><input type='hidden' name='effect-id' value='".$e->id."'><button type='submit' name='remove-effect'>
+remove effect
+</button></form>
+</td></tr>";
+                break;
+            }
+        }
+    }
+    $part.='</table>';
     echo $part;
 }
