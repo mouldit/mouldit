@@ -1,6 +1,7 @@
 <?php
 
 namespace components;
+
 use Action;
 use Effect;
 use Enums\TriggerType;
@@ -27,19 +28,44 @@ class Component
         $this->type = $type;
         $this->selected = false;
         $this->mapping = [];
-        $this->effects=[];
+        $this->effects = [];
     }
-    public function addEffect(Effect $e){
-        $this->effects[]=$e;
+
+    public function getMethods()
+    {
+        echo 'calling get methods';
+        $methods = '';
+        foreach ($this->effects as $e){
+            // todo als de button de source is is er geen actionLink
+            $methods.=$e->action->name.'(){';
+            $methods.=$e->action->getFrontendCode($e->action->concept.'s').'}';
+        }
+        echo 'methods=='.$methods;
+        return $methods;
     }
-    public function removeEffect(int $id){
-        for ($i=0;$i<sizeof($this->effects);$i++){
-            if($this->effects[$i]->id===$id){
-                array_splice($this->effects,$i,1);
+    protected function getTriggers(){
+        $methods='';
+        foreach ($this->effects as $e){
+            $methods.=$e->trigger->value.'="'.$e->action->name.'()"';
+        }
+        return $methods;
+    }
+
+    public function addEffect(Effect $e)
+    {
+        $this->effects[] = $e;
+    }
+
+    public function removeEffect(int $id)
+    {
+        for ($i = 0; $i < sizeof($this->effects); $i++) {
+            if ($this->effects[$i]->id === $id) {
+                array_splice($this->effects, $i, 1);
                 break;
             }
         }
     }
+
     public function select()
     {
         $this->selected = true;

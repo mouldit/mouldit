@@ -89,7 +89,7 @@ export class AppComponent {
                         $importStatements = strlen($c->getComponentImportStatements($lon,$this->pages))===0||!str_contains($data,$c->getComponentImportStatements($lon,$this->pages));
                             $cstr = $c->getConstructor();
                             $vars= $c->getVariables();
-                            // todo  fix constructor werkt niet bij tweede compon"ent
+                            // todo  fix constructor werkt niet bij tweede component
                             if (is_array($cstr)){
                                 if(is_array($vars)){
                                     $data = str_replace([
@@ -97,7 +97,8 @@ export class AppComponent {
                                         'COMPONENT_IMPORT_STATEMENT',
                                         'COMPONENT_VARIABLES',
                                         'NG_ON_INIT_BODY',
-                                        'COMPONENT_CONSTRUCTOR'],
+                                        'COMPONENT_CONSTRUCTOR',
+                                        'COMPONENT_METHODS'],
                                         ["MODULE_IMPORT_STATEMENT",
                                           $importStatements ?  $c->getComponentImportStatements($lon,$this->pages)
                                             .implode("\n",$cstr[1])
@@ -107,14 +108,16 @@ export class AppComponent {
                                               . "\nCOMPONENT_IMPORT_STATEMENT",
                                             $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages) . "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
-                                            $cstr[0]. "\nCOMPONENT_CONSTRUCTOR"], $data);
+                                            $cstr[0]. "\nCOMPONENT_CONSTRUCTOR",//todo comp methods
+                                            $c->getMethods()."\nCOMPONENT_METHODS"], $data);
                                 } else{
                                     $data = str_replace([
                                         'MODULE_IMPORT_STATEMENT',
                                         'COMPONENT_IMPORT_STATEMENT',
                                         'COMPONENT_VARIABLES',
                                         'NG_ON_INIT_BODY',
-                                        'COMPONENT_CONSTRUCTOR'],
+                                        'COMPONENT_CONSTRUCTOR',
+                                        'COMPONENT_METHODS'],
                                         ["MODULE_IMPORT_STATEMENT",
                                            $importStatements ? $c->getComponentImportStatements($lon,$this->pages)
                                             .implode("\n",$cstr[1])
@@ -122,7 +125,8 @@ export class AppComponent {
                                                . "\nCOMPONENT_IMPORT_STATEMENT",
                                             $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
-                                            $cstr[0]. "\nCOMPONENT_CONSTRUCTOR"], $data);
+                                            $cstr[0]. "\nCOMPONENT_CONSTRUCTOR",//todo comp methods
+                                            $c->getMethods()."\nCOMPONENT_METHODS"], $data);
                                 }
                             } else{
                                 if(is_array($vars)){
@@ -131,7 +135,8 @@ export class AppComponent {
                                         'COMPONENT_IMPORT_STATEMENT',
                                         'COMPONENT_VARIABLES',
                                         'NG_ON_INIT_BODY',
-                                        'COMPONENT_CONSTRUCTOR'],
+                                        'COMPONENT_CONSTRUCTOR',
+                                        'COMPONENT_METHODS'],
                                         ["MODULE_IMPORT_STATEMENT",
                                           $importStatements ?  $c->getComponentImportStatements($lon,$this->pages)
                                             .implode("\n",$vars[1])
@@ -139,20 +144,23 @@ export class AppComponent {
                                               . "\nCOMPONENT_IMPORT_STATEMENT",
                                             $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
-                                            $cstr. "\nCOMPONENT_CONSTRUCTOR"], $data);
+                                            $cstr. "\nCOMPONENT_CONSTRUCTOR",//todo comp methods
+                                            $c->getMethods()."\nCOMPONENT_METHODS"], $data);
                                 } else{
                                     $data = str_replace([
                                         'MODULE_IMPORT_STATEMENT',
                                         'COMPONENT_IMPORT_STATEMENT',
                                         'COMPONENT_VARIABLES',
                                         'NG_ON_INIT_BODY',
-                                        'COMPONENT_CONSTRUCTOR'],
+                                        'COMPONENT_CONSTRUCTOR',
+                                        'COMPONENT_METHODS',//todo comp methods
+                                        ],
                                         ["MODULE_IMPORT_STATEMENT",
                                           $importStatements ?  $c->getComponentImportStatements($lon,$this->pages)
                                             . "\nCOMPONENT_IMPORT_STATEMENT":"COMPONENT_IMPORT_STATEMENT",
                                             $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
-                                            $cstr. "\nCOMPONENT_CONSTRUCTOR"], $data);
+                                            $cstr. "\nCOMPONENT_CONSTRUCTOR",$c->getMethods()."\nCOMPONENT_METHODS"], $data);
                                 }
                             }
                     }
@@ -162,8 +170,9 @@ export class AppComponent {
                         'CSS_FILE_NAME',
                         'COMPONENT_VARIABLES',
                         'COMPONENT_CONSTRUCTOR',
-                        'NG_ON_INIT_BODY'],
-                        ['', '', '', '', '', '', '', '',''], $data);
+                        'NG_ON_INIT_BODY',
+                        'COMPONENT_METHODS'],
+                        ['', '', '', '', '', '', '', '','',''], $data);
                     fwrite($f, $data);
                 }
                 if ($f) fclose($f);

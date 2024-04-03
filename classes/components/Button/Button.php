@@ -107,13 +107,13 @@ class Button extends Component implements IComponent
         // maar voor een button in principe wel, edoch niet per se nodig
         if($this->disabled){
             if(isset($this->icon)){
-                return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
+                return '<p-button '.$this->getTriggers().' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
             }
-            return '<p-button label="'.$this->label.'" [disabled]="true"></p-button>';
+            return '<p-button '.$this->getTriggers().' label="'.$this->label.'" [disabled]="true"></p-button>';
         }
         if(isset($this->icon)){
-            return '<p-button label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
+            return '<p-button '.$this->getTriggers().' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
         }
-        return '<p-button label="'.$this->label.'"></p-button>';
+        return '<p-button '.$this->getTriggers().' label="'.$this->label.'"></p-button>';
     }
 }

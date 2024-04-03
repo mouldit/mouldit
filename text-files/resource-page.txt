@@ -15,4 +15,6 @@ export class COMPONENT_CLASS_NAME implements OnInit{
   ngOnInit(): void {
     NG_ON_INIT_BODY
   }
+
+  COMPONENT_METHODS
 }
