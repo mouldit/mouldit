@@ -32,6 +32,14 @@ class Component
     public function addEffect(Effect $e){
         $this->effects[]=$e;
     }
+    public function removeEffect(int $id){
+        for ($i=0;$i<sizeof($this->effects);$i++){
+            if($this->effects[$i]->id===$id){
+                array_splice($this->effects,$i,1);
+                break;
+            }
+        }
+    }
     public function select()
     {
         $this->selected = true;

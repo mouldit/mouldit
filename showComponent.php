@@ -156,7 +156,7 @@ function showComponent($c, $pages){
         for ($i=0;$i<sizeof($components);$i++) {
             if ($components[$i]->id === $e->target) {
                 $part .= "<tr><td>" . $e->trigger->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
-<form action='" . $_SERVER['PHP_SELF'] . "' method=''post'><input type='hidden' name='effect-id' value='".$e->id."'><button type='submit' name='remove-effect'>
+<form action='" . $_SERVER['PHP_SELF'] . "' method='post'><input type='hidden' name='effect-id' value='".$e->id."'><button type='submit' name='remove-effect'>
 remove effect
 </button></form>
 </td></tr>";
