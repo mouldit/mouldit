@@ -29,8 +29,8 @@ class Component
         $this->mapping = [];
         $this->effects=[];
     }
-    public function addEffect(int $id,TriggerType $t){
-        $this->effects[]=new Effect($t,$id);
+    public function addEffect(Effect $e){
+        $this->effects[]=$e;
     }
     public function select()
     {

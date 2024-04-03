@@ -7,6 +7,7 @@ function showComponent($c, $pages){
 
     $part='<h1>Component configuration of '.$c->type.'</h1>';
     $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><label>name</label><input value="'.$c->name.'" name="component-name"><button type="submit" name="component-edited">save</button></form>';
+
     $part.='<h2>Specific configuration</h2>';
     if($c->type==='menubar'){
         $part.='<h3>Menu Items</h3>';
@@ -120,5 +121,35 @@ function showComponent($c, $pages){
             $part.='<span>No action linked with this component</span>';
         }
     }
+    // effects: is dit general of specific, beiden: een component beschikt over bepaalde triggers, maar altijd wel één, en je moet die dus per component tonen
+    // voorlopig enkel triggers die elke component heeft
+    $part.='<h3>Effects</h3>';
+    $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post">';
+
+    $part.='<label>trigger</label><select name="trigger-name"><option>--select trigger--</option>';
+    $triggers = array_column(\Enums\TriggerType::cases(),'name');
+    foreach ($triggers as $t){
+        $part.='<option value="'.$t.'">'.$t.'</option>';
+    }
+    $part.='</select>';
+
+    $part.='<label>action</label><select name="action-name"><option>--select action--</option>';
+    $actions = array_column($_SESSION['actions'],'name');
+    foreach ($actions as $a){
+        $part.='<option value="'.$a.'">'.$a.'</option>';
+    }
+    $part.='</select>';
+
+    $part.='<label>component</label><select name="component-id"><option>--select component--</option>';
+    $components=[];
+    foreach ($_SESSION['frontend']->pages as $p){
+        $components+=$p->components;
+    }
+    foreach ($components as $c){
+        $part.='<option value="'.$c->id.'">'.$c->name.'</option>';
+    }
+    $part.='</select>';
+
+    $part.='<button type="submit" name="add-effect">add effect</button></form>';
     echo $part;
 }

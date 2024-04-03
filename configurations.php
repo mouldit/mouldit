@@ -50,6 +50,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     echo 'creating actions';
     $_SESSION['pageCounter'] = 0;
     $_SESSION['componentCounter'] = 0;
+    $_SESSION['effectCounter'] = 0;
     global $implementedTypesOfActions;
     $implementedTypesOfActions = [
         ['Get_all', 'get', '/get/all/']
@@ -203,7 +204,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['page-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo verhuis actionLink naar de component ONLY dwz op showComponent screen ipv showPageScreen
+    // todo verwijder actionLink uit Page class en zie dat alles werkt doordat alles op Component niveau gebeurt
+    //      voor id van effecten kan je op termijn ook een id genereren op basis van id component en id page combined en dan een nummer per effect binnen de component zelf
+    //      het id is dan een string
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             $_SESSION['frontend']->pages[$i]->name = $_POST['name'];
@@ -232,7 +235,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo test for button
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
@@ -247,7 +249,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo test for button
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->id === (int)$_POST['page']) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
@@ -315,7 +316,33 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
-} else if (isset($_POST['save-item']) && isset($_POST['edit-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+}  else if (isset($_POST['add-effect']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                    // deze component moet aangepast worden
+                    if (isset($_POST['trigger-name']) && isset($_POST['action-name'])&& isset($_POST['component-id'])) {
+                        for ($k=0;$k<sizeof($_SESSION['actions']);$k++){
+                            if($_SESSION['actions'][$k]->name===$_POST['action-name']){
+                                            $_SESSION['frontend']->pages[$i]->components[$j]->addEffect(
+                                                    new Effect(
+                                                            $_SESSION['effectCounter']++,
+                                                            $_POST['trigger-name'],
+                                                            $_SESSION['actions'][$i],
+                                                        (int)$_POST['component-id']));
+                                            echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->effects, true).'</pre>';
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+}else if (isset($_POST['save-item']) && isset($_POST['edit-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
