@@ -69,7 +69,7 @@ $part.='</select>
                 $part.= "<li style='overflow:auto'>
                             <span style='float:left'>" . $page->components[$i]->name . "</span> 
                              <form style='float:right' action=\"" . $_SERVER['PHP_SELF'] . "\" method='post'>
-                               <input  type='hidden' value='" . $page->components[$i]->name . "' name='component-name'>
+                               <input  type='hidden' value='" . $page->components[$i]->id . "' name='component-id'>
                                <button type='submit' name='new-component-selected'>edit</button>
                             </form>
                          </li>";

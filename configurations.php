@@ -156,7 +156,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 }
             }
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                if ($_SESSION['frontend']->pages[$i]->components[$j]->name === $_POST['component-name']) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->id === $_POST['component-id']) {
                     $_SESSION['frontend']->pages[$i]->components[$j]->select();
                     break;
                 }
@@ -209,6 +209,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     //      het id is dan een string
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
+            // todo fix: ook een pagina naam is niet uniek wat betekent dat zaken gemakkelijk in de war geraken
+            //           bv frontend code variabelen
             $_SESSION['frontend']->pages[$i]->name = $_POST['name'];
             $_SESSION['frontend']->pages[$i]->url = $_POST['url'];
             if (isset($_POST['action']) && isset($_POST['target'])) {
@@ -240,6 +242,8 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     if (isset($_POST['component-name'])) {
+                        // todo uniekheid kan hier gebroken worden, zelfs op eenzelfde pagina
+                        //      gevolg is er nog maar één component aangepast wordt en getoond in de detail
                         $_SESSION['frontend']->pages[$i]->components[$j]->name = $_POST['component-name'];
                     }
                     break;
