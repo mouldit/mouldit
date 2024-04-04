@@ -25,7 +25,6 @@ function getConcepts($schema): array {
                 $concept->addFields((clone $concepts[$i]->fields)->fields);
                 $concept->addFields($data[1]);
                 $concepts[] = $concept;
-
                 break;
             }
         }

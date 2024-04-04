@@ -14,7 +14,6 @@ class ContentInjection
     public function __construct()
     {
         $args = func_get_args();
-        echo '<pre>'.print_r($args, true).'</pre>';
         foreach ($args as $arg){
             if(!is_string($arg)) throw new Exception('A content-injection property name needs to be of type string');
             $this->contentInjection[$arg]=null;

@@ -69,101 +69,57 @@ function showComponent($c, $pages){
             <button type="submit" name="button-general-properties">save</button></form>';
     }
     $part.='<h2>General configuration</h2>';
-    if($c instanceof Card){
+    if($c instanceof Card) {
         // todo voeg hier op termijn ook de button aan toe
-        $part.='<h3>Data Mapping</h3>';
+        $part .= '<h3>Data Mapping</h3>';
         $props = $c->getAttributes();
         //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
-        if(sizeof($c->mapping)>0){
+        if (sizeof($c->mapping) > 0) {
             // todo aanpassen, is niet langer met index maar met keys
-            $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
-            foreach ($c->actionLink->getFullQualifiedFieldNames() as $fieldName){
+            $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+            foreach ($c->actionLink->getFullQualifiedFieldNames() as $fieldName) {
                 // todo het probleem hier is dat het weer omgekeerd moet:
                 //      je moet mappen op FQFNs
-                $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
-<select style="display:block;float:right;" name="'.$fieldName.'"><option>-- Selecteer een render property --</option>';
-                foreach ($c->mapping as $key=>$value){
-                    if(isset($value) && $fieldName===$value){
-                        $part.='<option selected value="'.$key.'">'.$key.'</option>';
-                    } else{
-                        $part.='<option value="'.$key.'">'.$key.'</option>';
+                $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
+<select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
+                foreach ($c->mapping as $key => $value) {
+                    if (isset($value) && $fieldName === $value) {
+                        $part .= '<option selected value="' . $key . '">' . $key . '</option>';
+                    } else {
+                        $part .= '<option value="' . $key . '">' . $key . '</option>';
                     }
                 }
-                $part.='</select></li>';
+                $part .= '</select></li>';
             }
-            $part.='</ul>
-<input type="hidden" name="component" value="'.$c->id.'"><input type="hidden" name="page" value="'.$c->pageId.'"><button type="submit" name="mapping">Save</button></form>';
-        } else if(isset($c->actionLink)){
+            $part .= '</ul>
+<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '"><button type="submit" name="mapping">Save</button></form>';
+        } else if (isset($c->actionLink)) {
             $fqfn = $c->actionLink->getFullQualifiedFieldNames();
-            $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
-            foreach ($fqfn as $fieldName){
-                $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$fieldName.'</span>
-<select style="display:block;float:right;" name="'.$fieldName.'"><option>-- Selecteer een render property --</option>';
-                for ($i=0;$i<sizeof($props);$i++){
-                    if(str_contains($fieldName,'_')){
-                        $strEx = explode('_',$fieldName);
-                        if($strEx[sizeof($strEx)-1]===$props[$i]){
-                            $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
+            $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+            foreach ($fqfn as $fieldName) {
+                $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
+<select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
+                for ($i = 0; $i < sizeof($props); $i++) {
+                    if (str_contains($fieldName, '_')) {
+                        $strEx = explode('_', $fieldName);
+                        if ($strEx[sizeof($strEx) - 1] === $props[$i]) {
+                            $part .= '<option selected value="' . $props[$i] . '">' . $props[$i] . '</option>';
                         } else {
-                            $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
+                            $part .= '<option value="' . $props[$i] . '">' . $props[$i] . '</option>';
                         }
-                    } else if($fieldName===$props[$i]){
-                        $part.='<option selected value="'.$props[$i].'">'.$props[$i].'</option>';
-                    } else{
-                        $part.='<option value="'.$props[$i].'">'.$props[$i].'</option>';
+                    } else if ($fieldName === $props[$i]) {
+                        $part .= '<option selected value="' . $props[$i] . '">' . $props[$i] . '</option>';
+                    } else {
+                        $part .= '<option value="' . $props[$i] . '">' . $props[$i] . '</option>';
                     }
                 }
-                $part.='</select></li>';
+                $part .= '</select></li>';
             }
-            $part.='</ul>
-<input type="hidden" name="component" value="'.$c->id.'"><input type="hidden" name="page" value="'.$c->pageId.'"><button type="submit" name="mapping">Save</button></form>';
-        } else{
-            $part.='<span>No action linked with this component</span>';
+            $part .= '</ul>
+<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '"><button type="submit" name="mapping">Save</button></form>';
+        } else {
+            $part .= '<span>No action linked with this component</span>';
         }
     }
-    // effects: is dit general of specific, beiden: een component beschikt over bepaalde triggers, maar altijd wel één, en je moet die dus per component tonen
-    // voorlopig enkel triggers die elke component heeft
-    $part.='<h3>Effects</h3>';
-    $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post">';
-
-    $part.='<label>trigger</label><select name="trigger-name"><option>--select trigger--</option>';
-    $triggers = array_column(\Enums\TriggerType::cases(),'name');
-    foreach ($triggers as $t){
-        $part.='<option value="'.$t.'">'.$t.'</option>';
-    }
-    $part.='</select>';
-
-    $part.='<label>action</label><select name="action-name"><option>--select action--</option>';
-    $actions = array_column($_SESSION['actions'],'name');
-    foreach ($actions as $a){
-        $part.='<option value="'.$a.'">'.$a.'</option>';
-    }
-    $part.='</select>';
-
-    $part.='<label>component</label><select name="component-id"><option>--select component--</option>';
-    $components=[];
-    foreach ($_SESSION['frontend']->pages as $p){
-        $components+=$p->components;
-    }
-    foreach ($components as $ct){
-        $part.='<option value="'.$ct->id.'">'.$ct->name.'</option>';
-    }
-    $part.='</select>';
-
-    $part.='<button type="submit" name="add-effect">add effect</button></form>';
-    $part.='<table><thead><th>Trigger</th><th>Action</th><th>Component</th><th></th></thead>';
-    foreach ($c->effects as $e){
-        for ($i=0;$i<sizeof($components);$i++) {
-            if ($components[$i]->id === $e->target) {
-                $part .= "<tr><td>" . $e->trigger->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
-<form action='" . $_SERVER['PHP_SELF'] . "' method='post'><input type='hidden' name='effect-id' value='".$e->id."'><button type='submit' name='remove-effect'>
-remove effect
-</button></form>
-</td></tr>";
-                break;
-            }
-        }
-    }
-    $part.='</table>';
     echo $part;
 }

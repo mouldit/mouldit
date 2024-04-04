@@ -4,6 +4,16 @@ class Frontend
 {
     use FrontendMethods;
     public array $pages = [];
+    public array $effects = [];
+    public function removeEffect(int $id)
+    {
+        for ($i = 0; $i < sizeof($this->effects); $i++) {
+            if ($this->effects[$i]->id === $id) {
+                array_splice($this->effects, $i, 1);
+                break;
+            }
+        }
+    }
 
     /**
      * @throws Exception

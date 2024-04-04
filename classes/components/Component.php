@@ -33,17 +33,18 @@ class Component
 
     public function getMethods()
     {
-        echo 'calling get methods';
+        // TS: todo deze code moet anders: is gewoon de trigger service callen nu al dan niet met data
+        //     todo on page load trigger ... ????
         $methods = '';
         foreach ($this->effects as $e){
-            // todo als de button de source is is er geen actionLink
             $methods.=$e->action->name.'(){';
+            // todo deze code zal in het target komen in de oninit per definitie
             $methods.=$e->action->getFrontendCode($e->action->concept.'s').'}';
         }
-        echo 'methods=='.$methods;
         return $methods;
     }
     protected function getTriggers(){
+        // HTML
         $methods='';
         foreach ($this->effects as $e){
             $methods.=$e->trigger->value.'="'.$e->action->name.'()"';
@@ -56,15 +57,7 @@ class Component
         $this->effects[] = $e;
     }
 
-    public function removeEffect(int $id)
-    {
-        for ($i = 0; $i < sizeof($this->effects); $i++) {
-            if ($this->effects[$i]->id === $id) {
-                array_splice($this->effects, $i, 1);
-                break;
-            }
-        }
-    }
+
 
     public function select()
     {
