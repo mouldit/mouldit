@@ -1,6 +1,7 @@
 <?php
 
 use Enums\TriggerType;
+use Enums\PageTriggerType;
 
 class Effect
 {
@@ -28,7 +29,7 @@ class Effect
     public function getOnInit(){
         // todo bundel actions bij eenzelfde trigger + source
         $onInit ='';
-        if($this->trigger instanceof \Enums\PageTriggerType){
+        if($this->trigger instanceof PageTriggerType){
             $onInit.=$this->action->getOnInit();
         } else{
             $onInit.='this.triggerService.'
@@ -48,7 +49,9 @@ class Effect
         $this->id=$id;
         $this->source = $source;
         $this->target=$target;
-        $arr = TriggerType::cases();
+        $triggers = \Enums\TriggerType::cases();
+        $pageTriggers = \Enums\PageTriggerType::cases();
+        $arr=array_merge($triggers,$pageTriggers);
         for ($i=0;$i<sizeof($arr);$i++){
             if($arr[$i]->name===$trigger){
                 $this->trigger=$arr[$i];

@@ -9,6 +9,7 @@ spl_autoload_register(function () {
     require_once('classes/Enums/IconType.php');
     require_once('classes/Enums/DisplayType.php');
     require_once('classes/Enums/TriggerType.php');
+    require_once('classes/Enums/PageTriggerType.php');
     require_once('classes/Enums/OverflowType.php');
     require_once('classes/Enums/UnitType.php');
     require_once('classes/Action.php');
@@ -321,19 +322,21 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['add-effect']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo save page trigger
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     // deze component moet aangepast worden
                     if (isset($_POST['trigger-name']) && isset($_POST['action-name']) && isset($_POST['component-id'])) {
+                        echo 'trigger = ' . $_POST['trigger-name'];
                         $target = (int)$_POST['component-id'];
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action-name']) {
-                                for ($l=0;$l<sizeof($_SESSION['frontend']->pages);$l++){
-                                    for ($m=0;$m<sizeof($_SESSION['frontend']->pages[$l]->components);$m++){
-                                        if($_SESSION['frontend']->pages[$l]->components[$m]->id===$target){
-                                            $_SESSION['frontend']->effects[]=new Effect(
+                                for ($l = 0; $l < sizeof($_SESSION['frontend']->pages); $l++) {
+                                    for ($m = 0; $m < sizeof($_SESSION['frontend']->pages[$l]->components); $m++) {
+                                        if ($_SESSION['frontend']->pages[$l]->components[$m]->id === $target) {
+                                            $_SESSION['frontend']->effects[] = new Effect(
                                                 $_SESSION['effectCounter']++,
                                                 $_SESSION['frontend']->pages[$i]->components[$j],
                                                 $_POST['trigger-name'],
@@ -358,14 +361,14 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected && isset($_POST['effect-id'])) {
-                        for ($k = 0; $k < sizeof($_SESSION['frontend']->effects); $k++) {
-                            $id=(int)$_POST['effect-id'];
-                            if ($_SESSION['frontend']->effects[$k]->id === $id) {
-                                $_SESSION['frontend']->removeEffect($id);
-                                break;
-                            }
+                    for ($k = 0; $k < sizeof($_SESSION['frontend']->effects); $k++) {
+                        $id = (int)$_POST['effect-id'];
+                        if ($_SESSION['frontend']->effects[$k]->id === $id) {
+                            $_SESSION['frontend']->removeEffect($id);
+                            break;
                         }
-                        break;
+                    }
+                    break;
                 }
             }
             break;
@@ -604,63 +607,85 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     ?>
 </div>
-<!-- todo fix: target en source zijn nu componenten ipv enkel id's-->
-<div class="screen" id="effects" style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
+<div class="screen" id="effects"
+     style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
     <h1>Effects</h1>
     <label>Source component: </label><span><?php
         for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
-        if ($_SESSION['frontend']->pages[$i]->selected) {
-        for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-            if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                echo $_SESSION['frontend']->pages[$i]->components[$j]->name;
+            if ($_SESSION['frontend']->pages[$i]->selected) {
+                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                    if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                        echo $_SESSION['frontend']->pages[$i]->components[$j]->name;
+                    }
+                }
             }
-        }}}
+        }
         ?></span>
     <form action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
-    <label>trigger</label><select name="trigger-name"><option>--select trigger--</option>
-        <?php    $triggers = array_column(\Enums\TriggerType::cases(),'name');
-            foreach ($triggers as $t){
-            echo '<option value="'.$t.'">'.$t.'</option>';
-            }
-        ?>
-        HIER MOET NOG DE OPTIE KOMEN OM EEN COMPONENT TE SELECTEREN
-        </select><label>action</label>
-        <select name="action-name"><option>--select action--</option>
-        <?php    $actions = array_column($_SESSION['actions'],'name');
-            foreach ($actions as $a){
-            echo '<option value="'.$a.'">'.$a.'</option>';
-            }
-        ?>
-        </select>
-        <label>target</label>
-        <select name="component-id"><option>--select component--</option>
+        <label>trigger</label><select name="trigger-name">
+            <option>--select trigger--</option>
             <?php
-            $components=[];
-            foreach ($_SESSION['frontend']->pages as $p){
-            $components+=$p->components;
-            }
-            foreach ($components as $ct){
-            echo '<option value="'.$ct->id.'">'.$ct->name.'</option>';
+            $triggers = array_column(\Enums\TriggerType::cases(), 'name');
+            $pageTriggers = array_column(\Enums\PageTriggerType::cases(), 'name');
+            $triggers = array_merge($triggers, $pageTriggers);
+            foreach ($triggers as $t) {
+                echo '<option value="' . $t . '">' . $t . '</option>';
             }
             ?>
-        </select><button type="submit" name="add-effect">add effect</button></form>
+        </select><label>action</label>
+        <select name="action-name">
+            <option>--select action--</option>
+            <?php $actions = array_column($_SESSION['actions'], 'name');
+            foreach ($actions as $a) {
+                echo '<option value="' . $a . '">' . $a . '</option>';
+            }
+            ?>
+        </select>
+        <label>target</label>
+        <select name="component-id">
+            <option>--select component--</option>
+            <?php
+            $components = [];
+            foreach ($_SESSION['frontend']->pages as $p) {
+                $components += $p->components;
+            }
+            foreach ($components as $ct) {
+                echo '<option value="' . $ct->id . '">' . $ct->name . '</option>';
+            }
+            ?>
+        </select>
+        <button type="submit" name="add-effect">add effect</button>
+    </form>
     <table>
-        <thead><tr><td>Trigger</td><td>Action</td><td>Component</td><td></td></tr></thead>
-   <?php // effects: is dit general of specific, beiden: een component beschikt over bepaalde triggers, maar altijd wel één, en je moet die dus per component tonen
-    // voorlopig enkel triggers die elke component heeft
-        foreach ($_SESSION['frontend']->effects as $e){
-        for ($i=0;$i<sizeof($components);$i++) {
-        if ($components[$i]->id === $e->target->id) {
-        echo "<tr><td>" . $e->trigger->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
-                <form action='" . $_SERVER['PHP_SELF'] . "' method='post'><input type='hidden' name='effect-id' value='".$e->id."'><button type='submit' name='remove-effect'>
+        <thead>
+        <tr>
+            <td>Trigger</td>
+            <td>Source Component</td>
+            <td>Action</td>
+            <td>Target Component</td>
+            <td></td>
+        </tr>
+        </thead>
+        <?php // effects: is dit general of specific, beiden: een component beschikt over bepaalde triggers, maar altijd wel één, en je moet die dus per component tonen
+        // voorlopig enkel triggers die elke component heeft
+        foreach ($_SESSION['frontend']->effects as $e) {
+            for ($i = 0; $i < sizeof($components); $i++) {
+                if ($components[$i]->id === $e->target->id) {
+                    for ($j = 0; $j < sizeof($components); $j++) {
+                        if ($components[$j]->id === $e->source->id) {
+                            echo "<tr><td>" . $e->trigger->name . "</td><td>" . $components[$j]->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
+                <form action='" . $_SERVER['PHP_SELF'] . "' method='post'><input type='hidden' name='effect-id' value='" . $e->id . "'><button type='submit' name='remove-effect'>
                     remove effect
                 </button></form>
             </td></tr>";
-        break;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
         }
-        }
-        }
-   ?></table>
+        ?></table>
 </div>
 <div style="clear:left;float:none; margin-top: 4px;text-align: center">
     <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">

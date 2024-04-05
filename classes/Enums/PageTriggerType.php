@@ -2,7 +2,7 @@
 
 namespace Enums;
 
-enum PageTriggerType
+enum PageTriggerType:string
 {
-    case OnPageLoad;
+    case OnPageLoad='OnPageLoad';
 }
