@@ -329,7 +329,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     if (isset($_POST['trigger-name']) && isset($_POST['action-name']) && isset($_POST['component-id'])) {
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action-name']) {
-                                // todo fix => aan effects in frontend
                                 $_SESSION['frontend']->effects[]=new Effect(
                                     $_SESSION['effectCounter']++,
                                     $_SESSION['frontend']->pages[$i]->components[$j]->id,
