@@ -21,7 +21,10 @@ class Action
         $this->clientURL = $clientURL;
         $this->concept = $concept; // todo zoals hier is een id veel beter
     }
-
+    public function getVariable(){
+        // todo meer specifiek per type actie ipv altijd dit
+        return $this->concept.'s';
+    }
     function getReturnType()
     {
         if ($this->type === 'Get_all') return 'list';
@@ -83,12 +86,18 @@ class Action
     {
         $this->selected = false;
     }
+    public function getOnInit(string $varname=NULL){
+        return 'this.http.'.$this->verb.'(\'http://localhost:5000/'
+            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {
+            this.'.($varname ?? $this->getVariable()).')=res;
+        });';
+    }
 
-    public function getFrontendCode(string $varname)
+/*    public function getFrontendCode(string $varname)
     {
         return 'this.http.'.$this->verb.'(\'http://localhost:5000/'
             .$this->concept.'/'.$this->concept.'s\').subscribe(res => {
             this.'.$varname.'=res;
         });';
-    }
+    }*/
 }
