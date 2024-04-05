@@ -595,7 +595,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                    echo 'gonna';
                     showComponent($_SESSION['frontend']->pages[$i]->components[$j], $_SESSION['frontend']->pages);
                     break;
                 }
