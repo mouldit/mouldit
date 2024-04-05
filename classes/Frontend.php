@@ -100,7 +100,7 @@ export class AppComponent {
                         if($var[0]===$key) $vars.=$key.'_'.$var[1]."=new EventEmitter();\n";
                     }
                 } else{
-                    $vars.=$key.'=new EventEmitter();';
+                    $vars.=$key.'=new EventEmitter();'."\n";
                 }
             }
             $data = str_replace(['SERVICE_VARIABLES'],

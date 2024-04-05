@@ -604,6 +604,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
     ?>
 </div>
+<!-- todo fix: target en source zijn nu componenten ipv enkel id's-->
 <div class="screen" id="effects" style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
     <h1>Effects</h1>
     <label>Source component: </label><span><?php
@@ -649,7 +650,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     // voorlopig enkel triggers die elke component heeft
         foreach ($_SESSION['frontend']->effects as $e){
         for ($i=0;$i<sizeof($components);$i++) {
-        if ($components[$i]->id === $e->target) {
+        if ($components[$i]->id === $e->target->id) {
         echo "<tr><td>" . $e->trigger->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
                 <form action='" . $_SERVER['PHP_SELF'] . "' method='post'><input type='hidden' name='effect-id' value='".$e->id."'><button type='submit' name='remove-effect'>
                     remove effect
