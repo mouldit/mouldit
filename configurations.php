@@ -327,16 +327,23 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     // deze component moet aangepast worden
                     if (isset($_POST['trigger-name']) && isset($_POST['action-name']) && isset($_POST['component-id'])) {
+                        $target = (int)$_POST['component-id'];
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action-name']) {
-                                $_SESSION['frontend']->effects[]=new Effect(
-                                    $_SESSION['effectCounter']++,
-                                    $_SESSION['frontend']->pages[$i]->components[$j]->id,
-                                    $_POST['trigger-name'],
-                                    $_SESSION['actions'][$k],
-                                    (int)$_POST['component-id']);
+                                for ($l=0;$l<sizeof($_SESSION['frontend']->pages);$l++){
+                                    for ($m=0;$m<sizeof($_SESSION['frontend']->pages[$l]->components);$m++){
+                                        if($_SESSION['frontend']->pages[$l]->components[$m]->id===$target){
+                                            $_SESSION['frontend']->effects[]=new Effect(
+                                                $_SESSION['effectCounter']++,
+                                                $_SESSION['frontend']->pages[$i]->components[$j],
+                                                $_POST['trigger-name'],
+                                                $_SESSION['actions'][$k],
+                                                $_SESSION['frontend']->pages[$l]->components[$m]);
+                                            break;
+                                        }
+                                    }
+                                }
                                 break;
-
                             }
                         }
                     }
@@ -390,6 +397,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['button-general-properties']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo fix: als je als icon trash neemt, bewaart hij pencil en als je daarna terug trash neemt bewaart hij wel trash
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {

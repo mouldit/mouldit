@@ -29,7 +29,10 @@ class Button extends Component implements IComponent
      */
     public function setIcon($icon, $position)
     {
-        // todo shorten
+        // todo shorten =>plsits op in update en create!!
+        // todo fix bug Pencil vs Trash
+        // de fout zit in de create method want bij update is alles correct!
+        // todo zorg dat je een default position kan bewaard worden
         if (isset($this->icon)) {
             if (isset($icon)) {
                 $icons = \Enums\IconType::cases();
@@ -50,15 +53,16 @@ class Button extends Component implements IComponent
                 }
             }
         } else {
+            // create new icon
             if (isset($icon)) {
                 $icons = \Enums\IconType::cases();
                 for ($i = 0; $i < sizeof($icons); $i++) {
                     if ($icons[$i]->name === $icon) {
                         if (isset($position)) {
                             $positions = \Enums\IconPositionType::cases();
-                            for ($i = 0; $i < sizeof($positions); $i++) {
-                                if ($positions[$i]->name === $position) {
-                                    $this->icon = new Icon($icons[$i], $positions[$i]);
+                            for ($j = 0; $j < sizeof($positions); $j++) {
+                                if ($positions[$j]->name === $position) {
+                                    $this->icon = new Icon($icons[$i], $positions[$j]);
                                     break;
                                 }
                             }
@@ -70,6 +74,7 @@ class Button extends Component implements IComponent
                 }
             } else throw new \Exception('Invalid init of Icon object');
         }
+        //echo '<pre>'.print_r($this->icon, true).'</pre>';
     }
     // todo code methods
     // todo GUI to fill attributes
