@@ -18,9 +18,39 @@ function showPage(Page $page,$actions,$implementedTypesOfComponents){
                     <input style="display:block; float:right; min-width: 170px" type="text" name="name" value="'.$page->name.'">
                     <label style="display:block; margin-bottom:8px; clear:left;float:left">url</label>
                     <input style="display:block; clear:right; float:right; min-width: 170px" type="text" name="url" value="'.$page->url.'">
-            </div><div><button type="submit" name="page-edited">save</button></div>
-            </form>
-            <br>
+                    <label style="display:block; margin-bottom:8px; clear:left;float:left">on page load</label>
+                    <select name="action" style="display:block; clear:right; float:right; min-width: 178px">';
+        $part.='<option>selecteer een actie</option>';
+        foreach ($actions as $a){
+            if(isset($page->actionLink) && $page->actionLink===$a->name){
+                $part.='<option selected value="'.$a->name.'">'.$a->name.'</option>';
+            } else{
+                $part.='<option value="'.$a->name.'">'.$a->name.'</option>';
+            }
+        }
+        $part.='</select>
+                <label style="display:block; margin-bottom:8px;clear:left;float:left">target</label>';
+        // todo fix: op het moment dat je een component toevoeget aan een pagina wordt deze automatisch genomen boven diegene die al gesaved was???
+        //           dus bij 'add' gaat de actionLink op de een of anderre manier gewijzigd worden??
+        //           dit zou kunnen
+        if(sizeof($page->components)>0){
+            $part.='<select name="target" style="display:block; clear:right;float:right; min-width: 178px">';
+            $part.='<option>selecteer een target component</option>';
+            foreach ($page->components as $c){
+                if(isset($compWithAction->actionLink)  && $compWithAction->id===$c->id){
+                    $part.='<option value="'.$c->id.'" selected>'.$c->name.'</option>';
+                } else{
+                    $part.='<option value="'.$c->id.'">'.$c->name.'</option>';
+                }
+            }
+            $part.='<select>';
+        } else{
+            $part.= '<span style="display:block; clear:right;float:right; min-width: 178px">Enkel toegevoegde componenten kunnen worden geselecteerd.</span>';
+        }
+        $part .=
+            '</div><div><button type="submit" name="page-edited">save</button></div>
+            </form><br>
+            
             <form style="width:500px;overflow:auto" action="' . $_SERVER['PHP_SELF'] . '" method="post">
             <label style="display:block; margin-bottom:8px;clear:left;float:left">components</label>
             <button style="display:block;clear:right;float:right" type="submit" name="add">add</button>
