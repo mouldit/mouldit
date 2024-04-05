@@ -40,6 +40,7 @@ class Effect
                 .'});'
                 ."\n";
         }
+        return $onInit;
     }
 
     public function __construct($id,\components\Component $source,string $trigger,$action,\components\Component $target)
