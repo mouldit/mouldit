@@ -1,0 +1,10 @@
+import {EventEmitter, Injectable} from "@angular/core";
+MODULE_IMPORT_STATEMENT
+COMPONENT_IMPORT_STATEMENT
+
+@Injectable()
+export class SERVICE_NAME{
+    SERVICE_VARIABLES
+        constructor(CONSTRUCTOR_INITIALIZATIONS) {}
+    SERVICE_METHODS
+}

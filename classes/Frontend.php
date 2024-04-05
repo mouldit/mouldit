@@ -77,6 +77,39 @@ export class AppComponent {
             fwrite($f, $data);
         }
         if ($f) fclose($f);
+        // services
+        if(!file_exists($dir . '/services'))mkdir($dir . '/services');
+        $f = fopen($dir . '/services' . '/trigger-service.ts', 'wb');// ik ga ervan uit dat dit sowieso nodig zal zijn omdat elke angular
+        // applicatie wel ergens een click event heeft
+        $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/service.txt');
+        if($f && $data){
+            $data = str_replace(['MODULE_IMPORT_STATEMENT','COMPONENT_IMPORT_STATEMENT','SERVICE_NAME','CONSTRUCTOR_INITIALIZATIONS','SERVICE_METHODS'],
+                ['','','TriggerService','',''], $data);
+            $vars='';
+            $variables=[];
+            $variableNames=[];
+            foreach ($this->effects as $e){
+                $variables[]=[lcfirst($e->trigger->name).ucfirst($e->source->name),$e->source->id];
+                $variableNames[]=lcfirst($e->trigger->name).ucfirst($e->source->name);
+            }
+            $arr = array_count_values($variableNames);
+            $keys = array_keys($arr);
+            foreach ($keys as $key){
+                if($arr[$key]>1){
+                    foreach ($variables as $var){
+                        if($var[0]===$key) $vars.=$key.'_'.$var[1]."=new EventEmitter();\n";
+                    }
+                } else{
+                    $vars.=$key.'=new EventEmitter();';
+                }
+            }
+            $data = str_replace(['SERVICE_VARIABLES'],
+                [$vars], $data);
+            $data = str_replace(['MODULE_IMPORT_STATEMENT','COMPONENT_IMPORT_STATEMENT','SERVICE_NAME','CONSTRUCTOR_INITIALIZATIONS','SERVICE_METHODS'],
+                ['', '','','',''], $data);
+            fwrite($f, $data);
+        }
+        if ($f) fclose($f);
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
