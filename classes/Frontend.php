@@ -132,6 +132,12 @@ export class AppComponent {
                         $importStatements = strlen($c->getComponentImportStatements($lon,$this->pages))===0||!str_contains($data,$c->getComponentImportStatements($lon,$this->pages));
                             $cstr = $c->getConstructor();
                             $vars= $c->getVariables();
+                            $effectOnInit='';
+                            foreach ($this->effects as $e){
+                                if($e->source->id===$c->id){
+                                    $effectOnInit.="\n{$e->getOnInit()}";
+                                }
+                            }
                             // todo  fix constructor werkt niet bij tweede component
                             if (is_array($cstr)){
                                 if(is_array($vars)){
@@ -149,7 +155,7 @@ export class AppComponent {
                                             . "\nCOMPONENT_IMPORT_STATEMENT":implode("\n",$cstr[1])
                                               .implode("\n",$vars[1])
                                               . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages) . "\nNG_ON_INIT_BODY",
+                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
                                             $cstr[0]. "\nCOMPONENT_CONSTRUCTOR",//todo comp methods
                                             $c->getMethods()."\nCOMPONENT_METHODS"], $data);
@@ -166,7 +172,7 @@ export class AppComponent {
                                             .implode("\n",$cstr[1])
                                             . "\nCOMPONENT_IMPORT_STATEMENT":implode("\n",$cstr[1])
                                                . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
+                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
                                             $cstr[0]. "\nCOMPONENT_CONSTRUCTOR",//todo comp methods
                                             $c->getMethods()."\nCOMPONENT_METHODS"], $data);
@@ -185,7 +191,7 @@ export class AppComponent {
                                             .implode("\n",$vars[1])
                                             . "\nCOMPONENT_IMPORT_STATEMENT":implode("\n",$vars[1])
                                               . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
+                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
                                             $cstr. "\nCOMPONENT_CONSTRUCTOR",//todo comp methods
                                             $c->getMethods()."\nCOMPONENT_METHODS"], $data);
@@ -201,7 +207,7 @@ export class AppComponent {
                                         ["MODULE_IMPORT_STATEMENT",
                                           $importStatements ?  $c->getComponentImportStatements($lon,$this->pages)
                                             . "\nCOMPONENT_IMPORT_STATEMENT":"COMPONENT_IMPORT_STATEMENT",
-                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages). "\nNG_ON_INIT_BODY",
+                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
                                             // todo verschillende constrcutor samenvoegen!
                                             $cstr. "\nCOMPONENT_CONSTRUCTOR",$c->getMethods()."\nCOMPONENT_METHODS"], $data);
                                 }

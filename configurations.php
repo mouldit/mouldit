@@ -647,7 +647,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             <?php
             $components = [];
             foreach ($_SESSION['frontend']->pages as $p) {
-                $components += $p->components;
+                $components = array_merge($components,$p->components);
             }
             foreach ($components as $ct) {
                 echo '<option value="' . $ct->id . '">' . $ct->name . '</option>';
