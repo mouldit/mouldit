@@ -86,10 +86,13 @@ class Action
     {
         $this->selected = false;
     }
+    public function isAsynchronous(){
+        return true; // todo net zoals er verschillende soorten triggers bestaan gaan er verschillende soorten actions moeten komen
+    }
     public function getOnInit(string $varname=NULL){
         return 'this.http.'.$this->verb.'(\'http://localhost:5000/'
             .$this->concept.'/'.$this->concept.'s\').subscribe(res => {
-            this.'.($varname ?? $this->getVariable()).')=res;
+            this.'.($varname ?? $this->getVariable()).'=res;
         });';
     }
 

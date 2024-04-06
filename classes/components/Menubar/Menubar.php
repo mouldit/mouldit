@@ -29,26 +29,15 @@ class Menubar extends \components\Component  implements IComponent
 
     function getImportStatement()
     {
-        return "\n".'import {MenubarModule} from "primeng/menubar";'."\n".'import {MenuModule} from "primeng/menu";';
+        return [
+            'import {MenubarModule} from "primeng/menubar";',
+            'import {MenuModule} from "primeng/menu";'
+        ];
     }
 
     function getImportsStatement()
     {
         return "\n".'MenubarModule,'. "\n".'MenuModule,';
-    }
-
-    function getComponentImportStatements(int $levelsOfNesting,array $pages):string
-    {
-        $importStatements = '';
-/*        foreach ($this->menuItems as $mi){
-            for ($i=0;$i<sizeof($pages);$i++){
-                if($pages[$i]->id===$mi->page){
-                    $importStatements.="\n".$pages[$i]->getRelativeImportStatement($pages,$levelsOfNesting);
-                    break;
-                }
-            }
-        }*/
-        return $importStatements;
     }
 
     function getVariables()
@@ -75,7 +64,7 @@ class Menubar extends \components\Component  implements IComponent
         return $oninit;
     }
 
-    function getConstructor()
+    function getConstructorVariables()
     {
         return '';
     }
@@ -83,5 +72,10 @@ class Menubar extends \components\Component  implements IComponent
     function getHTML()
     {
         return "<p-menubar [model]=\"items\"></p-menubar>\n";
+    }
+
+    function getComponentImportStatements()
+    {
+        return [];
     }
 }

@@ -34,7 +34,14 @@ class Card extends \components\Component  implements IComponent
     // todo sommige componenten maken gebruik van pagina componenten die dan ook geïmporteerd worden
     function getImportStatement()
     {
-        return "\n".'import {CardModule} from "primeng/card";';
+        // todo de laatste drie horen hier niet thuis!
+        return ['import {CardModule} from "primeng/card";'];
+    }
+    function getComponentImportStatements(){
+        return [
+            'import { HttpClient } from \'@angular/common/http\';',
+            'import { Observable, throwError } from \'rxjs\';',
+            'import { catchError, map } from \'rxjs/operators\';'];
     }
 
     function getImportsStatement()
@@ -42,35 +49,20 @@ class Card extends \components\Component  implements IComponent
         return "\n".'CardModule,';
     }
 
-    function getComponentImportStatements( int $levelsOfNesting,array $pages)
-    {
-        return '';
-    }
-
     function getVariables()
     {
-        if(isset($this->actionLink)){
-            return $this->actionLink->concept.'s:any=undefined;';
-        }
-        return "";
+        return '';
     }
 
     function getInit($pages)
     {
-        // todo implement activated route on menubar
-        if(isset($this->actionLink)){
-            return $this->actionLink->getFrontendCode($this->actionLink->concept.'s');
-        }
         return '';
     }
 
-    function getConstructor()
+    function getConstructorVariables()
     {
-       return ['constructor(private http: HttpClient) {}',
-           [ 'import { HttpClient } from \'@angular/common/http\';'."\n",
-        'import { Observable, throwError } from \'rxjs\';'."\n",
-        'import { catchError, map } from \'rxjs/operators\';'."\n"]
-       ];
+        // todo de overeenkomstige import gebeurt nog niet
+        return 'private http: HttpClient';
     }
 
     function getHTML()

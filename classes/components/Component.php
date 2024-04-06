@@ -30,7 +30,7 @@ class Component
         $this->mapping = [];
         $this->effects = [];
     }
-
+// todo werk alle overbodige methods weg
     public function getMethods()
     {
         // TS: todo deze code moet anders: is gewoon de trigger service callen nu al dan niet met data

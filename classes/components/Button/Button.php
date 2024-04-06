@@ -84,25 +84,23 @@ class Button extends Component implements IComponent
     }
     function getImportStatement()
     {
-        return "\nimport {ButtonModule} from \"primeng/button\";";
-    }
-    function getComponentImportStatements(int $levelsOfNesting, array $pages)
-    {
-        return '';
+        // deze method geeft import statements terug voor de app.module.ts imports
+        return ['import {ButtonModule} from "primeng/button";'];
     }
     function getImportsStatement()
     {
+        // deze method geeft import statements terug voor de app.module.ts imports
         return "\n".'ButtonModule,';
     }
     function getVariables()
     {
-        return "";
+        return '';
     }
     function getInit($pages)
     {
         return '';
     }
-    function getConstructor()
+    function getConstructorVariables()
     {
         return '';
     }
@@ -120,5 +118,10 @@ class Button extends Component implements IComponent
             return '<p-button '.$this->getTriggers().' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
         }
         return '<p-button '.$this->getTriggers().' label="'.$this->label.'"></p-button>';
+    }
+
+    function getComponentImportStatements()
+    {
+        return [];
     }
 }

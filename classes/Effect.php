@@ -19,31 +19,33 @@ class Effect
             .ucfirst($this->source->name).'()"'; else return '';
     }
     public function getMethods(bool $id){
-        // todo import van de TriggerService/Aanmaken van de TriggerService
+        // todo import van de TriggerService + aanmaken in constrcutor
         // todo bundel actions bij eenzelfde trigger + source
         if($this->trigger instanceof TriggerType) return lcfirst($this->trigger->name)
             .ucfirst($this->source->name).'(){'."\n\t\t"
             .'this.triggerService.'.lcfirst($this->trigger->name)
-            .ucfirst($this->source->name).($id?'_'.$this->source->id:'').'.next();'."\n}\n"; else return '';
+            .ucfirst($this->source->name).($id?'_'.$this->source->id:'').'.emit();'."\n}\n"; else return '';
     }
-    public function getOnInit(){
+    public function getOnInit(bool $action=false, bool $id=false):string{
         // todo bundel actions bij eenzelfde trigger + source
         $onInit ='';
-        if($this->trigger instanceof PageTriggerType){
+        if($this->trigger instanceof PageTriggerType||($action && $this->action->isAsynchronous())){
             $onInit.=$this->action->getOnInit();
-        } else{
-            $onInit.='this.triggerService.'
-                .lcfirst($this->trigger->name)
-                .ucfirst($this->source->name)
-                .'.subscribe(res=>{'
-                ."\n"
-                .$this->action->getOnInit()
-                .'});'
-                ."\n";
+        }
+        if($action && !$this->action->isAsynchronous()){
+            $onInit.='this.triggerService.'.lcfirst($this->trigger->name)
+            .ucfirst($this->source->name).($id?'_'.$this->source->id:'').'.subscribe(res=>{
+            '.$this->action->getOnInit()."\n".'
+            });'."\n}\n";;
         }
         return $onInit;
     }
-
+    public function getImports(){
+        // todo
+    }
+    public function getConstructorVariables(){
+        // todo
+    }
     public function __construct($id,\components\Component $source,string $trigger,$action,\components\Component $target)
     {
         $this->id=$id;
