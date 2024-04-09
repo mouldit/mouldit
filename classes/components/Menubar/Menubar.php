@@ -27,6 +27,21 @@ class Menubar extends \components\Component  implements IComponent
     }
 
 
+    // todo
+    public function getControllerImports(){
+        return ['import {MenuItem} from "primeng/api";'];
+    }
+    function getControllerVariables()
+    {
+        return ["\n".'items: MenuItem[] | undefined;'."\n"];
+    }
+    function getConstructorInjections()
+    {
+        return [];
+    }
+
+
+
     function getImportStatement()
     {
         return [
@@ -34,17 +49,10 @@ class Menubar extends \components\Component  implements IComponent
             'import {MenuModule} from "primeng/menu";'
         ];
     }
-
     function getImportsStatement()
     {
         return "\n".'MenubarModule,'. "\n".'MenuModule,';
     }
-
-    function getVariables()
-    {
-        return ["\n".'items: MenuItem[] | undefined;'."\n",['import {MenuItem} from "primeng/api";']];
-    }
-
     function getInit($pages)
     {
         $oninit = "\n".'this.items=['."\n";
@@ -63,19 +71,8 @@ class Menubar extends \components\Component  implements IComponent
         $oninit.=']'."\n";
         return $oninit;
     }
-
-    function getConstructorVariables()
-    {
-        return '';
-    }
-
-    function getHTML()
+    function getHTML(string $triggers,\Action $action=null)
     {
         return "<p-menubar [model]=\"items\"></p-menubar>\n";
-    }
-
-    function getComponentImportStatements()
-    {
-        return [];
     }
 }

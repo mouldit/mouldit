@@ -1,14 +1,6 @@
 <?php
 function showPage(Page $page,$actions,$implementedTypesOfComponents){
     $part = '';
-    $compWithAction = null;
-    for ($i=0;$i<sizeof($page->components);$i++){
-        if(isset($page->components[$i]->actionLink)){
-            // todo voorlopig alleen 1 component maar de bedoeling is natuurlijk om er meer te zetten
-            $compWithAction = $page->components[$i];
-            break;
-        }
-    }
     if ($page->selected) {
         $part .=
             '<h2 style="margin: 0 0 8px 0;">Details of page: ' . $page->name . '</h2>

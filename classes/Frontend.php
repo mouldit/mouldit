@@ -111,103 +111,40 @@ export class AppComponent {
             fwrite($f, $data);
         }
         if ($f) fclose($f);
-        // HTML en TS files
+
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
+                // HTML bestand = ComponentView
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
                 if($f){
                     $data = '';
                     foreach ($p->components as $c){
-                        $data.=$c->getHTML()."\n";
+                        $triggers = '';
+                        $action = null;
+                        foreach ($this->effects as $e){
+                            if($e->source->id===$c->id){
+                                $triggers.="\n{$e->getTrigger()}";
+                            } else if($e->target->id===$c->id){
+                                $action = $e->action;
+                            }
+                        }
+                        $data.=$c->getHTML($triggers,$action)."\n";
                     }
                     fwrite($f, $data);
                     fclose($f);
                 }
+                // TS bestand = ComponentController
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.ts', 'wb');
                 $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/resource-page.txt');
                 if ($f && $data) {
                     $data = str_replace(['COMPONENT_CLASS_NAME','COMPONENT_SELECTOR','HTML_FILE_NAME','CSS_FILE_NAME'],
                         [$p->getPageComponentName(),$p->getHTMLSelector(),$p->getHTMLFilePath(),$p->getCSSFilePath()], $data);
-                    foreach ($p->components as $c) {
-                        $cstr = $c->getConstructorVariables();// afblijven!
-                            $vars= $c->getVariables();// afblijven!
-                        $importStatements = implode("\n",$c->getComponentImportStatements());
-                        // todo duplicaten moeten geweerd worden door $vars en $cstr te vergelijken vooraleer verder te gaan
-                            $effectOnInit='';
-                            $effectMethods='';
-                            foreach ($this->effects as $e){
-                                if($e->source->id===$c->id){
-                                    $effectOnInit.="\n{$e->getOnInit(false)}";
-                                    $effectMethods.="\n{$e->getMethods(false)}";
-                                } else if($e->target->id===$c->id){
-                                    $effectOnInit.="\n{$e->getOnInit(true)}";
-                                }
-                            }
-                            if (is_array($cstr)){
-                                if(is_array($vars)){
-                                    $data = str_replace([
-                                        'MODULE_IMPORT_STATEMENT',
-                                        'COMPONENT_IMPORT_STATEMENT',
-                                        'COMPONENT_VARIABLES',
-                                        'NG_ON_INIT_BODY',
-                                        'CONSTRUCTOR_VARIABLES',
-                                        'COMPONENT_METHODS'],
-                                        ["MODULE_IMPORT_STATEMENT",
-                                          implode("\n",$cstr[1])
-                                              .implode("\n",$vars[1]) .$importStatements
-                                              . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
-                                            $cstr[0]. "\nCONSTRUCTOR_VARIABLES",
-                                            $c->getMethods().$effectMethods."\nCOMPONENT_METHODS"], $data);
-                                } else{
-                                    $data = str_replace([
-                                        'MODULE_IMPORT_STATEMENT',
-                                        'COMPONENT_IMPORT_STATEMENT',
-                                        'COMPONENT_VARIABLES',
-                                        'NG_ON_INIT_BODY',
-                                        'CONSTRUCTOR_VARIABLES',
-                                        'COMPONENT_METHODS'],
-                                        ["MODULE_IMPORT_STATEMENT",
-                                           // todo in bepaalde gevallen is er niet 1 als index voor de constrcutor????
-                                           implode("\n",$cstr[1]).$importStatements
-                                               . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
-                                            $cstr[0]. "\nCONSTRUCTOR_VARIABLES",
-                                            $c->getMethods().$effectMethods."\nCOMPONENT_METHODS"], $data);
-                                }
-                            } else{
-                                if(is_array($vars)){
-                                    $data = str_replace([
-                                        'MODULE_IMPORT_STATEMENT',
-                                        'COMPONENT_IMPORT_STATEMENT',
-                                        'COMPONENT_VARIABLES',
-                                        'NG_ON_INIT_BODY',
-                                        'CONSTRUCTOR_VARIABLES',
-                                        'COMPONENT_METHODS'],
-                                        ["MODULE_IMPORT_STATEMENT",
-                                          implode("\n",$vars[1]).$importStatements
-                                              . "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars[0]. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
-                                            $cstr. "\nCONSTRUCTOR_VARIABLES",
-                                            $c->getMethods().$effectMethods."\nCOMPONENT_METHODS"], $data);
-                                } else{
-                                    $data = str_replace([
-                                        'MODULE_IMPORT_STATEMENT',
-                                        'COMPONENT_IMPORT_STATEMENT',
-                                        'COMPONENT_VARIABLES',
-                                        'NG_ON_INIT_BODY',
-                                        'CONSTRUCTOR_VARIABLES',
-                                        'COMPONENT_METHODS',
-                                        ],
-                                        ["MODULE_IMPORT_STATEMENT",
-                                         $importStatements. "\nCOMPONENT_IMPORT_STATEMENT",
-                                            $vars. "\nCOMPONENT_VARIABLES",$c->getInit($this->pages).$effectOnInit . "\nNG_ON_INIT_BODY",
-                                            $cstr. "\nCONSTRUCTOR_VARIABLES",$c->getMethods().$effectMethods."\nCOMPONENT_METHODS"], $data);
-                                }
-                            }
-                    }
-                    $data = str_replace(['MODULE_IMPORT_STATEMENT', 'COMPONENT_IMPORT_STATEMENT','COMPONENT_CLASS_NAME',
+                    $p->createViewController($data,$this->effects,$this->pages);
+                    $data = str_replace([
+                        'MODULE_IMPORT_STATEMENT',
+                        'COMPONENT_IMPORT_STATEMENT',
+                        'COMPONENT_CLASS_NAME',
                         'COMPONENT_SELECTOR',
                         'HTML_FILE_NAME',
                         'CSS_FILE_NAME',
@@ -219,11 +156,11 @@ export class AppComponent {
                     fwrite($f, $data);
                 }
                 if ($f) fclose($f);
+                // Component Style bestand
                 touch($dir . $this->getPath($this->pages,$p->id) . '/'.$p->getPageFolderName() . '.component.css');
             } else if ($this->isSubPage($this->pages,$p)) {
                 // todo
             }
         }
-
     }
 }

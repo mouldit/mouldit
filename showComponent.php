@@ -75,11 +75,9 @@ function showComponent($c, $pages){
         $props = $c->getAttributes();
         //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
         if (sizeof($c->mapping) > 0) {
-            // todo aanpassen, is niet langer met index maar met keys
             $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+            // todo fix: geen actionLink meer aanwezig
             foreach ($c->actionLink->getFullQualifiedFieldNames() as $fieldName) {
-                // todo het probleem hier is dat het weer omgekeerd moet:
-                //      je moet mappen op FQFNs
                 $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
 <select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
                 foreach ($c->mapping as $key => $value) {

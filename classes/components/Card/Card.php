@@ -37,7 +37,7 @@ class Card extends \components\Component  implements IComponent
         // todo de laatste drie horen hier niet thuis!
         return ['import {CardModule} from "primeng/card";'];
     }
-    function getComponentImportStatements(){
+    function getControllerImports(){
         return [
             'import { HttpClient } from \'@angular/common/http\';',
             'import { Observable, throwError } from \'rxjs\';',
@@ -49,7 +49,7 @@ class Card extends \components\Component  implements IComponent
         return "\n".'CardModule,';
     }
 
-    function getVariables()
+    function getControllerVariables()
     {
         return '';
     }
@@ -59,22 +59,22 @@ class Card extends \components\Component  implements IComponent
         return '';
     }
 
-    function getConstructorVariables()
+    function getConstructorInjections()
     {
         // todo de overeenkomstige import gebeurt nog niet
-        return 'private http: HttpClient';
+        return 'private http: HttpClient,';
     }
 
-    function getHTML()
+    function getHTML(string $triggers,\Action $action=null)
     {
-        if(isset($this->actionLink) && $this->actionLink->getReturnType()==='list'){
-            $html =  '<ng-container *ngFor="let '.$this->actionLink->concept.' of '.$this->actionLink->concept.'s'.'; let i = index">
-            <p-card '.$this->getTriggers().' ';
+        if(isset($action) && $action->getReturnType()==='list'){
+            $html =  '<ng-container *ngFor="let '.$action->concept.' of '.$action->concept.'s'.'; let i = index">
+            <p-card '.$triggers.' ';
             if(isset($this->mapping['header'])){
-               $html.='header="{{'.$this->actionLink->concept.'.'.$this->mapping['header'].'}}" ';
+               $html.='header="{{'.$action->concept.'.'.$this->mapping['header'].'}}" ';
             }
             if(isset($this->mapping['subheader'])){
-                $html.='subheader="{{'.$this->actionLink->concept.'.'.$this->mapping['subheader'].'}}" ';
+                $html.='subheader="{{'.$action->concept.'.'.$this->mapping['subheader'].'}}" ';
             }
             $html.='></p-card></ng-container>';
             return $html;
@@ -82,6 +82,5 @@ class Card extends \components\Component  implements IComponent
             return '';
         }
     }
-
 
 }

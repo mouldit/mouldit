@@ -92,36 +92,39 @@ class Button extends Component implements IComponent
         // deze method geeft import statements terug voor de app.module.ts imports
         return "\n".'ButtonModule,';
     }
-    function getVariables()
+
+    // todo
+    function getControllerVariables()
     {
-        return '';
+        return [];
     }
+    function getConstructorInjections()
+    {
+        return [];
+    }
+    function getControllerImports()
+    {
+        return [];
+    }
+
     function getInit($pages)
     {
         return '';
     }
-    function getConstructorVariables()
+
+    function getHTML(string $triggers,\Action $action=null)
     {
-        return '';
-    }
-    function getHTML()
-    {
-        // data mapping is niet voor elke component opportuun
-        // maar voor een button in principe wel, edoch niet per se nodig
         if($this->disabled){
             if(isset($this->icon)){
-                return '<p-button '.$this->getTriggers().' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
+                return '<p-button '.$triggers.' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'" [disabled]="true"></p-button>';
             }
-            return '<p-button '.$this->getTriggers().' label="'.$this->label.'" [disabled]="true"></p-button>';
+            return '<p-button '.$triggers.' label="'.$this->label.'" [disabled]="true"></p-button>';
         }
         if(isset($this->icon)){
-            return '<p-button '.$this->getTriggers().' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
+            return '<p-button '.$triggers.' label="'.$this->label.'" icon="'.$this->icon->icon->value.'" iconPos="'.$this->icon->position->value.'"></p-button>';
         }
-        return '<p-button '.$this->getTriggers().' label="'.$this->label.'"></p-button>';
+        return '<p-button '.$triggers.' label="'.$this->label.'"></p-button>';
     }
 
-    function getComponentImportStatements()
-    {
-        return [];
-    }
+
 }

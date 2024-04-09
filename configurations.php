@@ -127,7 +127,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['frontend']->pages[] = $main;
     foreach ($_SESSION['actions'] as $a) {
         $p = new Page($_SESSION['pageCounter']++, $a->name . '_page', $a->clientURL);
-        $p->actionLink = $a->name;
         $p->parentId = $main->id;
         $_SESSION['frontend']->pages[] = $p;
     }
@@ -516,10 +515,14 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         padding: 8px;
         border: 1px solid black;
     }
+    .screen{
+        border:1px solid #161667;
+        margin:4px;
+    }
 </style>
-<body style="background: white">
+<body style="background: #785a7a">
 <!---->
-<div id="actions" class="screen" style="float:left; min-width: 200px;border:1px solid red">
+<div id="actions" class="screen" style="float:left; min-width: 200px;">
     <ul style="margin:0">
         <?php
         for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
@@ -536,7 +539,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         ?>
     </ul>
 </div>
-<div class="screen" id="action-detail" style="float:left; min-width: 500px;min-height:400px;border:1px solid red">
+<div class="screen" id="action-detail" style="float:left; min-width: 500px;min-height:400px;">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['actions']); $i++) {
         showAction($_SESSION['actions'][$i]);
@@ -566,7 +569,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 </script>
-<div class="screen" id="pages" style="float:left; min-width: 200px;border:1px solid red">
+<div class="screen" id="pages" style="float:left; min-width: 200px;">
     <ul style="margin:0">
         <?php
         for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
@@ -584,7 +587,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     </ul>
 </div>
 <div class="screen" id="page-detail"
-     style="float:left; min-width: 500px;min-height:400px;border:1px solid red;padding: 0 8px">
+     style="float:left; min-width: 500px;min-height:400px;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         showPage($_SESSION['frontend']->pages[$i], $_SESSION['actions'], $implementedTypesOfComponents);
@@ -592,7 +595,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     ?>
 </div>
 <div class="screen" id="component-detail"
-     style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
+     style="float:left; min-width: 700px;min-height:400px;padding: 0 8px">
     <?php
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
@@ -608,7 +611,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     ?>
 </div>
 <div class="screen" id="effects"
-     style="float:left; min-width: 700px;min-height:400px;border:1px solid red;padding: 0 8px">
+     style="float:left; min-width: 700px;min-height:400px;padding: 0 8px">
     <h1>Effects</h1>
     <label>Source component: </label><span><?php
         for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {

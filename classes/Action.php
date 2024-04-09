@@ -89,18 +89,13 @@ class Action
     public function isAsynchronous(){
         return true; // todo net zoals er verschillende soorten triggers bestaan gaan er verschillende soorten actions moeten komen
     }
-    public function getOnInit(string $varname=NULL){
-        return 'this.http.'.$this->verb.'(\'http://localhost:5000/'
-            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {
-            this.'.($varname ?? $this->getVariable()).'=res;
-        });';
-    }
-
-/*    public function getFrontendCode(string $varname)
-    {
-        return 'this.http.'.$this->verb.'(\'http://localhost:5000/'
-            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {
-            this.'.$varname.'=res;
-        });';
-    }*/
+    public function getAsJavaScript(bool $id,Effect $e){
+        return
+            'this.http.'.$this->verb.'(\'http://localhost:5000/'
+            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {'
+            .'this.triggerService.'.lcfirst($e->trigger->name)
+            .ucfirst($e->source->name).($id?'_'.$e->source->id:'').'.emit('
+            .'res'
+            .');'."\n});";
+        }
 }
