@@ -71,8 +71,6 @@ function showComponent($c, $pages){
     $part.='<h2>General configuration</h2>';
     if($c instanceof Card) {
         // todo voeg hier op termijn ook de button aan toe
-
-
         $part .= '<h3>Data Mapping</h3>';
         $props = $c->getAttributes();
         //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
@@ -116,7 +114,8 @@ function showComponent($c, $pages){
                 $part .= '</select></li>';
             }
             $part .= '</ul>
-<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '"><button type="submit" name="mapping">Save</button></form>';
+<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
+<button type="submit" name="mapping">Save</button></form>';
         } else {
             $part .= '<span>No action linked with this component</span>';
         }
