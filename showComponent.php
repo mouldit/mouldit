@@ -71,6 +71,8 @@ function showComponent($c, $pages){
     $part.='<h2>General configuration</h2>';
     if($c instanceof Card) {
         // todo voeg hier op termijn ook de button aan toe
+
+
         $part .= '<h3>Data Mapping</h3>';
         $props = $c->getAttributes();
         //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
@@ -119,5 +121,8 @@ function showComponent($c, $pages){
             $part .= '<span>No action linked with this component</span>';
         }
     }
+
+
+
     echo $part;
 }
