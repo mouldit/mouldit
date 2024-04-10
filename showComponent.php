@@ -2,7 +2,7 @@
 
 use components\Card\Card;
 
-function showComponent($c, $pages){
+function showComponent($c, $pages, $actions){
 // todo datamapping is niet opportuun voor elk type component
 
     $part='<h1>Component configuration of '.$c->type.'</h1>';
@@ -69,59 +69,71 @@ function showComponent($c, $pages){
             <button type="submit" name="button-general-properties">save</button></form>';
     }
     $part.='<h2>General configuration</h2>';
+
     if($c instanceof Card) {
         // todo voeg hier op termijn ook de button aan toe
         $part .= '<h3>Data Mapping</h3>';
         $props = $c->getAttributes();
         //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
-        if (sizeof($c->mapping) > 0) {
-            $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
-            // todo fix: geen actionLink meer aanwezig
-            foreach ($c->actionLink->getFullQualifiedFieldNames() as $fieldName) {
-                $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
+        if(sizeof($c->mapping)===0){
+            $part .= '<span>No action linked with this component</span>';
+        } else{
+            foreach(array_keys($c->mapping) as $actionName){
+                for ($i=0;$i<sizeof($actions);$i++){
+                    if($actions[$i]->name===$actionName){
+                        // todo wijzig ook de $_POST keys door er de actionName voor te zetten
+                        if(sizeof($c->mapping[$actionName])>0){
+                            // todo kan er ook een NULL waarde zijn ipv een array
+                            // er zijn zoveel ingaves als er propernames zijn voor de overeenkomstige component
+                            $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+                            foreach ($actions[$i]->getFullQualifiedFieldNames() as $fieldName) {
+                                $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
 <select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
-                foreach ($c->mapping as $key => $value) {
-                    if (isset($value) && $fieldName === $value) {
-                        $part .= '<option selected value="' . $key . '">' . $key . '</option>';
-                    } else {
-                        $part .= '<option value="' . $key . '">' . $key . '</option>';
-                    }
-                }
-                $part .= '</select></li>';
-            }
-            $part .= '</ul>
-<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '"><button type="submit" name="mapping">Save</button></form>';
-        } else if (isset($c->actionLink)) {
-            $fqfn = $c->actionLink->getFullQualifiedFieldNames();
-            $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
-            foreach ($fqfn as $fieldName) {
-                $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
+                                foreach ($c->mapping[$actionName] as $key => $value) {
+                                    if (isset($value) && $fieldName === $value) {
+                                        $part .= '<option selected value="' . $key . '">' . $key . '</option>';
+                                    } else {
+                                        $part .= '<option value="' . $key . '">' . $key . '</option>';
+                                    }
+                                }
+                                $part .= '</select></li>';
+                            }
+                            $part .= '</ul>
+<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
+<button type="submit" name="mapping">Save</button>
+</form>';
+                        }else {
+                            // er is nog geen mapping voor de overeenkomstige action , doch selchts een lege array => todo of is de waarde dan NULL?
+                            $fqfn = $actions[$i]->getFullQualifiedFieldNames();
+                            $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
+                            foreach ($fqfn as $fieldName) {
+                                $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
 <select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
-                for ($i = 0; $i < sizeof($props); $i++) {
-                    if (str_contains($fieldName, '_')) {
-                        $strEx = explode('_', $fieldName);
-                        if ($strEx[sizeof($strEx) - 1] === $props[$i]) {
-                            $part .= '<option selected value="' . $props[$i] . '">' . $props[$i] . '</option>';
-                        } else {
-                            $part .= '<option value="' . $props[$i] . '">' . $props[$i] . '</option>';
-                        }
-                    } else if ($fieldName === $props[$i]) {
-                        $part .= '<option selected value="' . $props[$i] . '">' . $props[$i] . '</option>';
-                    } else {
-                        $part .= '<option value="' . $props[$i] . '">' . $props[$i] . '</option>';
-                    }
-                }
-                $part .= '</select></li>';
-            }
-            $part .= '</ul>
+                                for ($i = 0; $i < sizeof($props); $i++) {
+                                    if (str_contains($fieldName, '_')) {
+                                        $strEx = explode('_', $fieldName);
+                                        if ($strEx[sizeof($strEx) - 1] === $props[$i]) {
+                                            $part .= '<option selected value="' . $props[$i] . '">' . $props[$i] . '</option>';
+                                        } else {
+                                            $part .= '<option value="' . $props[$i] . '">' . $props[$i] . '</option>';
+                                        }
+                                    } else if ($fieldName === $props[$i]) {
+                                        $part .= '<option selected value="' . $props[$i] . '">' . $props[$i] . '</option>';
+                                    } else {
+                                        $part .= '<option value="' . $props[$i] . '">' . $props[$i] . '</option>';
+                                    }
+                                }
+                                $part .= '</select></li>';
+                            }
+                            $part .= '</ul>
 <input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
 <button type="submit" name="mapping">Save</button></form>';
-        } else {
-            $part .= '<span>No action linked with this component</span>';
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
-
-
-
     echo $part;
 }

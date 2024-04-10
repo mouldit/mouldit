@@ -254,11 +254,17 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // je kan nu een mapping hebben voor meerdere acties => todo: de mapping koppelen aan de juiste actie
+    // todo de format is: mapping is een array, de keys zijn actionNames ,
+    //  is telkens een array met als keys de property names van de component
+    //  en als waarde de naam van het gemapte veld of NULL indien er geen mapping is
+    //  indien er geen enkele mapping is, is de array gewoon leeg
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->id === (int)$_POST['page']) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['component']) {
+
                     for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
+
                         if ($_SESSION['actions'][$k]->name === $_SESSION['frontend']->pages[$i]->actionLink) {
                             $props = $_SESSION['frontend']->pages[$i]->components[$j]->getAttributes();
                             $_SESSION['frontend']->pages[$i]->components[$j]->mapping = [];
