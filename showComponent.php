@@ -81,14 +81,14 @@ function showComponent($c, $pages, $actions){
             foreach(array_keys($c->mapping) as $actionName){
                 for ($i=0;$i<sizeof($actions);$i++){
                     if($actions[$i]->name===$actionName){
-                        // todo wijzig ook de $_POST keys door er de actionName voor te zetten
                         if(sizeof($c->mapping[$actionName])>0){
                             // todo kan er ook een NULL waarde zijn ipv een array
                             // er zijn zoveel ingaves als er propernames zijn voor de overeenkomstige component
+                            $part .= '<label>Action: </label><input readonly value="'.$actionName.'">';
                             $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
                             foreach ($actions[$i]->getFullQualifiedFieldNames() as $fieldName) {
                                 $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
-<select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
+<select style="display:block;float:right;" name="'. $fieldName . '"><option>-- Selecteer een render property --</option>';
                                 foreach ($c->mapping[$actionName] as $key => $value) {
                                     if (isset($value) && $fieldName === $value) {
                                         $part .= '<option selected value="' . $key . '">' . $key . '</option>';
@@ -100,15 +100,15 @@ function showComponent($c, $pages, $actions){
                             }
                             $part .= '</ul>
 <input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
-<button type="submit" name="mapping">Save</button>
-</form>';
+<input type="hidden" name="action" value="' . $actionName . '">
+<button type="submit" name="mapping">Save</button></form>';
                         }else {
                             // er is nog geen mapping voor de overeenkomstige action , doch selchts een lege array => todo of is de waarde dan NULL?
                             $fqfn = $actions[$i]->getFullQualifiedFieldNames();
                             $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
                             foreach ($fqfn as $fieldName) {
                                 $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
-<select style="display:block;float:right;" name="' . $fieldName . '"><option>-- Selecteer een render property --</option>';
+<select style="display:block;float:right;" name="'. $fieldName . '"><option>-- Selecteer een render property --</option>';
                                 for ($i = 0; $i < sizeof($props); $i++) {
                                     if (str_contains($fieldName, '_')) {
                                         $strEx = explode('_', $fieldName);
@@ -127,9 +127,11 @@ function showComponent($c, $pages, $actions){
                             }
                             $part .= '</ul>
 <input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
+<input type="hidden" name="action" value="' . $actionName . '">
 <button type="submit" name="mapping">Save</button></form>';
                         }
                         break;
+                        // de gebruiker zal per actie moeten bewaren in de backend gewoon bepalen over welke actie het gaat
                     }
                 }
             }

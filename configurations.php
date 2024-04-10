@@ -204,35 +204,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['page-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo verwijder actionLink uit Page class en zie dat alles werkt doordat alles op Component niveau gebeurt
+    // todo
     //      voor id van effecten kan je op termijn ook een id genereren op basis van id component en id page combined en dan een nummer per effect binnen de component zelf
     //      het id is dan een string
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
-            // todo fix: ook een pagina naam is niet uniek wat betekent dat zaken gemakkelijk in de war geraken
-            //           bv frontend code variabelen
             $_SESSION['frontend']->pages[$i]->name = $_POST['name'];
             $_SESSION['frontend']->pages[$i]->url = $_POST['url'];
-            if (isset($_POST['action']) && isset($_POST['target'])) {
-                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                    if (isset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink)) {
-                        unset($_SESSION['frontend']->pages[$i]->components[$j]->actionLink);
-                        break;
-                    }
-                }
-                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                    if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['target']) {
-                        for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
-                            if ($_SESSION['actions'][$k]->name === $_POST['action']) {
-                                $_SESSION['frontend']->pages[$i]->components[$j]->linkWithAction($_SESSION['actions'][$k]);
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-            if (isset($_POST['action'])) $_SESSION['frontend']->pages[$i]->actionLink = $_POST['action'];
             break;
         }
     }
@@ -262,12 +240,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['frontend']->pages[$i]->id === (int)$_POST['page']) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['component']) {
-
                     for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
-
-                        if ($_SESSION['actions'][$k]->name === $_SESSION['frontend']->pages[$i]->actionLink) {
+                        if(isset($_POST['action']) && $_POST['action']===$_SESSION['actions'][$k]->name){
                             $props = $_SESSION['frontend']->pages[$i]->components[$j]->getAttributes();
-                            $_SESSION['frontend']->pages[$i]->components[$j]->mapping = [];
+                            $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$_POST['action']] = [];
                             $fieldNames = $_SESSION['actions'][$k]->getFullQualifiedFieldNames();
                             foreach ($props as $prop) {
                                 $val = NULL;
@@ -277,11 +253,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         break;
                                     }
                                 }
-                                $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$prop] = $val;
+                                $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$_POST['action']][$prop] = $val;
                             }
-                            //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->mapping, true).'</pre>';
                             break;
                         }
+                            //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->mapping, true).'</pre>';
                     }
                     break;
                 }
@@ -444,7 +420,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                                 if ($_SESSION['actions'][$k]->type === 'Get_all' && $_SESSION['actions'][$k]->concept === $_SESSION['concepts'][$j]->name) {
                                     for ($l = 0; $l < sizeof($_SESSION['frontend']->pages); $l++) {
-                                        if (isset($_SESSION['frontend']->pages[$l]->actionLink) && $_SESSION['frontend']->pages[$l]->actionLink === $_SESSION['actions'][$k]->name) {
+                                        $names = [];
+                                        for ($m=0;$m<sizeof($_SESSION['frontend']->effects);$m++){
+                                            for ($n=0;$n<sizeof($_SESSION['frontend']->pages[$l]->components);$n++){
+                                                if($_SESSION['frontend']->pages[$l]->components[$n]->id===$_SESSION['frontend']->effects[$m]->source->id&&
+                                                    $_SESSION['frontend']->effects[$m]->trigger===\Enums\PageTriggerType::OnPageLoad){
+                                                    $names[]=$_SESSION['frontend']->effects[$m]->action->name;
+                                                }
+                                            }
+                                        }
+                                        if(sizeof($names)===1){
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
                                                 $_SESSION['frontend']->pages[$l]->id
                                                 , $j + 1);
@@ -608,7 +593,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                    showComponent($_SESSION['frontend']->pages[$i]->components[$j], $_SESSION['frontend']->pages);
+                    showComponent($_SESSION['frontend']->pages[$i]->components[$j], $_SESSION['frontend']->pages, $_SESSION['actions']);
                     break;
                 }
             }
