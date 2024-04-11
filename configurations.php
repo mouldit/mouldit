@@ -436,7 +436,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         echo $_SESSION['frontend']->pages[$l]->name;
                                         //echo '<pre>'.print_r($names, true).'</pre>';
                                         if(sizeof($names)===1){
-                                            // todo fix: dev olgorde nummero is nog niet correct
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
                                                 $_SESSION['frontend']->pages[$l]->id
                                                 , sizeof($menuItems)+1);
