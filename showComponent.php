@@ -16,12 +16,10 @@ function showComponent($c, $pages, $actions){
         foreach ($pages as $p){
             $part.='<option value="'.$p->id.'">'.$p->name.'</option>';
         }
-
         $part.='</select>
             <button type="submit" name="add-item">add item</button></form>';
         $part.='<ul style="margin:0">';
         foreach ($c->menuItems as $menuItem){
-
             $part.='<li><form action="' . $_SERVER['PHP_SELF'] . '" method="post" style="display: inline"><input type="hidden" name="remove-item" value="'
                 .$menuItem->name.'"><button type="submit" name="remove">remove</button></form>
 <form action="' . $_SERVER['PHP_SELF'] . '" method="post" style="display: inline"><label>Number</label>

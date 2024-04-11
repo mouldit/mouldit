@@ -413,6 +413,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $comp = NULL;
             switch ($_POST['add-component']) {
                 case 'menubar':
+                    // todo fix: het probleem is dat op het moment dit wordt aangemaakt een bepaalde trigger voor een bepaalde
+                    //      pagina mogelijks nog moet worden gemaakt, dwz dat een menubar component op dat moment moet aangemaakt worden
+                    //      hetgeen een onhandige koppeling tussen componenten creëert al is er dan inderdaad een directe relatie
                     if ($_SESSION['frontend']->pages[$i]->main) {
                         $menuItems = [];
                         for ($j = 0; $j < sizeof($_SESSION['concepts']); $j++) {
@@ -424,15 +427,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         for ($m=0;$m<sizeof($_SESSION['frontend']->effects);$m++){
                                             for ($n=0;$n<sizeof($_SESSION['frontend']->pages[$l]->components);$n++){
                                                 if($_SESSION['frontend']->pages[$l]->components[$n]->id===$_SESSION['frontend']->effects[$m]->source->id&&
-                                                    $_SESSION['frontend']->effects[$m]->trigger===\Enums\PageTriggerType::OnPageLoad){
+                                                    $_SESSION['frontend']->effects[$m]->trigger===\Enums\PageTriggerType::OnPageLoad&&
+                                                    $_SESSION['frontend']->effects[$m]->action->name===$_SESSION['actions'][$k]->name){
                                                     $names[]=$_SESSION['frontend']->effects[$m]->action->name;
                                                 }
                                             }
                                         }
+                                        echo $_SESSION['frontend']->pages[$l]->name;
+                                        //echo '<pre>'.print_r($names, true).'</pre>';
                                         if(sizeof($names)===1){
+                                            // todo fix: dev olgorde nummero is nog niet correct
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
                                                 $_SESSION['frontend']->pages[$l]->id
-                                                , $j + 1);
+                                                , sizeof($menuItems)+1);
                                             break;
                                         }
                                     }
