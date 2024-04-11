@@ -24,20 +24,24 @@ class Page implements IPage
         $this->url = $url;
         $this->selected = false;
         $this->components = [];
+        $this->imports=[];
+        $this->constructorInjections=[];
+        $this->controllerVariables=[];
         if (isset($main)) $this->main = $main; else $this->main = false;
     }
     public function createViewController(&$data, array $effects, array $pages)
     {
+        $effectOnInit = '';
+        $effectMethods = '';
+        $effectCstr = '';
+        $effectImports = '';
+        $effectVars = '';
+        $onInit='';
+        $lon = $this->getLevelOfNesting($this);
         foreach ($this->components as $c) {
             $this->constructorInjections = array_unique(array_merge($this->constructorInjections, $c->getConstructorInjections()));
             $this->controllerVariables = array_unique(array_merge($this->controllerVariables, $c->getcontrollerVariables()));
             $this->imports = array_unique(array_merge($this->imports, $c->getControllerImports()));
-            $effectOnInit = '';
-            $effectMethods = '';
-            $effectCstr = '';
-            $effectImports = '';
-            $effectVars = '';
-            $lon = $this->getLevelOfNesting($this);
             foreach ($effects as $e) {
                 if ($e->source->id === $c->id) {
                     if (!str_contains($effectMethods, $e->getMethods(false))) {
@@ -60,21 +64,24 @@ class Page implements IPage
                         $effectVars .= "\n{$e->getVariable()}";
                     }
                 }
+                if (!str_contains($onInit, $c->getInit($pages))) {
+                    $onInit .= "\n{$c->getInit($pages)}";
+                }
             }
-            $data = str_replace([
-                'COMPONENT_IMPORT_STATEMENT',
-                'COMPONENT_VARIABLES',
-                'NG_ON_INIT_BODY',
-                'CONSTRUCTOR_VARIABLES',
-                'COMPONENT_METHODS'
-            ], [implode("\n", $this->imports) . $effectImports . "\nCOMPONENT_IMPORT_STATEMENT",
-                implode("\n", $this->controllerVariables) . $effectVars . "\nCOMPONENT_VARIABLES",
-                $c->getInit($pages) . $effectOnInit . "\nNG_ON_INIT_BODY",
-                implode("\n", $this->constructorInjections) . $effectCstr . "\nCONSTRUCTOR_VARIABLES",
-                $effectMethods . "\nCOMPONENT_METHODS"
-            ],
-                $data);
         }
+        $data = str_replace([
+            'COMPONENT_IMPORT_STATEMENT',
+            'COMPONENT_VARIABLES',
+            'NG_ON_INIT_BODY',
+            'CONSTRUCTOR_VARIABLES',
+            'COMPONENT_METHODS'
+        ], [implode("\n", $this->imports) . $effectImports . "\nCOMPONENT_IMPORT_STATEMENT",
+            implode("\n", $this->controllerVariables) . $effectVars . "\nCOMPONENT_VARIABLES",
+            $onInit . $effectOnInit . "\nNG_ON_INIT_BODY",
+            implode("\n", $this->constructorInjections) . $effectCstr . "\nCONSTRUCTOR_VARIABLES",
+            $effectMethods . "\nCOMPONENT_METHODS"
+        ],
+            $data);
     }
 
     public function setParentId($id)

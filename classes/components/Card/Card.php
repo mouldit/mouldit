@@ -51,7 +51,7 @@ class Card extends \components\Component  implements IComponent
 
     function getControllerVariables()
     {
-        return '';
+        return [];
     }
 
     function getInit($pages)
@@ -62,7 +62,7 @@ class Card extends \components\Component  implements IComponent
     function getConstructorInjections()
     {
         // todo de overeenkomstige import gebeurt nog niet
-        return 'private http: HttpClient,';
+        return ['private http: HttpClient,'];
     }
 
     function getHTML(string $triggers,\Action $action=null)

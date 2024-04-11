@@ -74,7 +74,6 @@ function showComponent($c, $pages, $actions){
         // todo voeg hier op termijn ook de button aan toe
         $part .= '<h3>Data Mapping</h3>';
         $props = $c->getAttributes();
-        //echo '<pre>'.print_r(isset($c->actionLink), true).'</pre>';
         if(sizeof($c->mapping)===0){
             $part .= '<span>No action linked with this component</span>';
         } else{
