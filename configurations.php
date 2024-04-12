@@ -48,7 +48,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
         !isset($_SESSION['actions'])) {
-    echo 'creating actions';
     $_SESSION['pageCounter'] = 0;
     $_SESSION['componentCounter'] = 0;
     $_SESSION['effectCounter'] = 0;
@@ -220,8 +219,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     if (isset($_POST['component-name'])) {
-                        // todo uniekheid kan hier gebroken worden, zelfs op eenzelfde pagina
-                        //      gevolg is er nog maar één component aangepast wordt en getoond in de detail
                         $_SESSION['frontend']->pages[$i]->components[$j]->name = $_POST['component-name'];
                     }
                     break;
@@ -380,7 +377,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['button-general-properties']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo fix: als je als icon trash neemt, bewaart hij pencil en als je daarna terug trash neemt bewaart hij wel trash
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
