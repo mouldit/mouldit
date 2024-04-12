@@ -304,14 +304,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['add-effect']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo save page trigger
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     // deze component moet aangepast worden
                     if (isset($_POST['trigger-name']) && isset($_POST['action-name']) && isset($_POST['component-id'])) {
-                        echo 'trigger = ' . $_POST['trigger-name'];
                         $target = (int)$_POST['component-id'];
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action-name']) {
@@ -612,18 +610,24 @@ if (isset($_SESSION['pathToRootOfServer']) &&
      style="float:left; min-width: 700px;min-height:400px;padding: 0 8px">
     <h1>Effects</h1>
     <label>Source component: </label><span><?php
+        $sourceFound = false;
         for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
             if ($_SESSION['frontend']->pages[$i]->selected) {
                 for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                     if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                         echo $_SESSION['frontend']->pages[$i]->components[$j]->name;
+                        $sourceFound=true;
+                        break;
                     }
                 }
             }
         }
+        if(!$sourceFound){
+            echo 'Select a component on the page view to link with a trigger.';
+        }
         ?></span>
     <form action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
-        <label>trigger</label><select name="trigger-name">
+        <label>trigger</label><select name="trigger-name" <?php if(!$sourceFound) echo 'disabled'; ?>>
             <option>--select trigger--</option>
             <?php
             $triggers = array_column(\Enums\TriggerType::cases(), 'name');
@@ -634,7 +638,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             }
             ?>
         </select><label>action</label>
-        <select name="action-name">
+        <select name="action-name" <?php if(!$sourceFound) echo 'disabled'; ?>>
             <option>--select action--</option>
             <?php $actions = array_column($_SESSION['actions'], 'name');
             foreach ($actions as $a) {
@@ -643,7 +647,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             ?>
         </select>
         <label>target</label>
-        <select name="component-id">
+        <select name="component-id" <?php if(!$sourceFound) echo 'disabled'; ?>>
             <option>--select component--</option>
             <?php
             $components = [];
@@ -655,7 +659,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             }
             ?>
         </select>
-        <button type="submit" name="add-effect">add effect</button>
+        <button type="submit" name="add-effect" <?php if(!$sourceFound) echo 'disabled'; ?>>add effect</button>
     </form>
     <table>
         <thead>
