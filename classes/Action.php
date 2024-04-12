@@ -97,5 +97,10 @@ class Action
             .ucfirst($e->source->name).($id?'_'.$e->source->id:'').'.emit('
             .'res'
             .');'."\n});";
-        }
+    }
+    public function getAction(){
+        return   'this.http.'.$this->verb.'(\'http://localhost:5000/'
+            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {'
+            .'this.'.$this->getVariable().'=res'."\n});";
+    }
 }

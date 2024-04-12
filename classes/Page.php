@@ -50,7 +50,8 @@ class Page implements IPage
                     if (!str_contains($effectImports, $e->getImports($lon))) {
                         $effectImports .= "\n{$e->getImports($lon)}";
                     }
-                } else if ($e->target->id === $c->id) {
+                }
+                if ($e->target->id === $c->id) {
                     if (!str_contains($effectOnInit, $e->getOnInit(false))) {
                         $effectOnInit .= "\n{$e->getOnInit(false)}";
                     }

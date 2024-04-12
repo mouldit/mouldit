@@ -12,6 +12,8 @@ class Effect
     public readonly \components\Component $target;
     // todo conditional trigger
 
+    // todo controleer of in de service de variabelen van een on page load wel worden aangemaakt
+
     // todo onderstaande methods aanpassen naar correcte trigger/action structuur
     public function getTrigger(){
         if($this->trigger instanceof TriggerType) return $this->trigger->value
@@ -20,10 +22,7 @@ class Effect
             .ucfirst($this->source->name).'()"'; else return '';
     }
     public function getMethods(bool $id){
-        // todo import van de TriggerService + aanmaken in constrcutor
         // todo bundel actions bij eenzelfde trigger + source
-
-        // todo ipv een onmiddellijke emit, doe je hier eerst de overeenkomstige actie en zend je het RESULTAAT van de actie uit
         if($this->trigger instanceof TriggerType) return lcfirst($this->trigger->name)
             .ucfirst($this->source->name).'(){'."\n\t\t"
             .$this->action->getAsJavaScript($id,$this)."\n".'}'; else return '';
@@ -33,9 +32,9 @@ class Effect
         // todo bundel actions bij eenzelfde trigger + source
         $onInit ='';
         if($this->trigger instanceof PageTriggerType){
-            // todo
+            $onInit.=$this->action->getAction();
         }
-        if($this->action->isAsynchronous()){
+        if($this->action->isAsynchronous()&&!($this->trigger instanceof PageTriggerType)){
             $onInit.='this.triggerService.'.lcfirst($this->trigger->name)
             .ucfirst($this->source->name).($id?'_'.$this->source->id:'').'.subscribe((res: any)=>{
             '."\nthis.".$this->action->getVariable()."=res;\n".'

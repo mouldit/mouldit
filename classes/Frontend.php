@@ -46,8 +46,9 @@ export class AppComponent {
         $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-module.txt');
         if ($f && $data) {
             $data = str_replace(['COMPONENT_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT', 'MODULE_PROVIDER_STATEMENT'],
-                ["\nimport { HttpClientModule } from '@angular/common/http';\nCOMPONENT_IMPORT_STATEMENT",
-                    "\nHttpClientModule,\nMODULE_IMPORTS_STATEMENT",""], $data);
+                ["\nimport { HttpClientModule } from '@angular/common/http';
+                \nimport {TriggerService} from \"./services/trigger-service\";\nCOMPONENT_IMPORT_STATEMENT",
+                    "\nHttpClientModule,\nMODULE_IMPORTS_STATEMENT","TriggerService\n"], $data);
             foreach ($this->pages as $p) {
                 $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT','MODULE_PROVIDER_STATEMENT'],
                     [$p->getImportStatement('.'.$this->getPath($this->pages,$p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
@@ -61,8 +62,9 @@ export class AppComponent {
                     }
                 }
             }
-            $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT', 'COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT'],
-                ['', '', '', ''], $data);
+            $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT', 'COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT',
+                'MODULE_PROVIDER_STATEMENT'],
+                ['', '', '', '',''], $data);
             fwrite($f, $data);
         }
         if ($f) fclose($f);
@@ -90,8 +92,11 @@ export class AppComponent {
             $variables=[];
             $variableNames=[];
             foreach ($this->effects as $e){
-                $variables[]=[lcfirst($e->trigger->name).ucfirst($e->source->name),$e->source->id];
-                $variableNames[]=lcfirst($e->trigger->name).ucfirst($e->source->name);
+                // todo het kan nuttig zijn op termijn om target s toch te laten inschrijven op on page load events van andere componenten?
+                if(!($e->trigger instanceof \Enums\PageTriggerType)){
+                    $variables[]=[lcfirst($e->trigger->name).ucfirst($e->source->name),$e->source->id];
+                    $variableNames[]=lcfirst($e->trigger->name).ucfirst($e->source->name);
+                }
             }
             $arr = array_count_values($variableNames);
             $keys = array_keys($arr);
@@ -115,6 +120,7 @@ export class AppComponent {
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 // HTML bestand = ComponentView
+                // todo fix: als er een Card wordt de Card niet geprint.
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
                 if($f){
@@ -122,10 +128,15 @@ export class AppComponent {
                     foreach ($p->components as $c){
                         $triggers = '';
                         $action = null;
+                        // todo fix zodat on page load events er in voorkomen
                         foreach ($this->effects as $e){
                             if($e->source->id===$c->id){
+                                // deze werkt enkel voor normale triggers wat ook zo moet
                                 $triggers.="\n{$e->getTrigger()}";
-                            } else if($e->target->id===$c->id){
+                            }
+                            if($e->target->id===$c->id){
+                                // todo voor on pgae load lijkt dit vreemd genoeg niet te werken
+                                echo 'comp = '.$c->name.' en action = '.$e->action->name;
                                 $action = $e->action;
                             }
                         }
