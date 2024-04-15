@@ -26,6 +26,15 @@ class Component
         $this->selected = false;
         $this->mapping = [];
     }
+    public function removeAction(string $name){
+       for($i=0;$i<sizeof($keys = array_keys($this->mapping));$i++){
+           if($keys[$i]===$name){
+               array_splice($this->mapping,$i,1);
+               //echo '<pre>'.print_r($this->mapping, true).'</pre>';
+               break;
+           }
+       }
+    }
     public function select()
     {
         $this->selected = true;

@@ -70,11 +70,11 @@ class Card extends \components\Component  implements IComponent
             echo 'getting html '.$this->name;
             $html =  '<ng-container *ngFor="let '.$action->concept.' of '.$action->concept.'s'.'; let i = index">
             <p-card '.$triggers.' ';
-            if(isset($this->mapping['header'])){
-               $html.='header="{{'.$action->concept.'.'.$this->mapping['header'].'}}" ';
+            if(isset($this->mapping[$action->name]['header'])){
+               $html.='header="{{'.$action->concept.'.'.$this->mapping[$action->name]['header'].'}}" ';
             }
-            if(isset($this->mapping['subheader'])){
-                $html.='subheader="{{'.$action->concept.'.'.$this->mapping['subheader'].'}}" ';
+            if(isset($this->mapping[$action->name]['subheader'])){
+                $html.='subheader="{{'.$action->concept.'.'.$this->mapping[$action->name]['subheader'].'}}" ';
             }
             $html.='></p-card></ng-container>';
             return $html;

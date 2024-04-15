@@ -238,7 +238,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->id === (int)$_POST['component']) {
                     for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
-                        if(isset($_POST['action']) && $_POST['action']===$_SESSION['actions'][$k]->name){
+                        if (isset($_POST['action']) && $_POST['action'] === $_SESSION['actions'][$k]->name) {
                             $props = $_SESSION['frontend']->pages[$i]->components[$j]->getAttributes();
                             $_SESSION['frontend']->pages[$i]->components[$j]->mapping[$_POST['action']] = [];
                             $fieldNames = $_SESSION['actions'][$k]->getFullQualifiedFieldNames();
@@ -254,7 +254,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                             }
                             break;
                         }
-                            //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->mapping, true).'</pre>';
+                        //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->mapping, true).'</pre>';
                     }
                     break;
                 }
@@ -319,6 +319,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                                 $_POST['trigger-name'],
                                                 $_SESSION['actions'][$k],
                                                 $_SESSION['frontend']->pages[$l]->components[$m]);
+                                            $_SESSION['frontend']->pages[$l]->components[$m]->mapping[$_POST['action-name']] = [];
                                             break;
                                         }
                                     }
@@ -334,23 +335,26 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['remove-effect']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
-        if ($_SESSION['frontend']->pages[$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected && isset($_POST['effect-id'])) {
-                    for ($k = 0; $k < sizeof($_SESSION['frontend']->effects); $k++) {
-                        $id = (int)$_POST['effect-id'];
-                        if ($_SESSION['frontend']->effects[$k]->id === $id) {
+    for ($k = 0; $k < sizeof($_SESSION['frontend']->effects); $k++) {
+        if (isset($_POST['effect-id'])) {
+            $id = (int)$_POST['effect-id'];
+            if ($_SESSION['frontend']->effects[$k]->id === $id) {
+                for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+                    for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                        if ($_SESSION['frontend']->pages[$i]->components[$j]->id === $_SESSION['frontend']->effects[$k]->source->id) {
+                            $_SESSION['frontend']->pages[$i]->components[$j]->removeAction($_SESSION['frontend']->effects[$k]->action->name);
                             $_SESSION['frontend']->removeEffect($id);
                             break;
                         }
                     }
-                    break;
                 }
+                break;
             }
-            break;
         }
+
     }
+
+
 } else if (isset($_POST['save-item']) && isset($_POST['edit-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
@@ -418,21 +422,21 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                 if ($_SESSION['actions'][$k]->type === 'Get_all' && $_SESSION['actions'][$k]->concept === $_SESSION['concepts'][$j]->name) {
                                     for ($l = 0; $l < sizeof($_SESSION['frontend']->pages); $l++) {
                                         $names = [];
-                                        for ($m=0;$m<sizeof($_SESSION['frontend']->effects);$m++){
-                                            for ($n=0;$n<sizeof($_SESSION['frontend']->pages[$l]->components);$n++){
-                                                if($_SESSION['frontend']->pages[$l]->components[$n]->id===$_SESSION['frontend']->effects[$m]->source->id&&
-                                                    $_SESSION['frontend']->effects[$m]->trigger===\Enums\PageTriggerType::OnPageLoad&&
-                                                    $_SESSION['frontend']->effects[$m]->action->name===$_SESSION['actions'][$k]->name){
-                                                    $names[]=$_SESSION['frontend']->effects[$m]->action->name;
+                                        for ($m = 0; $m < sizeof($_SESSION['frontend']->effects); $m++) {
+                                            for ($n = 0; $n < sizeof($_SESSION['frontend']->pages[$l]->components); $n++) {
+                                                if ($_SESSION['frontend']->pages[$l]->components[$n]->id === $_SESSION['frontend']->effects[$m]->source->id &&
+                                                    $_SESSION['frontend']->effects[$m]->trigger === \Enums\PageTriggerType::OnPageLoad &&
+                                                    $_SESSION['frontend']->effects[$m]->action->name === $_SESSION['actions'][$k]->name) {
+                                                    $names[] = $_SESSION['frontend']->effects[$m]->action->name;
                                                 }
                                             }
                                         }
                                         echo $_SESSION['frontend']->pages[$l]->name;
                                         //echo '<pre>'.print_r($names, true).'</pre>';
-                                        if(sizeof($names)===1){
+                                        if (sizeof($names) === 1) {
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
                                                 $_SESSION['frontend']->pages[$l]->id
-                                                , sizeof($menuItems)+1);
+                                                , sizeof($menuItems) + 1);
                                             break;
                                         }
                                     }
@@ -507,9 +511,10 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         padding: 8px;
         border: 1px solid black;
     }
-    .screen{
-        border:1px solid #161667;
-        margin:4px;
+
+    .screen {
+        border: 1px solid #161667;
+        margin: 4px;
     }
 </style>
 <body style="background: #785a7a">
@@ -612,18 +617,18 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                     if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                         echo $_SESSION['frontend']->pages[$i]->components[$j]->name;
-                        $sourceFound=true;
+                        $sourceFound = true;
                         break;
                     }
                 }
             }
         }
-        if(!$sourceFound){
+        if (!$sourceFound) {
             echo 'Select a component on the page view to link with a trigger.';
         }
         ?></span>
     <form action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
-        <label>trigger</label><select name="trigger-name" <?php if(!$sourceFound) echo 'disabled'; ?>>
+        <label>trigger</label><select name="trigger-name" <?php if (!$sourceFound) echo 'disabled'; ?>>
             <option>--select trigger--</option>
             <?php
             $triggers = array_column(\Enums\TriggerType::cases(), 'name');
@@ -634,7 +639,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             }
             ?>
         </select><label>action</label>
-        <select name="action-name" <?php if(!$sourceFound) echo 'disabled'; ?>>
+        <select name="action-name" <?php if (!$sourceFound) echo 'disabled'; ?>>
             <option>--select action--</option>
             <?php $actions = array_column($_SESSION['actions'], 'name');
             foreach ($actions as $a) {
@@ -643,19 +648,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             ?>
         </select>
         <label>target</label>
-        <select name="component-id" <?php if(!$sourceFound) echo 'disabled'; ?>>
+        <select name="component-id" <?php if (!$sourceFound) echo 'disabled'; ?>>
             <option>--select component--</option>
             <?php
             $components = [];
             foreach ($_SESSION['frontend']->pages as $p) {
-                $components = array_merge($components,$p->components);
+                $components = array_merge($components, $p->components);
             }
             foreach ($components as $ct) {
                 echo '<option value="' . $ct->id . '">' . $ct->name . '</option>';
             }
             ?>
         </select>
-        <button type="submit" name="add-effect" <?php if(!$sourceFound) echo 'disabled'; ?>>add effect</button>
+        <button type="submit" name="add-effect" <?php if (!$sourceFound) echo 'disabled'; ?>>add effect</button>
     </form>
     <table>
         <thead>

@@ -73,6 +73,7 @@ function showComponent($c, $pages, $actions){
         $part .= '<h3>Data Mapping</h3>';
         $props = $c->getAttributes();
         if(sizeof($c->mapping)===0){
+            // todo bij het toevoegen van een effect qua target een comp aanpassen wat betreft mapping
             $part .= '<span>No action linked with this component</span>';
         } else{
             foreach(array_keys($c->mapping) as $actionName){
@@ -95,13 +96,10 @@ function showComponent($c, $pages, $actions){
                                 }
                                 $part .= '</select></li>';
                             }
-                            $part .= '</ul>
-<input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
-<input type="hidden" name="action" value="' . $actionName . '">
-<button type="submit" name="mapping">Save</button></form>';
                         }else {
                             // er is nog geen mapping voor de overeenkomstige action , doch selchts een lege array => todo of is de waarde dan NULL?
                             $fqfn = $actions[$i]->getFullQualifiedFieldNames();
+                            $part .= '<label>Action: </label><input readonly value="'.$actionName.'">';
                             $part .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><ul style="width: 440px">';
                             foreach ($fqfn as $fieldName) {
                                 $part .= '<li style="display:block;overflow:auto"><span style="display:block;float:left;">' . $fieldName . '</span>
@@ -122,11 +120,11 @@ function showComponent($c, $pages, $actions){
                                 }
                                 $part .= '</select></li>';
                             }
-                            $part .= '</ul>
+                        }
+                        $part .= '</ul>
 <input type="hidden" name="component" value="' . $c->id . '"><input type="hidden" name="page" value="' . $c->pageId . '">
 <input type="hidden" name="action" value="' . $actionName . '">
 <button type="submit" name="mapping">Save</button></form>';
-                        }
                         break;
                         // de gebruiker zal per actie moeten bewaren in de backend gewoon bepalen over welke actie het gaat
                     }
