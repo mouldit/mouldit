@@ -6,7 +6,7 @@ use Exception;
 
 class ContentInjection
 {
-    private array $contentInjection=[];
+    public array $contentInjection=[];
 
     /**
      * @throws Exception

@@ -5,8 +5,7 @@ class Frontend
     use FrontendMethods;
     public array $pages = [];
     public array $effects = [];
-    public function removeEffect(int $id)
-    {
+    public function removeEffect(int $id){
         for ($i = 0; $i < sizeof($this->effects); $i++) {
             if ($this->effects[$i]->id === $id) {
                 array_splice($this->effects, $i, 1);
@@ -18,8 +17,7 @@ class Frontend
     /**
      * @throws Exception
      */
-    public function generate(string $dir): void
-    {
+    public function generate(string $dir): void{
         touch($dir . '/app.component.css');
         $f = fopen($dir . '/app.component.html', 'wb');
         $mp = $this->getMainPage($this->pages);
@@ -120,7 +118,6 @@ export class AppComponent {
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 // HTML bestand = ComponentView
-                // todo fix: als er een Card wordt de Card niet geprint.
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
                 if($f){
@@ -128,15 +125,12 @@ export class AppComponent {
                     foreach ($p->components as $c){
                         $triggers = '';
                         $action = null;
-                        // todo fix zodat on page load events er in voorkomen
                         foreach ($this->effects as $e){
                             if($e->source->id===$c->id){
                                 // deze werkt enkel voor normale triggers wat ook zo moet
                                 $triggers.="\n{$e->getTrigger()}";
                             }
                             if($e->target->id===$c->id){
-                                // todo voor on pgae load lijkt dit vreemd genoeg niet te werken
-                                echo 'comp = '.$c->name.' en action = '.$e->action->name;
                                 $action = $e->action;
                             }
                         }

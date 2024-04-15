@@ -38,14 +38,36 @@ function showComponent($c, $pages, $actions){
         $part.='</ul>';
     }
     if($c->type==='card'){
+        $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post">';
+        $part.='<h3>Content Injection<button type="submit">save</button></h3>';
+/*        echo '<pre>'.print_r($c->ci, true).'</pre>';
+        echo 'true='.is_array($c->ci);*/
+        $components = [];
 
+        foreach ($pages as $page){
+            $components = array_merge($components,$page->components);
+        }
+        $part.='<ul style="margin:0;width: 340px">';
+        foreach ($c->ci->contentInjection as $ciPropName=>$componentId){
+            $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$ciPropName.'</span>';
+            $part.='<select style="display:block;float:right;" name="ci_'.$ciPropName.'"><option value="">--select a component--</option>';
+            foreach ($components as $component){
+                if($component->id===$componentId){
+                    $part.='<option value="'.$component->id.'" selected>'.$component->name.'</option>';
+                } else{
+                    $part.='<option value="'.$component->id.'">'.$component->name.'</option>';
+                }
+            }
+            $part.='</select></li>';
+        }
+        $part.='</ul><input type="hidden" name="edit-ci" value="'.$c->id.'"></form>';
     }
     if($c->type==='button'){
         $part.='<h3>General properties</h3>';
         $part.='<form  action="' . $_SERVER['PHP_SELF'] . '" method="post" style="display: inline">
             <label>text</label>';
         isset($c->label) ? $part.='<input name="text" value="'.$c->label.'">':$part.='<input name="text">';
-            $part.=' <label>disabled</label>';
+        $part.=' <label>disabled</label>';
         isset($c->disabled) && $c->disabled===true ?
             $part.='<input type="radio" name="disabled" value="1" checked>yes<input type="radio" name="disabled" value="0">no':
             $part.='<input type="radio" name="disabled" value="1">yes<input type="radio" name="disabled" value="0" checked>no';
@@ -53,8 +75,8 @@ function showComponent($c, $pages, $actions){
             <select name="icon"><option>--select icon--</option>';
         $icons = array_column(\Enums\IconType::cases(), 'name');
         foreach ($icons as $icon){
-           isset($c->icon->icon) && $c->icon->icon->name===$icon ? $part.='<option value="'.$icon.'" selected>'.$icon.'</option>':
-               $part.='<option value="'.$icon.'">'.$icon.'</option>';
+            isset($c->icon->icon) && $c->icon->icon->name===$icon ? $part.='<option value="'.$icon.'" selected>'.$icon.'</option>':
+                $part.='<option value="'.$icon.'">'.$icon.'</option>';
         }
         $part.='</select>
             <select name="position"><option>--select icon position--</option>';

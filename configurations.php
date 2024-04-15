@@ -227,6 +227,23 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
+} else if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected && (int)$_POST['edit-ci'] === $_SESSION['frontend']->pages[$i]->components[$j]->id) {
+                    $keys = array_keys($_POST);
+                    foreach ($keys as $item) {
+                        if(str_contains($item,'ci_')){
+                            $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($item,strpos($item,'_')+1)]=
+                                $_POST[$item]!==''?(int)$_POST[$item]:NULL;
+                        }
+                    }
+                    //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection, true).'</pre>';
+                }
+            }
+        }
+    }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // je kan nu een mapping hebben voor meerdere acties => todo: de mapping koppelen aan de juiste actie
     // todo de format is: mapping is een array, de keys zijn actionNames ,
