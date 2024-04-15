@@ -114,7 +114,6 @@ export class AppComponent {
             fwrite($f, $data);
         }
         if ($f) fclose($f);
-
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 // HTML bestand = ComponentView
@@ -134,7 +133,20 @@ export class AppComponent {
                                 $action = $e->action;
                             }
                         }
-                        $data.=$c->getHTML($triggers,$action)."\n";
+                        // todo dit komt heel gekunsteld over, het zou beter zijn indien je een content
+                        //      componenten rechtsreeks kon aanmaken binnen de geselecteerde component
+                        $ci=false;
+                        for ($i=0;$i<sizeof($p->components);$i++){
+                            if(isset($p->components[$i]->ci)) {
+                                for ($j=0;$j<sizeof($p->components[$i]->ci->contentInjection);$j++){
+                                    if($p->components[$i]->ci->contentInjection[$j]===$c->id){
+                                        $ci=true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(!$ci){$data.=$c->getHTML($triggers,$action,$p->components)."\n";}
                     }
                     fwrite($f, $data);
                     fclose($f);
