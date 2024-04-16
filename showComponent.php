@@ -1,8 +1,9 @@
 <?php
 
 use components\Card\Card;
+use components\Component;
 
-function showComponent($c, $pages, $actions){
+function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
 // todo datamapping is niet opportuun voor elk type component
 
     $part='<h1>Component configuration of '.$c->type.'</h1>';
@@ -42,25 +43,21 @@ function showComponent($c, $pages, $actions){
         $part.='<h3>Content Injection<button type="submit">save</button></h3>';
 /*        echo '<pre>'.print_r($c->ci, true).'</pre>';
         echo 'true='.is_array($c->ci);*/
-        $components = [];
 
-        foreach ($pages as $page){
-            $components = array_merge($components,$page->components);
-        }
-        $part.='<ul style="margin:0;width: 340px">';
-        foreach ($c->ci->contentInjection as $ciPropName=>$componentId){
-            $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left;">'.$ciPropName.'</span>';
-            $part.='<select style="display:block;float:right;" name="ci_'.$ciPropName.'"><option value="">--select a component--</option>';
-            foreach ($components as $component){
-                if($component->id===$componentId){
-                    $part.='<option value="'.$component->id.'" selected>'.$component->name.'</option>';
-                } else{
-                    $part.='<option value="'.$component->id.'">'.$component->name.'</option>';
-                }
+        $part.='<ul style="margin:0;width: 740px">';
+        foreach ($c->ci->contentInjection as $ciPropName=>$component){
+            $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left; width: 150px">'.$ciPropName.'</span>';
+            $compstr = '';
+            if($component instanceof Component){
+                $compstr.='<label style="display:block;float:left; margin-right:16px;">'.$component->name.'</label><button style="display:block;float:left;" type="button">edit</button>';
             }
-            $part.='</select></li>';
+            $part.='<select style="display:block;float:left; margin-right:16px;" name="ci_'.$ciPropName.'"><option value="">--select a component type--</option>';
+            foreach ($implementedTypesOfComponents as $type){
+                $part.='<option value="'.$type.'">'.$type.'</option>';
+            }
+            $part.='</select>'.$compstr.'</li>';
         }
-        $part.='</ul><input type="hidden" name="edit-ci" value="'.$c->id.'"></form>';
+        $part.='</ul><input type="hidden" name="save-ci" value="'.$c->id.'"></form>';
     }
     if($c->type==='button'){
         $part.='<h3>General properties</h3>';
