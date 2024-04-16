@@ -53,7 +53,7 @@ function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
                 $compstr.='<label style="display:block;float:left; margin-right:16px;">'.$component->name.'</label>
 <input type="hidden" name="delete-ci" value="'.$c->id.'" form="delete-ci">
 <button style="display:block;float:left;" name="delete-ci_'.$ciPropName.'" type="submit" form="delete-ci">delete</button>
-<button style="display:block;float:left;" type="button">edit</button>';
+<button style="display:block;float:left;" type="button" onclick="openNewDialog()">edit</button>';
             }
             $part.='<select form="save-ci" style="display:block;float:left; margin-right:16px;" name="ci_'.$ciPropName.'"><option value="">--select a component type--</option>';
             foreach ($implementedTypesOfComponents as $type){

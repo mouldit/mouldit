@@ -784,4 +784,24 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     </form>
 </div>
 </body>
+<script>
+    function openNewDialog(){
+        /*
+        * todo via de edit button ga je naar de server en daar geef je de desbetreffende component mee
+        *  in een div hier open je het showComponent script met deze compone nt en de andere params
+        *  de div toon je via php ook enkel wanneer dit via zon' edit button werd gevraagd
+        * */
+        const el = document.createElement('div');
+        el.style.zIndex = '10';
+        el.style.minWidth = '100px';
+        el.style.minHeight = '100px';
+        el.style.background = 'white';
+        el.style.border = '1px solid blue';
+        el.style.position = 'fixed';
+        el.style.top = '0';
+        el.style.left = '0';
+
+        document.body.appendChild(el)
+    }
+</script>
 </html>
