@@ -246,11 +246,25 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     // todo
                                     break;
                                 case 'button':
-                                    // todo fix numbering! je moet ook de nesting in rekening brengen
                                     $counter = 0;
-                                    for ($k = 0; $k < sizeof($_SESSION['frontend']->pages[$i]->components); $k++) {
-                                        if ($_SESSION['frontend']->pages[$i]->components[$k]->type == 'button') $counter++;
+                                    $compArr=$_SESSION['frontend']->pages[$i]->components;
+                                    while(sizeof($compArr)>0){
+                                        $newItems = [];
+                                        foreach ($compArr as $it){
+                                            if($it->type==='button'){
+                                                $counter++;
+                                            }
+                                            if(isset($it->ci->contentInjection)){
+                                                foreach ($it->ci->contentInjection as $v){
+                                                    if(isset($v)){
+                                                        $newItems[]=$v;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        $compArr = [...$newItems];
                                     }
+                                    //
                                     $parentPath = '';
                                     if(isset($_SESSION['frontend']->pages[$i]->components[$j]->componentPath)){
                                        $parentPath =  $_SESSION['frontend']->pages[$i]->components[$j]->componentPath;
