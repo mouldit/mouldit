@@ -39,8 +39,9 @@ function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
         $part.='</ul>';
     }
     if($c->type==='card'){
-        $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post">';
-        $part.='<h3>Content Injection<button type="submit">save</button></h3>';
+        $part.='<form id="save-ci" action="' . $_SERVER['PHP_SELF'] . '" method="post"></form>';
+        $part.='<form id="delete-ci" action="' . $_SERVER['PHP_SELF'] . '" method="post"></form>';
+        $part.='<h3>Content Injection<button type="submit" form="save-ci">save</button></h3>';
 /*        echo '<pre>'.print_r($c->ci, true).'</pre>';
         echo 'true='.is_array($c->ci);*/
 
@@ -49,15 +50,18 @@ function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
             $part.='<li style="display:block;overflow:auto"><span style="display:block;float:left; width: 150px">'.$ciPropName.'</span>';
             $compstr = '';
             if($component instanceof Component){
-                $compstr.='<label style="display:block;float:left; margin-right:16px;">'.$component->name.'</label><button style="display:block;float:left;" type="button">edit</button>';
+                $compstr.='<label style="display:block;float:left; margin-right:16px;">'.$component->name.'</label>
+<input type="hidden" name="delete-ci" value="'.$c->id.'" form="delete-ci">
+<button style="display:block;float:left;" name="delete-ci_'.$ciPropName.'" type="submit" form="delete-ci">delete</button>
+<button style="display:block;float:left;" type="button">edit</button>';
             }
-            $part.='<select style="display:block;float:left; margin-right:16px;" name="ci_'.$ciPropName.'"><option value="">--select a component type--</option>';
+            $part.='<select form="save-ci" style="display:block;float:left; margin-right:16px;" name="ci_'.$ciPropName.'"><option value="">--select a component type--</option>';
             foreach ($implementedTypesOfComponents as $type){
                 $part.='<option value="'.$type.'">'.$type.'</option>';
             }
             $part.='</select>'.$compstr.'</li>';
         }
-        $part.='</ul><input type="hidden" name="save-ci" value="'.$c->id.'"></form>';
+        $part.='</ul><input type="hidden" name="save-ci" value="'.$c->id.'" form="save-ci">';
     }
     if($c->type==='button'){
         $part.='<h3>General properties</h3>';

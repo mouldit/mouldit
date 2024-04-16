@@ -251,15 +251,12 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                         if ($_SESSION['frontend']->pages[$i]->components[$k]->type == 'button') $counter++;
                                     }
                                     $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($item,strpos($item,'_')+1)]=
-                                    $_POST[$item] = new \components\Button\Button($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
+                                        new \components\Button\Button($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
                                         $_SESSION['frontend']->pages[$i]->name . '_button' . '_component_' . $counter, 'button');
                                     break;
                                 case 'card':
                                     // todo
                                     break;
-                                default:
-                                    $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($item,strpos($item,'_')+1)]=
-                                        $_POST[$item]=NULL;
                             }
                         }
                     }
@@ -268,6 +265,28 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             }
         }
     }
+} else if (isset($_POST['delete-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // todo fix: bij elke nieuwe create wordt voor elk prop de oude waarde overschreven
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                // todo dit is niet per se de geselecteerde component
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected && (int)$_POST['delete-ci'] === $_SESSION['frontend']->pages[$i]->components[$j]->id) {
+                    $keys = array_keys($_POST);
+                    for ($k=0;$k<sizeof($keys);$k++) {
+                        if (str_contains($keys[$k], 'ci_')) {
+                            //echo 'key = '.$keys[$k].' vs '.substr($keys[$k],strpos($keys[$k],'_')+1);
+                            $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($keys[$k],strpos($keys[$k],'_')+1)]=NULL;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                    //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection, true).'</pre>';
+                }
+            break;
+            }
+        }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // je kan nu een mapping hebben voor meerdere acties => todo: de mapping koppelen aan de juiste actie
     // todo de format is: mapping is een array, de keys zijn actionNames ,
