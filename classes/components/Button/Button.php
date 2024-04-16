@@ -16,9 +16,9 @@ class Button extends Component implements IComponent
     use Visibility;
     use Dimensioning;
 
-    public function __construct($id, $pageId, $name, $type, $label = null, $icon = null, $disabled = false)
+    public function __construct($id, $pageId, $name, $type,$path=NULL, $label = null, $icon = null, $disabled = false)
     {
-        parent::__construct($id, $pageId, $name, $type);
+        parent::__construct($id, $pageId, $name, $type,$path);
         if (isset($label)) $this->label = $label;
         if (isset($icon)) $this->icon = $icon;
         if (isset($disabled)) $this->disabled = $disabled;

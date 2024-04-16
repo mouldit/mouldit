@@ -246,13 +246,19 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     // todo
                                     break;
                                 case 'button':
+                                    // todo fix numbering! je moet ook de nesting in rekening brengen
                                     $counter = 0;
                                     for ($k = 0; $k < sizeof($_SESSION['frontend']->pages[$i]->components); $k++) {
                                         if ($_SESSION['frontend']->pages[$i]->components[$k]->type == 'button') $counter++;
                                     }
+                                    $parentPath = '';
+                                    if(isset($_SESSION['frontend']->pages[$i]->components[$j]->componentPath)){
+                                       $parentPath =  $_SESSION['frontend']->pages[$i]->components[$j]->componentPath;
+                                    }
                                     $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($item,strpos($item,'_')+1)]=
                                         new \components\Button\Button($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
-                                        $_SESSION['frontend']->pages[$i]->name . '_button' . '_component_' . $counter, 'button');
+                                        $_SESSION['frontend']->pages[$i]->name . '_button' . '_component_' . $counter, 'button',
+                                            $parentPath.'_'.$_SESSION['frontend']->pages[$i]->components[$j]->id);
                                     break;
                                 case 'card':
                                     // todo
@@ -506,7 +512,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                         }
                         $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
                             $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
-                            $_POST['add-component'], $menuItems
+                            $_POST['add-component'], NULL,$menuItems
                         );
                     } else {
                         $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,

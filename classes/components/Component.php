@@ -13,11 +13,11 @@ class Component
     public readonly int $id;
     public readonly int $pageId;
     public string $name; // unique
+    public string $componentPath;
     public string $type;
     public bool $selected;
     public array $mapping;
-
-    public function __construct($id, $pageId, $name, $type)
+    public function __construct($id, $pageId, $name, $type, $componentPath=NULL)
     {
         $this->id = $id;
         $this->pageId = $pageId;
@@ -25,6 +25,7 @@ class Component
         $this->type = $type;
         $this->selected = false;
         $this->mapping = [];
+        if(isset($componentPath))$this->componentPath=$componentPath;
     }
     public function removeAction(string $name){
        for($i=0;$i<sizeof($keys = array_keys($this->mapping));$i++){
