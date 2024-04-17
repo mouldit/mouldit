@@ -203,8 +203,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['page-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // todo
-    //      voor id van effecten kan je op termijn ook een id genereren op basis van id component en id page combined en dan een nummer per effect binnen de component zelf
+    // todo voor id van effecten kan je op termijn ook een id genereren op basis van id component en id page combined en dan een nummer per effect binnen de component zelf
     //      het id is dan een string
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
@@ -213,17 +212,37 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
-} else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-
+}
+else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
-        if ($_SESSION['frontend']->pages[$i]->selected) {
+        if ($_SESSION['frontend']->pages[$i]->selected && isset($_POST['component-id'])) {
+            $done = false;
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                // todo dit werkt niet voor een geneste component
-                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected
+                    && (int)$_POST['component-id']===$_SESSION['frontend']->pages[$i]->components[$j]->id) {
                     if (isset($_POST['component-name'])) {
                         $_SESSION['frontend']->pages[$i]->components[$j]->name = $_POST['component-name'];
+                        $done=true;
                     }
                     break;
+                }
+            }
+            if(!$done){
+                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                    if(isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)){
+                        $arr = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
+                        while(sizeof($arr)>0){
+                            for ($k=0;$k<sizeof($arr);$k++){
+                                if(isset($arr[$k])&&$arr[$k]->id===(int)$_POST['component-id'] && isset($_POST['component-name'])){
+                                    $arr[$k]->name = $_POST['component-name'];
+                                    $done=true;
+                                    break;
+                                }
+                            }
+                            $arr=[]; // todo maak er een ware geneste structuur van
+                        }
+                        if($done) break;
+                    }
                 }
             }
             break;

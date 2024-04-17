@@ -15,7 +15,8 @@ if($abs){
     $part.='<h1>Component configuration of '.$c->type.'</h1>';
 }
     $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><label>name</label><input value="'.$c->name.'" 
-name="component-name"><button type="submit" name="component-edited">save</button></form>';
+name="component-name"><input type="hidden" value="'.$c->id.'" 
+name="component-id"><button type="submit" name="component-edited">save</button></form>';
 
     $part.='<h2>Specific configuration</h2>';
     if($c->type==='menubar'){
