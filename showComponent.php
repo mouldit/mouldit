@@ -3,11 +3,19 @@
 use components\Card\Card;
 use components\Component;
 
-function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
+function showComponent($c, $pages, $actions,$implementedTypesOfComponents,$abs=false){
 // todo datamapping is niet opportuun voor elk type component
-
-    $part='<h1>Component configuration of '.$c->type.'</h1>';
-    $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><label>name</label><input value="'.$c->name.'" name="component-name"><button type="submit" name="component-edited">save</button></form>';
+// todo conditioneel absolute or static
+    $part='';
+if($abs){
+    $part='<div style="position:absolute;z-index: 10;background:white">
+<form  action="' . $_SERVER['PHP_SELF'] . '" method="post"><button name="close-dialog" type="submit">close</button></form>
+<h1>Component configuration of '.$c->type.'</h1>';
+} else{
+    $part.='<h1>Component configuration of '.$c->type.'</h1>';
+}
+    $part.='<form action="' . $_SERVER['PHP_SELF'] . '" method="post"><label>name</label><input value="'.$c->name.'" 
+name="component-name"><button type="submit" name="component-edited">save</button></form>';
 
     $part.='<h2>Specific configuration</h2>';
     if($c->type==='menubar'){
@@ -40,6 +48,7 @@ function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
     }
     if($c->type==='card'){
         $part.='<form id="save-ci" action="' . $_SERVER['PHP_SELF'] . '" method="post"></form>';
+        $part.='<form id="edit-ci" action="' . $_SERVER['PHP_SELF'] . '" method="post"></form>';
         $part.='<form id="delete-ci" action="' . $_SERVER['PHP_SELF'] . '" method="post"></form>';
         $part.='<h3>Content Injection<button type="submit" form="save-ci">save</button></h3>';
 /*        echo '<pre>'.print_r($c->ci, true).'</pre>';
@@ -53,7 +62,8 @@ function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
                 $compstr.='<label style="display:block;float:left; margin-right:16px;">'.$component->name.'</label>
 <input type="hidden" name="delete-ci" value="'.$c->id.'" form="delete-ci">
 <button style="display:block;float:left;" name="delete-ci_'.$ciPropName.'" type="submit" form="delete-ci">delete</button>
-<button style="display:block;float:left;" type="button" onclick="openNewDialog()">edit</button>';
+<input type="hidden" name="edit-ci" form="edit-ci">
+<button style="display:block;float:left;" name="edit-ci_'.$component->id.'"  type="submit" form="edit-ci">edit</button>';
             }
             $part.='<select form="save-ci" style="display:block;float:left; margin-right:16px;" name="ci_'.$ciPropName.'"><option value="">--select a component type--</option>';
             foreach ($implementedTypesOfComponents as $type){
@@ -154,6 +164,9 @@ function showComponent($c, $pages, $actions,$implementedTypesOfComponents){
                 }
             }
         }
+    }
+    if($abs){
+        $part.='</div>';
     }
     echo $part;
 }

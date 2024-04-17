@@ -214,9 +214,11 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         }
     }
 } else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                // todo dit werkt niet voor een geneste component
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
                     if (isset($_POST['component-name'])) {
                         $_SESSION['frontend']->pages[$i]->components[$j]->name = $_POST['component-name'];
@@ -236,9 +238,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected && (int)$_POST['save-ci'] === $_SESSION['frontend']->pages[$i]->components[$j]->id) {
                     $keys = array_keys($_POST);
                     foreach ($keys as $item) {
-                        if(str_contains($item,'ci_')){
+                        if (str_contains($item, 'ci_')) {
                             // de waarde is nu een type dat je moet aanmaken en toevoegen aan ci prop
-                            switch ($_POST[$item]){
+                            switch ($_POST[$item]) {
                                 case 'menubar':
                                     // todo
                                     break;
@@ -247,17 +249,17 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     break;
                                 case 'button':
                                     $counter = 0;
-                                    $compArr=$_SESSION['frontend']->pages[$i]->components;
-                                    while(sizeof($compArr)>0){
+                                    $compArr = $_SESSION['frontend']->pages[$i]->components;
+                                    while (sizeof($compArr) > 0) {
                                         $newItems = [];
-                                        foreach ($compArr as $it){
-                                            if($it->type==='button'){
+                                        foreach ($compArr as $it) {
+                                            if ($it->type === 'button') {
                                                 $counter++;
                                             }
-                                            if(isset($it->ci->contentInjection)){
-                                                foreach ($it->ci->contentInjection as $v){
-                                                    if(isset($v)){
-                                                        $newItems[]=$v;
+                                            if (isset($it->ci->contentInjection)) {
+                                                foreach ($it->ci->contentInjection as $v) {
+                                                    if (isset($v)) {
+                                                        $newItems[] = $v;
                                                     }
                                                 }
                                             }
@@ -266,13 +268,13 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                     }
                                     //
                                     $parentPath = '';
-                                    if(isset($_SESSION['frontend']->pages[$i]->components[$j]->componentPath)){
-                                       $parentPath =  $_SESSION['frontend']->pages[$i]->components[$j]->componentPath;
+                                    if (isset($_SESSION['frontend']->pages[$i]->components[$j]->componentPath)) {
+                                        $parentPath = $_SESSION['frontend']->pages[$i]->components[$j]->componentPath;
                                     }
-                                    $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($item,strpos($item,'_')+1)]=
+                                    $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($item, strpos($item, '_') + 1)] =
                                         new \components\Button\Button($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
-                                        $_SESSION['frontend']->pages[$i]->name . '_button' . '_component_' . $counter, 'button',
-                                            $parentPath.'_'.$_SESSION['frontend']->pages[$i]->components[$j]->id);
+                                            $_SESSION['frontend']->pages[$i]->name . '_button' . '_component_' . $counter, 'button',
+                                            $parentPath . '_' . $_SESSION['frontend']->pages[$i]->components[$j]->id);
                                     break;
                                 case 'card':
                                     // todo
@@ -293,20 +295,20 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                 // todo dit is niet per se de geselecteerde component
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected && (int)$_POST['delete-ci'] === $_SESSION['frontend']->pages[$i]->components[$j]->id) {
                     $keys = array_keys($_POST);
-                    for ($k=0;$k<sizeof($keys);$k++) {
+                    for ($k = 0; $k < sizeof($keys); $k++) {
                         if (str_contains($keys[$k], 'ci_')) {
                             //echo 'key = '.$keys[$k].' vs '.substr($keys[$k],strpos($keys[$k],'_')+1);
-                            $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($keys[$k],strpos($keys[$k],'_')+1)]=NULL;
+                            $_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection[substr($keys[$k], strpos($keys[$k], '_') + 1)] = NULL;
                             break;
                         }
                     }
                     break;
                 }
-                    //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection, true).'</pre>';
-                }
-            break;
+                //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection, true).'</pre>';
             }
+            break;
         }
+    }
 } else if (isset($_POST['mapping']) && isset($_POST['component']) && isset($_POST['page']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // je kan nu een mapping hebben voor meerdere acties => todo: de mapping koppelen aan de juiste actie
     // todo de format is: mapping is een array, de keys zijn actionNames ,
@@ -526,7 +528,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                         }
                         $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id,
                             $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
-                            $_POST['add-component'], NULL,$menuItems
+                            $_POST['add-component'], NULL, $menuItems
                         );
                     } else {
                         $comp = new \components\Menubar\Menubar($_SESSION['componentCounter']++, $_SESSION['frontend']->pages[$i]->id, $_SESSION['frontend']->pages[$i]->name . '_' . $_POST['add-component'] . '_component_' . $counter,
@@ -557,7 +559,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     // todo maak dat je componenten een andere volgorde kan geven zodat je ze niet helemaal moet verwijderen en opnieuw bouwen
 } else if (isset($_POST['generate-backend']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     generateBackend($_SESSION['concepts'], $_SESSION['actions'], $_SESSION['pathToRootOfServer']);
-} else if (!isset($_POST['generate-frontend'])) {
+} else if (!isset($_POST['generate-frontend'])&&!(isset($_POST['edit-ci']))&&!(isset($_POST['close-dialog']))) {
     echo 'destroying session';
     session_destroy();
 }
@@ -598,6 +600,32 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     }
 </style>
 <body style="background: #785a7a">
+<?php
+if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+        if ($_SESSION['frontend']->pages[$i]->selected) {
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if (isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)) {
+                    $comps = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
+                    while (sizeof($comps) > 0) {
+                        for ($k = 0; $k < sizeof($comps); $k++) {
+                            $keys=array_keys($_POST);
+                            for ($l=0;$l<sizeof($keys);$l++){
+                                if (str_contains($keys[$l],'edit-ci_') && isset($comps[$k])&&$comps[$k]->id ===
+                                    (int)substr($keys[$l], strpos($keys[$l], '_') + 1)) {
+                                    showComponent($comps[$k], $_SESSION['frontend']->pages, $_SESSION['actions'], $implementedTypesOfComponents,true);
+                                    break;
+                                }
+                            }
+                        }
+                        $comps = [];// todo maak hiervan een echte geneste structuur
+                    }
+                }
+            }
+        }
+    }
+}
+?>
 <!---->
 <div id="actions" class="screen" style="float:left; min-width: 200px;">
     <ul style="margin:0">
@@ -678,7 +706,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                    showComponent($_SESSION['frontend']->pages[$i]->components[$j], $_SESSION['frontend']->pages, $_SESSION['actions'],$implementedTypesOfComponents);
+                    showComponent($_SESSION['frontend']->pages[$i]->components[$j], $_SESSION['frontend']->pages, $_SESSION['actions'], $implementedTypesOfComponents);
                     break;
                 }
             }
@@ -784,8 +812,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     </form>
 </div>
 </body>
+
 <script>
-    function openNewDialog(){
+    function openNewDialog() {
         /*
         * todo via de edit button ga je naar de server en daar geef je de desbetreffende component mee
         *  in een div hier open je het showComponent script met deze compone nt en de andere params
