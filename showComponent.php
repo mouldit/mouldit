@@ -97,7 +97,8 @@ name="component-id"><button type="submit" name="component-edited">save</button><
             isset($c->icon->position) && $c->icon->position->name===$pos ? $part.='<option value="'.$pos.'" selected>'.$pos.'</option>':
                 $part.='<option value="'.$pos.'">'.$pos.'</option>';
         }
-        $part.='</select>
+        $part.='</select><input type="hidden" value="'.$c->id.'" 
+name="component-id">
             <button type="submit" name="button-general-properties">save</button></form>';
     }
     $part.='<h2>General configuration</h2>';

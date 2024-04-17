@@ -483,23 +483,52 @@ else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'PO
     }
 } else if (isset($_POST['button-general-properties']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
-        if ($_SESSION['frontend']->pages[$i]->selected) {
-            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                    if (isset($_POST['text'])) {
-                        $_SESSION['frontend']->pages[$i]->components[$j]->label = $_POST['text'];
+        if ($_SESSION['frontend']->pages[$i]->selected && isset($_POST['component-id'])) {
+                $done = false;
+                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                    if ($_SESSION['frontend']->pages[$i]->components[$j]->selected
+                        && (int)$_POST['component-id']===$_SESSION['frontend']->pages[$i]->components[$j]->id) {
+                        // de gewone code
+                        if (isset($_POST['text'])) {
+                            $_SESSION['frontend']->pages[$i]->components[$j]->label = $_POST['text'];
+                        }
+                        if (isset($_POST['disabled'])) {
+                            $_SESSION['frontend']->pages[$i]->components[$j]->disabled = (bool)$_POST['disabled'];
+                        }
+                        if (isset($_POST['icon']) || isset($_POST['position'])) {
+                            $_SESSION['frontend']->pages[$i]->components[$j]->setIcon($_POST['icon'], $_POST['position']);
+                        }
+                        //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j], true).'</pre>';
+                        break;
                     }
-                    if (isset($_POST['disabled'])) {
-                        $_SESSION['frontend']->pages[$i]->components[$j]->disabled = (bool)$_POST['disabled'];
-                    }
-                    if (isset($_POST['icon']) || isset($_POST['position'])) {
-                        $_SESSION['frontend']->pages[$i]->components[$j]->setIcon($_POST['icon'], $_POST['position']);
-                    }
-                    //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j], true).'</pre>';
-                    break;
                 }
-            }
-            break;
+                if(!$done){
+                    for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                        if(isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)){
+                            $arr = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
+                            while(sizeof($arr)>0){
+                                for ($k=0;$k<sizeof($arr);$k++){
+                                    if(isset($arr[$k])&&$arr[$k]->id===(int)$_POST['component-id']){
+                                        if (isset($_POST['text'])) {
+                                            $arr[$k]->label = $_POST['text'];
+                                        }
+                                        if (isset($_POST['disabled'])) {
+                                            $arr[$k]->disabled = (bool)$_POST['disabled'];
+                                        }
+                                        if (isset($_POST['icon']) || isset($_POST['position'])) {
+                                            $arr[$k]->setIcon($_POST['icon'], $_POST['position']);
+                                        }
+                                        $done=true;
+                                        break;
+                                    }
+                                }
+                                $arr=[]; // todo maak er een ware geneste structuur van
+                            }
+                            if($done) break;
+                        }
+                    }
+                }
+                break;
         }
     }
 } else if (isset($_POST['add']) && $_SERVER['REQUEST_METHOD'] === 'POST') {

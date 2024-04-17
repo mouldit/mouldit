@@ -53,10 +53,23 @@ export class AppComponent {
                        $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT",""], $data);
                 foreach ($p->components as $c) {
                     if (!in_array($c->type, $declared)) {
+                        // todo ook geneste componenten nog!
                         $declared[] = $c->type;
                         $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
                             [implode("\n",$c->getImportStatement()) . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement()
                                 . "\nMODULE_IMPORTS_STATEMENT"], $data);
+                        if(isset($c->ci->contentInjection)){
+                            $comps = array_values($c->ci->contentInjection);
+                            foreach ($comps as $comp){
+                                if(isset($comp)){
+                                    // todo maak hier een volwaardige nesting van met een while loop
+                                    $declared[] = $comp->type;
+                                    $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
+                                        [implode("\n",$comp->getImportStatement()) . "\nMODULE_IMPORT_STATEMENT", $comp->getImportsStatement()
+                                            . "\nMODULE_IMPORTS_STATEMENT"], $data);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -133,20 +146,12 @@ export class AppComponent {
                                 $action = $e->action;
                             }
                         }
-                        // todo dit komt heel gekunsteld over, het zou beter zijn indien je een content
-                        //      componenten rechtsreeks kon aanmaken binnen de geselecteerde component
-                        $ci=false;
-                        for ($i=0;$i<sizeof($p->components);$i++){
-                            if(isset($p->components[$i]->ci)) {
-                                for ($j=0;$j<sizeof($p->components[$i]->ci->contentInjection);$j++){
-                                    if($p->components[$i]->ci->contentInjection[$j]===$c->id){
-                                        $ci=true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if(!$ci){$data.=$c->getHTML($triggers,$action,$p->components)."\n";}
+                        // todo nog te voorzien:
+                        //      effecten aan ci componenten die via this kunnen opgeroepen worden
+                        //      of via de getHTML() methode kunnen meegegeven worden, bv een onclick effect om een crud operatie te triggeren
+                        $data.=$c->getHTML($triggers,$action,$p->components)."\n";
+                        // todo de imports van deze geneste componenten moeten ook nog gebeuren
+                        // todo container component voorzien voor als je meerdere componenten in een block wilt toevoegen
                     }
                     fwrite($f, $data);
                     fclose($f);
