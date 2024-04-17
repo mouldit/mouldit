@@ -14,5 +14,5 @@ interface IComponent
 
     function getInit($pages);
 
-    function getHTML(string $triggers,\Action $action=null);
+    function getHTML(string $triggers,\Action $action=null,array $ciComps=NULL);
 }

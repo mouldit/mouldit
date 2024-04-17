@@ -135,8 +135,13 @@ export class AppComponent {
                 if($f){
                     $data = '';
                     foreach ($p->components as $c){
+                        // todo nog te voorzien:
+                        //      effecten aan ci componenten die via this kunnen opgeroepen worden
+                        //      of via de getHTML() methode kunnen meegegeven worden, bv een onclick effect om een crud operatie te triggeren
                         $triggers = '';
                         $action = null;
+                        $ciComps = null;// een el van deze arr is een tuple met de component id, de bijhorende triggers en de bijhorende action
+                        // todo waardoor ik denk: hoe kan je triggers en acties zo scheiden??
                         foreach ($this->effects as $e){
                             if($e->source->id===$c->id){
                                 // deze werkt enkel voor normale triggers wat ook zo moet
@@ -146,11 +151,7 @@ export class AppComponent {
                                 $action = $e->action;
                             }
                         }
-                        // todo nog te voorzien:
-                        //      effecten aan ci componenten die via this kunnen opgeroepen worden
-                        //      of via de getHTML() methode kunnen meegegeven worden, bv een onclick effect om een crud operatie te triggeren
-                        $data.=$c->getHTML($triggers,$action,$p->components)."\n";
-                        // todo de imports van deze geneste componenten moeten ook nog gebeuren
+                        $data.=$c->getHTML($triggers,$action,$ciComps)."\n";
                         // todo container component voorzien voor als je meerdere componenten in een block wilt toevoegen
                     }
                     fwrite($f, $data);

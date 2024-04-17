@@ -112,7 +112,7 @@ class Button extends Component implements IComponent
         return '';
     }
 
-    function getHTML(string $triggers,\Action $action=null)
+    function getHTML(string $triggers,\Action $action=null,$ciComps=NULL)
     {
         if($this->disabled){
             if(isset($this->icon)){

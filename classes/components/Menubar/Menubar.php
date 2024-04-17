@@ -71,7 +71,7 @@ class Menubar extends \components\Component  implements IComponent
         $oninit.=']'."\n";
         return $oninit;
     }
-    function getHTML(string $triggers,\Action $action=null)
+    function getHTML(string $triggers,\Action $action=null,$ciComps=NULL)
     {
         return "<p-menubar [model]=\"items\"></p-menubar>\n";
     }

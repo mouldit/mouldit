@@ -72,10 +72,10 @@ class Card extends \components\Component implements IComponent
         return ['private http: HttpClient,'];
     }
 
-    function getHTML(string $triggers, \Action $action = null)
+    function getHTML(string $triggers, \Action $action = null,$ciComps=NULL)
     {
+        // todo het mogelijk maken dat hier meerdere acties naar toe kunnen
         if (isset($action) && $action->getReturnType() === 'list') {
-            echo 'getting html ' . $this->name;
             $html = '<ng-container *ngFor="let ' . $action->concept . ' of ' . $action->concept . 's' . '; let i = index">
             <p-card ' . $triggers . ' ';
             if (isset($this->mapping[$action->name]['header'])) {
