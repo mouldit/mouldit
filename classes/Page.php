@@ -89,6 +89,32 @@ class Page implements IPage
     {
         $this->parentId = $id;
     }
+    public function getPageComponent(int $source){
+        for ($i=0;$i<sizeof($this->components);$i++){
+            if($this->components[$i]->id===$source) return $this->components[$i];
+            if(isset($this->components[$i]->ci->contentInjection)){
+                $arr = array_values($this->components[$i]->ci->contentInjection);
+                foreach ($arr as $v){
+                    if(isset($v) && $v->id===$source){
+                        // todo maak hier een echte nesting van
+                        return $v;
+                    }
+                }
+            }
+        }
+    }
+    public function getNestedComponents(){
+        $nested = [];
+        for ($i=0;$i<sizeof($this->components);$i++){
+            if(isset($this->components[$i]->ci->contentInjection)){
+                $arr = array_values($this->components[$i]->ci->contentInjection);
+                foreach ($arr as $v){
+                    if(isset($v))$nested[]=$v;
+                }
+            }
+        }
+        return $nested;
+    }
 
     public function select()
     {

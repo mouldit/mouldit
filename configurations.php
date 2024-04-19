@@ -44,6 +44,8 @@ if (isset($_SESSION['pathToRootOfClient'])) {
     }
 }
 // backend
+
+
 if (isset($_SESSION['pathToRootOfServer']) &&
     $dir = opendir($_SESSION['pathToRootOfServer']) &&
         file_exists($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl') &&
@@ -212,36 +214,35 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             break;
         }
     }
-}
-else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+} else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected && isset($_POST['component-id'])) {
             $done = false;
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected
-                    && (int)$_POST['component-id']===$_SESSION['frontend']->pages[$i]->components[$j]->id) {
+                    && (int)$_POST['component-id'] === $_SESSION['frontend']->pages[$i]->components[$j]->id) {
                     if (isset($_POST['component-name'])) {
                         $_SESSION['frontend']->pages[$i]->components[$j]->name = $_POST['component-name'];
-                        $done=true;
+                        $done = true;
                     }
                     break;
                 }
             }
-            if(!$done){
+            if (!$done) {
                 for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                    if(isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)){
+                    if (isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)) {
                         $arr = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
-                        while(sizeof($arr)>0){
-                            for ($k=0;$k<sizeof($arr);$k++){
-                                if(isset($arr[$k])&&$arr[$k]->id===(int)$_POST['component-id'] && isset($_POST['component-name'])){
+                        while (sizeof($arr) > 0) {
+                            for ($k = 0; $k < sizeof($arr); $k++) {
+                                if (isset($arr[$k]) && $arr[$k]->id === (int)$_POST['component-id'] && isset($_POST['component-name'])) {
                                     $arr[$k]->name = $_POST['component-name'];
-                                    $done=true;
+                                    $done = true;
                                     break;
                                 }
                             }
-                            $arr=[]; // todo maak er een ware geneste structuur van
+                            $arr = []; // todo maak er een ware geneste structuur van
                         }
-                        if($done) break;
+                        if ($done) break;
                     }
                 }
             }
@@ -406,17 +407,18 @@ else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'PO
         if ($_SESSION['frontend']->pages[$i]->selected) {
             for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
                 if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                    // deze component moet aangepast worden
-                    if (isset($_POST['trigger-name']) && isset($_POST['action-name']) && isset($_POST['component-id'])) {
+                    if (isset($_POST['source-component']) && isset($_POST['trigger-name']) && isset($_POST['action-name']) && isset($_POST['component-id'])) {
                         $target = (int)$_POST['component-id'];
+                        $source = (int)$_POST['source-component'];
                         for ($k = 0; $k < sizeof($_SESSION['actions']); $k++) {
                             if ($_SESSION['actions'][$k]->name === $_POST['action-name']) {
                                 for ($l = 0; $l < sizeof($_SESSION['frontend']->pages); $l++) {
                                     for ($m = 0; $m < sizeof($_SESSION['frontend']->pages[$l]->components); $m++) {
                                         if ($_SESSION['frontend']->pages[$l]->components[$m]->id === $target) {
+                                            $component = $_SESSION['frontend']->pages[$l]->getPageComponent($source);
                                             $_SESSION['frontend']->effects[] = new Effect(
                                                 $_SESSION['effectCounter']++,
-                                                $_SESSION['frontend']->pages[$i]->components[$j],
+                                                $component,
                                                 $_POST['trigger-name'],
                                                 $_SESSION['actions'][$k],
                                                 $_SESSION['frontend']->pages[$l]->components[$m]);
@@ -441,9 +443,11 @@ else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'PO
             $id = (int)$_POST['effect-id'];
             if ($_SESSION['frontend']->effects[$k]->id === $id) {
                 for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
-                    for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                        if ($_SESSION['frontend']->pages[$i]->components[$j]->id === $_SESSION['frontend']->effects[$k]->source->id) {
-                            $_SESSION['frontend']->pages[$i]->components[$j]->removeAction($_SESSION['frontend']->effects[$k]->action->name);
+                    $arr = $_SESSION['frontend']->pages[$i]->getNestedComponents();
+                    $arr = array_merge($arr,$_SESSION['frontend']->pages[$i]->components);
+                    for ($j = 0; $j < sizeof($arr); $j++) {
+                        if ($arr[$j]->id === $_SESSION['frontend']->effects[$k]->source->id) {
+                            $arr[$j]->removeAction($_SESSION['frontend']->effects[$k]->action->name);
                             $_SESSION['frontend']->removeEffect($id);
                             break;
                         }
@@ -452,10 +456,7 @@ else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'PO
                 break;
             }
         }
-
     }
-
-
 } else if (isset($_POST['save-item']) && isset($_POST['edit-item']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected) {
@@ -484,51 +485,51 @@ else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'PO
 } else if (isset($_POST['button-general-properties']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
         if ($_SESSION['frontend']->pages[$i]->selected && isset($_POST['component-id'])) {
-                $done = false;
+            $done = false;
+            for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
+                if ($_SESSION['frontend']->pages[$i]->components[$j]->selected
+                    && (int)$_POST['component-id'] === $_SESSION['frontend']->pages[$i]->components[$j]->id) {
+                    // de gewone code
+                    if (isset($_POST['text'])) {
+                        $_SESSION['frontend']->pages[$i]->components[$j]->label = $_POST['text'];
+                    }
+                    if (isset($_POST['disabled'])) {
+                        $_SESSION['frontend']->pages[$i]->components[$j]->disabled = (bool)$_POST['disabled'];
+                    }
+                    if (isset($_POST['icon']) || isset($_POST['position'])) {
+                        $_SESSION['frontend']->pages[$i]->components[$j]->setIcon($_POST['icon'], $_POST['position']);
+                    }
+                    //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j], true).'</pre>';
+                    break;
+                }
+            }
+            if (!$done) {
                 for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                    if ($_SESSION['frontend']->pages[$i]->components[$j]->selected
-                        && (int)$_POST['component-id']===$_SESSION['frontend']->pages[$i]->components[$j]->id) {
-                        // de gewone code
-                        if (isset($_POST['text'])) {
-                            $_SESSION['frontend']->pages[$i]->components[$j]->label = $_POST['text'];
-                        }
-                        if (isset($_POST['disabled'])) {
-                            $_SESSION['frontend']->pages[$i]->components[$j]->disabled = (bool)$_POST['disabled'];
-                        }
-                        if (isset($_POST['icon']) || isset($_POST['position'])) {
-                            $_SESSION['frontend']->pages[$i]->components[$j]->setIcon($_POST['icon'], $_POST['position']);
-                        }
-                        //echo '<pre>'.print_r($_SESSION['frontend']->pages[$i]->components[$j], true).'</pre>';
-                        break;
-                    }
-                }
-                if(!$done){
-                    for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                        if(isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)){
-                            $arr = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
-                            while(sizeof($arr)>0){
-                                for ($k=0;$k<sizeof($arr);$k++){
-                                    if(isset($arr[$k])&&$arr[$k]->id===(int)$_POST['component-id']){
-                                        if (isset($_POST['text'])) {
-                                            $arr[$k]->label = $_POST['text'];
-                                        }
-                                        if (isset($_POST['disabled'])) {
-                                            $arr[$k]->disabled = (bool)$_POST['disabled'];
-                                        }
-                                        if (isset($_POST['icon']) || isset($_POST['position'])) {
-                                            $arr[$k]->setIcon($_POST['icon'], $_POST['position']);
-                                        }
-                                        $done=true;
-                                        break;
+                    if (isset($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection)) {
+                        $arr = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
+                        while (sizeof($arr) > 0) {
+                            for ($k = 0; $k < sizeof($arr); $k++) {
+                                if (isset($arr[$k]) && $arr[$k]->id === (int)$_POST['component-id']) {
+                                    if (isset($_POST['text'])) {
+                                        $arr[$k]->label = $_POST['text'];
                                     }
+                                    if (isset($_POST['disabled'])) {
+                                        $arr[$k]->disabled = (bool)$_POST['disabled'];
+                                    }
+                                    if (isset($_POST['icon']) || isset($_POST['position'])) {
+                                        $arr[$k]->setIcon($_POST['icon'], $_POST['position']);
+                                    }
+                                    $done = true;
+                                    break;
                                 }
-                                $arr=[]; // todo maak er een ware geneste structuur van
                             }
-                            if($done) break;
+                            $arr = []; // todo maak er een ware geneste structuur van
                         }
+                        if ($done) break;
                     }
                 }
-                break;
+            }
+            break;
         }
     }
 } else if (isset($_POST['add']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -607,7 +608,7 @@ else if (isset($_POST['component-edited']) && $_SERVER['REQUEST_METHOD'] === 'PO
     // todo maak dat je componenten een andere volgorde kan geven zodat je ze niet helemaal moet verwijderen en opnieuw bouwen
 } else if (isset($_POST['generate-backend']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     generateBackend($_SESSION['concepts'], $_SESSION['actions'], $_SESSION['pathToRootOfServer']);
-} else if (!isset($_POST['generate-frontend'])&&!(isset($_POST['edit-ci']))&&!(isset($_POST['close-dialog']))) {
+} else if (!isset($_POST['generate-frontend']) && !(isset($_POST['edit-ci'])) && !(isset($_POST['close-dialog']))) {
     echo 'destroying session';
     session_destroy();
 }
@@ -657,11 +658,11 @@ if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     $comps = array_values($_SESSION['frontend']->pages[$i]->components[$j]->ci->contentInjection);
                     while (sizeof($comps) > 0) {
                         for ($k = 0; $k < sizeof($comps); $k++) {
-                            $keys=array_keys($_POST);
-                            for ($l=0;$l<sizeof($keys);$l++){
-                                if (str_contains($keys[$l],'edit-ci_') && isset($comps[$k])&&$comps[$k]->id ===
+                            $keys = array_keys($_POST);
+                            for ($l = 0; $l < sizeof($keys); $l++) {
+                                if (str_contains($keys[$l], 'edit-ci_') && isset($comps[$k]) && $comps[$k]->id ===
                                     (int)substr($keys[$l], strpos($keys[$l], '_') + 1)) {
-                                    showComponent($comps[$k], $_SESSION['frontend']->pages, $_SESSION['actions'], $implementedTypesOfComponents,true);
+                                    showComponent($comps[$k], $_SESSION['frontend']->pages, $_SESSION['actions'], $implementedTypesOfComponents, true);
                                     break;
                                 }
                             }
@@ -766,24 +767,38 @@ if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="screen" id="effects"
      style="float:left; min-width: 700px;min-height:400px;padding: 0 8px">
     <h1>Effects</h1>
-    <label>Source component: </label><span><?php
-        $sourceFound = false;
-        for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
-            if ($_SESSION['frontend']->pages[$i]->selected) {
-                for ($j = 0; $j < sizeof($_SESSION['frontend']->pages[$i]->components); $j++) {
-                    if ($_SESSION['frontend']->pages[$i]->components[$j]->selected) {
-                        echo $_SESSION['frontend']->pages[$i]->components[$j]->name;
-                        $sourceFound = true;
-                        break;
+    <form action="<?php $_SERVER['PHP_SELF'] ?>" method="post"><label>Source component: <select name="source-component"><?php
+            $sourceFound = false;
+            echo '<option>--select source</option>';
+            for ($i = 0; $i < sizeof($_SESSION['frontend']->pages); $i++) {
+                if ($_SESSION['frontend']->pages[$i]->selected) {
+                    for ($p = 0; $p < sizeof($_SESSION['frontend']->pages[$i]->components); $p++) {
+                        $arr2 = [];
+                        if (isset($_SESSION['frontend']->pages[$i]->components[$p]->ci->contentInjection)) {
+                            $arr2 = array_values($_SESSION['frontend']->pages[$i]->components[$p]->ci->contentInjection);
+                        }
+                        if ($_SESSION['frontend']->pages[$i]->components[$p]->selected) {
+                            echo '<option value="' . $_SESSION['frontend']->pages[$i]->components[$p]->id . '" selected>'
+                                . $_SESSION['frontend']->pages[$i]->components[$p]->name . '</option>';
+                            $sourceFound = true;
+                        } else {
+                            echo '<option value="' . $_SESSION['frontend']->pages[$i]->components[$p]->id . '">'
+                                . $_SESSION['frontend']->pages[$i]->components[$p]->name . '</option>';
+                        }
+                        while (sizeof($arr2) > 0) {
+                            foreach ($arr2 as $ar) {
+                                if (isset($ar)) {
+                                    echo '<option value="' . $ar->id . '">'
+                                        . $ar->name . '</option>';
+                                }
+                            }
+                            $arr2 = [];// todo fix: door dit te doen loopt het volgens mij mis
+                        }
                     }
+                    break;
                 }
             }
-        }
-        if (!$sourceFound) {
-            echo 'Select a component on the page view to link with a trigger.';
-        }
-        ?></span>
-    <form action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
+            ?></select></label>
         <label>trigger</label><select name="trigger-name" <?php if (!$sourceFound) echo 'disabled'; ?>>
             <option>--select trigger--</option>
             <?php
@@ -810,6 +825,7 @@ if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $components = [];
             foreach ($_SESSION['frontend']->pages as $p) {
                 $components = array_merge($components, $p->components);
+                $components = array_merge($components,$p->getNestedComponents());
             }
             foreach ($components as $ct) {
                 echo '<option value="' . $ct->id . '">' . $ct->name . '</option>';
@@ -833,6 +849,7 @@ if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($_SESSION['frontend']->effects as $e) {
             for ($i = 0; $i < sizeof($components); $i++) {
                 if ($components[$i]->id === $e->target->id) {
+                    // todo research: moet een geneste component ook target van een action kunnen zijn?
                     for ($j = 0; $j < sizeof($components); $j++) {
                         if ($components[$j]->id === $e->source->id) {
                             echo "<tr><td>" . $e->trigger->name . "</td><td>" . $components[$j]->name . "</td><td>" . $e->action->name . "</td><td>" . $components[$i]->name . "</td><td>
@@ -860,25 +877,4 @@ if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 </div>
 </body>
-
-<script>
-    function openNewDialog() {
-        /*
-        * todo via de edit button ga je naar de server en daar geef je de desbetreffende component mee
-        *  in een div hier open je het showComponent script met deze compone nt en de andere params
-        *  de div toon je via php ook enkel wanneer dit via zon' edit button werd gevraagd
-        * */
-        const el = document.createElement('div');
-        el.style.zIndex = '10';
-        el.style.minWidth = '100px';
-        el.style.minHeight = '100px';
-        el.style.background = 'white';
-        el.style.border = '1px solid blue';
-        el.style.position = 'fixed';
-        el.style.top = '0';
-        el.style.left = '0';
-
-        document.body.appendChild(el)
-    }
-</script>
 </html>
