@@ -142,6 +142,8 @@ export class AppComponent {
                         $action = null;
                         $ciComps = null;// een el van deze arr is een tuple met de component id, de bijhorende triggers en de bijhorende action
                         // todo waardoor ik denk: hoe kan je triggers en acties zo scheiden??
+                        // todo strategie om dit op te lossen
+                        $nested = $p->getNestedComponents($c->id);
                         foreach ($this->effects as $e){
                             if($e->source->id===$c->id){
                                 // deze werkt enkel voor normale triggers wat ook zo moet

@@ -103,13 +103,24 @@ class Page implements IPage
             }
         }
     }
-    public function getNestedComponents(){
+    public function getNestedComponents($id=null){
         $nested = [];
-        for ($i=0;$i<sizeof($this->components);$i++){
-            if(isset($this->components[$i]->ci->contentInjection)){
-                $arr = array_values($this->components[$i]->ci->contentInjection);
-                foreach ($arr as $v){
-                    if(isset($v))$nested[]=$v;
+        if(isset($id)){
+            for ($i=0;$i<sizeof($this->components);$i++){
+                if(isset($this->components[$i]->ci->contentInjection)&&$this->components[$i]->id===$id){
+                    $arr = array_values($this->components[$i]->ci->contentInjection);
+                    foreach ($arr as $v){
+                        if(isset($v))$nested[]=$v;
+                    }
+                }
+            }
+        } else{
+            for ($i=0;$i<sizeof($this->components);$i++){
+                if(isset($this->components[$i]->ci->contentInjection)){
+                    $arr = array_values($this->components[$i]->ci->contentInjection);
+                    foreach ($arr as $v){
+                        if(isset($v))$nested[]=$v;
+                    }
                 }
             }
         }
