@@ -153,6 +153,20 @@ export class AppComponent {
                                 $action = $e->action;
                             }
                         }
+                        // strategie
+                        for ($i=0;$i<sizeof($nested);$i++){
+                            $ciEl = [$nested[$i]->id,];
+                            $ciElTriggers = '';
+                            $ciElAction = NULL;// te fucking ingewikkeld voor vandaag
+                            foreach ($this->effects as $e){
+                                if($e->source->id===$nested[$i]->id){
+                                    // deze werkt enkel voor normale triggers wat ook zo moet
+                                    $triggers.="\n{$e->getTrigger()}";
+                                }
+
+                            }
+                        }
+
                         $data.=$c->getHTML($triggers,$action,$ciComps)."\n";
                         // todo container component voorzien voor als je meerdere componenten in een block wilt toevoegen
                     }
