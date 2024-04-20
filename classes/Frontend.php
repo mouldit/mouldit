@@ -135,38 +135,32 @@ export class AppComponent {
                 if($f){
                     $data = '';
                     foreach ($p->components as $c){
-                        // todo nog te voorzien:
-                        //      effecten aan ci componenten die via this kunnen opgeroepen worden
-                        //      of via de getHTML() methode kunnen meegegeven worden, bv een onclick effect om een crud operatie te triggeren
                         $triggers = '';
                         $action = null;
-                        $ciComps = null;// een el van deze arr is een tuple met de component id, de bijhorende triggers en de bijhorende action
-                        // todo waardoor ik denk: hoe kan je triggers en acties zo scheiden??
-                        // todo strategie om dit op te lossen
+                        $ciComps = [];
                         $nested = $p->getNestedComponents($c->id);
                         foreach ($this->effects as $e){
                             if($e->source->id===$c->id){
-                                // deze werkt enkel voor normale triggers wat ook zo moet
                                 $triggers.="\n{$e->getTrigger()}";
                             }
                             if($e->target->id===$c->id){
                                 $action = $e->action;
                             }
                         }
-                        // strategie
                         for ($i=0;$i<sizeof($nested);$i++){
-                            $ciEl = [$nested[$i]->id,];
+                            $ciEl = $nested[$i]->id;
                             $ciElTriggers = '';
-                            $ciElAction = NULL;// te fucking ingewikkeld voor vandaag
+                            $ciElAction = NULL;
                             foreach ($this->effects as $e){
                                 if($e->source->id===$nested[$i]->id){
-                                    // deze werkt enkel voor normale triggers wat ook zo moet
-                                    $triggers.="\n{$e->getTrigger()}";
+                                    $ciElTriggers.="\n{$e->getTrigger()}";
                                 }
-
+                                if($e->target->id===$c->id){
+                                    $ciElAction = $e->action;
+                                }
                             }
+                            $ciComps[]=[$ciEl,$ciElTriggers,$ciElAction];
                         }
-
                         $data.=$c->getHTML($triggers,$action,$ciComps)."\n";
                         // todo container component voorzien voor als je meerdere componenten in een block wilt toevoegen
                     }

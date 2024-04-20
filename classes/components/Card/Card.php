@@ -72,7 +72,7 @@ class Card extends \components\Component implements IComponent
         return ['private http: HttpClient,'];
     }
 
-    function getHTML(string $triggers, \Action $action = null,$ciComps=NULL)
+    function getHTML(string $triggers, \Action $action = null, $ciComps = NULL)
     {
         // todo het mogelijk maken dat hier meerdere acties naar toe kunnen
         if (isset($action) && $action->getReturnType() === 'list') {
@@ -92,6 +92,7 @@ class Card extends \components\Component implements IComponent
                 // todo
             }
             if (isset($this->ci->contentInjection['footer'])) {
+                // todo een effect met een trigger voor deze subcomponent
                 $html .= '    <ng-template pTemplate="footer">
         ' . $this->ci->contentInjection['footer']->getHTML("") . '
     </ng-template>';
