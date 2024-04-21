@@ -72,7 +72,7 @@ class Card extends \components\Component implements IComponent
         return ['private http: HttpClient,'];
     }
 
-    function getHTML(string $triggers, \Action $action = null, array $ciComps=null)
+    function getHTML(string $triggers, \Action $action = null, array $ciComps = null)
     {
         // todo het mogelijk maken dat hier meerdere acties naar toe kunnen
         if (isset($action) && $action->getReturnType() === 'list') {
@@ -92,13 +92,13 @@ class Card extends \components\Component implements IComponent
                 // todo
             }
             if (isset($this->ci->contentInjection['footer'])) {
-                $triggersCi='';
-                for ($i=0;$i<sizeof($ciComps);$i++){
-                    if($ciComps[$i][0]===$this->ci->contentInjection['footer']->id){
-                        $triggersCi.=$ciComps[$i][1];
+                $triggersCi = '';
+                for ($i = 0; $i < sizeof($ciComps); $i++) {
+                    if ($ciComps[$i][0] === $this->ci->contentInjection['footer']->id) {
+                        $triggersCi .= $ciComps[$i][1];
                     }
                 }
-                // todo ng for for a nested component based on an action and datamapping
+                // todo ng for for a nested component based on an action=>is list!! and datamapping
                 $html .= '    <ng-template pTemplate="footer">
         ' . $this->ci->contentInjection['footer']->getHTML($triggersCi) . '
     </ng-template>';
@@ -109,5 +109,4 @@ class Card extends \components\Component implements IComponent
             return '';
         }
     }
-
 }
