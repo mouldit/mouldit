@@ -29,8 +29,7 @@ class Page implements IPage
         $this->controllerVariables=[];
         if (isset($main)) $this->main = $main; else $this->main = false;
     }
-    public function createViewController(&$data, array $effects, array $pages)
-    {
+    public function createViewController(&$data, array $effects, array $pages){
         $effectOnInit = '';
         $effectMethods = '';
         $effectCstr = '';
@@ -42,8 +41,12 @@ class Page implements IPage
             $this->constructorInjections = array_unique(array_merge($this->constructorInjections, $c->getConstructorInjections()));
             $this->controllerVariables = array_unique(array_merge($this->controllerVariables, $c->getcontrollerVariables()));
             $this->imports = array_unique(array_merge($this->imports, $c->getControllerImports()));
+            $ids = [$c->id];
+            $ids = array_merge($ids,array_map(function ($item){
+                return $item->id;
+            },$this->getNestedComponents($c->id)));
             foreach ($effects as $e) {
-                if ($e->source->id === $c->id) {
+                if (is_int(array_search($e->source->id,$ids))) {
                     if (!str_contains($effectMethods, $e->getMethods(false))) {
                         $effectMethods .= "\n{$e->getMethods(false)}";
                     }
@@ -51,7 +54,8 @@ class Page implements IPage
                         $effectImports .= "\n{$e->getImports($lon)}";
                     }
                 }
-                if ($e->target->id === $c->id) {
+                //echo '<pre> de ids zijn '.print_r($ids, true).'</pre>';
+                if (is_int(array_search($e->target->id,$ids))) {
                     if (!str_contains($effectOnInit, $e->getOnInit(false))) {
                         $effectOnInit .= "\n{$e->getOnInit(false)}";
                     }

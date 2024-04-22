@@ -43,6 +43,8 @@ export class AppComponent {
         $f = fopen($dir . '/app.module.ts', 'wb');
         $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-module.txt');
         if ($f && $data) {
+            // todo we krijgen een dubbele import als de import van een module op twee niveaus bestaat:
+            //      een top en een nested level
             $data = str_replace(['COMPONENT_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT', 'MODULE_PROVIDER_STATEMENT'],
                 ["\nimport { HttpClientModule } from '@angular/common/http';
                 \nimport {TriggerService} from \"./services/trigger-service\";\nCOMPONENT_IMPORT_STATEMENT",
@@ -53,7 +55,6 @@ export class AppComponent {
                        $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT",""], $data);
                 foreach ($p->components as $c) {
                     if (!in_array($c->type, $declared)) {
-                        // todo ook geneste componenten nog!
                         $declared[] = $c->type;
                         $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
                             [implode("\n",$c->getImportStatement()) . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement()
@@ -61,7 +62,17 @@ export class AppComponent {
                         if(isset($c->ci->contentInjection)){
                             $comps = array_values($c->ci->contentInjection);
                             foreach ($comps as $comp){
+                                // todo zorg ervoor dat van de parent en de nested er uiteindelijk de niet gemeenschapellijke over blijven
+                                //      het huidige is maar een tussen oplossing
                                 if(isset($comp)){
+                                    echo '$c '.implode('',$c->getImportStatement()).' vs '.implode('',$comp->getImportStatement());
+                                    echo '$c '.$c->getImportsStatement().' vs '.$comp->getImportsStatement();
+                                }
+                                if(isset($comp)&&(!str_contains(
+                                    implode('',$c->getImportStatement()),
+                                            implode('',$comp->getImportStatement()))&&
+                                        !str_contains($c->getImportsStatement(),
+                                            $comp->getImportsStatement()))){
                                     // todo maak hier een volwaardige nesting van met een while loop
                                     $declared[] = $comp->type;
                                     $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
