@@ -51,7 +51,7 @@ class Menubar extends \components\Component  implements IComponent
     }
     function getImportsStatement()
     {
-        return "\n".'MenubarModule,'. "\n".'MenuModule,';
+        return ['MenubarModule', 'MenuModule'];
     }
     function getInit($pages)
     {

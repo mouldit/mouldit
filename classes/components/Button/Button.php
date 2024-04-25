@@ -90,7 +90,7 @@ class Button extends Component implements IComponent
     function getImportsStatement()
     {
         // deze method geeft import statements terug voor de app.module.ts imports
-        return "\n".'ButtonModule,';
+        return ['ButtonModule'];
     }
 
     // todo

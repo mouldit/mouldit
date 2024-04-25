@@ -50,6 +50,7 @@ export class AppComponent {
                 \nimport {TriggerService} from \"./services/trigger-service\";\nCOMPONENT_IMPORT_STATEMENT",
                     "\nHttpClientModule,\nMODULE_IMPORTS_STATEMENT","TriggerService\n"], $data);
             $import = [];
+            $imports=[];
             foreach ($this->pages as $p) {
                 // todo test dit om te zien over er over pagina's heen geen dubbeleme imports en zo gebeuren
                 $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT','MODULE_PROVIDER_STATEMENT'],
@@ -59,11 +60,11 @@ export class AppComponent {
                     // todo replace with merge and unique array
                     if (!in_array($c->type, $declared)) {
                         $declared[] = $c->type;
-                        $imports = [];// todo
                         $import = array_merge($import,$c->getImportStatement());
-                        $data = str_replace([ 'MODULE_IMPORTS_STATEMENT'],
+                        $imports = array_merge($imports,$c->getImportsStatement());
+/*                        $data = str_replace([ 'MODULE_IMPORTS_STATEMENT'],
                             [$c->getImportsStatement()
-                                . "\nMODULE_IMPORTS_STATEMENT"], $data);
+                                . "\nMODULE_IMPORTS_STATEMENT"], $data);*/
                         if(isset($c->ci->contentInjection)){
                             $comps = array_values($c->ci->contentInjection);
                             foreach ($comps as $comp){
@@ -73,9 +74,10 @@ export class AppComponent {
                                     $temp = $comp->getImportStatement();
                                     $merged = array_merge($import, $temp);
                                     $import = array_unique($merged);
-                                    $data = str_replace(['MODULE_IMPORTS_STATEMENT'],
+                                    $imports = array_unique(array_merge($imports,$comp->getImportsStatement()));
+/*                                    $data = str_replace(['MODULE_IMPORTS_STATEMENT'],
                                         [$comp->getImportsStatement()
-                                            . "\nMODULE_IMPORTS_STATEMENT"], $data);
+                                            . "\nMODULE_IMPORTS_STATEMENT"], $data);*/
                                 }
                             }
                         }
@@ -83,8 +85,9 @@ export class AppComponent {
                     }
                 }
             }
-            $data = str_replace(['MODULE_IMPORT_STATEMENT'],
-                [join("\n",$import) . "\nMODULE_IMPORT_STATEMENT"
+            $data = str_replace(['MODULE_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT'],
+                [join("\n",$import) . "\nMODULE_IMPORT_STATEMENT",
+                    join(",\n",$imports) . "\nMODULE_IMPORTS_STATEMENT"
                 ], $data);
             $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT', 'COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT',
                 'MODULE_PROVIDER_STATEMENT'],

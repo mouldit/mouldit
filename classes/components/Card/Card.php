@@ -54,7 +54,7 @@ class Card extends \components\Component implements IComponent
 
     function getImportsStatement()
     {
-        return "\n" . 'CardModule,';
+        return ['CardModule'];
     }
 
     function getControllerVariables()
