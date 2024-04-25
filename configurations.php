@@ -764,13 +764,10 @@ if (isset($_POST['edit-ci']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
 </div>
-<div class="screen" id="data-modelling"
+<!--<div class="screen" id="data-modelling"
      style="float:left; min-width: 700px;min-height:400px;padding: 0 8px">
     <h1>Data Modelling</h1>
-- naam model + relation/type
-    - properties: naam + type + required + plurality
-
-</div>
+</div>-->
 <div class="screen" id="effects"
      style="float:left; min-width: 700px;min-height:400px;padding: 0 8px">
     <h1>Effects</h1>
