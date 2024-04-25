@@ -49,41 +49,43 @@ export class AppComponent {
                 ["\nimport { HttpClientModule } from '@angular/common/http';
                 \nimport {TriggerService} from \"./services/trigger-service\";\nCOMPONENT_IMPORT_STATEMENT",
                     "\nHttpClientModule,\nMODULE_IMPORTS_STATEMENT","TriggerService\n"], $data);
+            $import = [];
             foreach ($this->pages as $p) {
+                // todo test dit om te zien over er over pagina's heen geen dubbeleme imports en zo gebeuren
                 $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT','MODULE_PROVIDER_STATEMENT'],
                     [$p->getImportStatement('.'.$this->getPath($this->pages,$p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
                        $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT",""], $data);
                 foreach ($p->components as $c) {
+                    // todo replace with merge and unique array
                     if (!in_array($c->type, $declared)) {
                         $declared[] = $c->type;
-                        $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
-                            [implode("\n",$c->getImportStatement()) . "\nMODULE_IMPORT_STATEMENT", $c->getImportsStatement()
+                        $imports = [];// todo
+                        $import = array_merge($import,$c->getImportStatement());
+                        $data = str_replace([ 'MODULE_IMPORTS_STATEMENT'],
+                            [$c->getImportsStatement()
                                 . "\nMODULE_IMPORTS_STATEMENT"], $data);
                         if(isset($c->ci->contentInjection)){
                             $comps = array_values($c->ci->contentInjection);
                             foreach ($comps as $comp){
-                                // todo zorg ervoor dat van de parent en de nested er uiteindelijk de niet gemeenschapellijke over blijven
-                                //      het huidige is maar een tussen oplossing
                                 if(isset($comp)){
-                                    echo '$c '.implode('',$c->getImportStatement()).' vs '.implode('',$comp->getImportStatement());
-                                    echo '$c '.$c->getImportsStatement().' vs '.$comp->getImportsStatement();
-                                }
-                                if(isset($comp)&&(!str_contains(
-                                    implode('',$c->getImportStatement()),
-                                            implode('',$comp->getImportStatement()))&&
-                                        !str_contains($c->getImportsStatement(),
-                                            $comp->getImportsStatement()))){
                                     // todo maak hier een volwaardige nesting van met een while loop
                                     $declared[] = $comp->type;
-                                    $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT'],
-                                        [implode("\n",$comp->getImportStatement()) . "\nMODULE_IMPORT_STATEMENT", $comp->getImportsStatement()
+                                    $temp = $comp->getImportStatement();
+                                    $merged = array_merge($import, $temp);
+                                    $import = array_unique($merged);
+                                    $data = str_replace(['MODULE_IMPORTS_STATEMENT'],
+                                        [$comp->getImportsStatement()
                                             . "\nMODULE_IMPORTS_STATEMENT"], $data);
                                 }
                             }
                         }
+                        //echo '<pre> import  = '.print_r($import, true).'</pre>';
                     }
                 }
             }
+            $data = str_replace(['MODULE_IMPORT_STATEMENT'],
+                [join("\n",$import) . "\nMODULE_IMPORT_STATEMENT"
+                ], $data);
             $data = str_replace(['MODULE_IMPORT_STATEMENT', 'MODULE_IMPORTS_STATEMENT', 'COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT',
                 'MODULE_PROVIDER_STATEMENT'],
                 ['', '', '', '',''], $data);
