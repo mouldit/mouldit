@@ -562,7 +562,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                                                 }
                                             }
                                         }
-                                        echo $_SESSION['frontend']->pages[$l]->name;
                                         //echo '<pre>'.print_r($names, true).'</pre>';
                                         if (sizeof($names) === 1) {
                                             $menuItems[] = new \components\Menubar\MenuItem($_SESSION['concepts'][$j]->name . 's',
