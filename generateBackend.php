@@ -38,6 +38,47 @@ function printSubFields(SubFieldSet $sfs){
 }
 function generateBackend($concepts, $actions, $path): bool
 {
+    // todo aanpassen naar nieuwe acties
+    /*
+     * router.patch('remove/from/watchlist/:accountId/:contentId', async (req: any, res: any, next: any) => {
+    try {
+        const content = e.select(e.Content, (m) => ({
+            filter_single: {id: req.params.contentId}
+        }))
+        e.update(e.Account, (acc) => ({
+            filter_single: {id: req.params.accountId},
+            set: {
+                watchlist: {"-=": content}
+            }
+
+        })).run(client)
+        // todo return waarde kiezen in speciaal geval zoals dit neen => later toe te voegen
+                const result = await e.select(e.Content,()=>({
+                            id: true,
+                            title: true,
+                            actors: {name: true},
+                            // calculated properties if requested so
+                            filter_single: {id: req.contentId}
+                        })).run(client)
+        const result = await e.select(e.Account, () => (
+                // zal gebeuren op basis van config gebruiker
+                {
+                    filter_single: {id: req.params.accountId},
+                    username: true,
+                    watchlist: true,
+                }
+            )
+        ).run(client);
+         if (result) {
+                    res.status(200).send(result)
+                } else res.status(400)
+            } catch (err) {
+                res.status(500).json({
+                            error: err
+                        })
+            }
+        });
+ */
     if ($success = touch($path . '/app.ts')) {
         $fp = fopen($path . '/app.ts', 'w');
         $fileAsStr = file_get_contents('./app.txt');

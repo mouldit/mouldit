@@ -55,7 +55,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['effectCounter'] = 0;
     global $implementedTypesOfActions;
     $implementedTypesOfActions = [
-        ['Get_all', 'get', '/get/all/'],['Remove_one','patch','/remove/:concept/:item'],['Add_one','patch','/add/:concept/:item']
+        ['Get_all', 'get', '/get/all/'],['Remove_one','patch','/remove/'],['Add_one','patch','/add/']
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
@@ -67,17 +67,26 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     function getActionInfo($concept,$type,$urlPart):array{
         if($type==='Get_all') return [[$type. '_' . $concept->name . 's',$urlPart.$concept->name]];
         if($type==='Remove_one'||$type==='Add_one'){
-            $sets = [$concept->fields->fields];
+            $sets = [$concept->fields];
             $info = [];
+            $bind=null;
+            if($type==='Remove_one')$bind='from'; else $bind='to';
             while(sizeof($sets)>0){
                 $set = array_shift($sets);
-                for ($i=0;$i<sizeof($set);$i++){
-                    if($set[$i]->hasSubFields()){
+                for ($i=0;$i<sizeof($set->fields);$i++){
+                    if($set->fields[$i]->hasSubFields()){
                         $sets[]=$set[$i]->subfields;
                     }
-                    if($set[$i]->multi){
-                        $info[]=[$type.'_from_'.$concept->name.'_'.$set[$i]->fieldPath,$urlPart.$concept->name.'/'
-                            .str_replace('_','/',$set[$i]->fieldPath)];
+                    if($set->fields[$i]->multi){
+                        if($set instanceof FieldSet){
+                            $info[]=[$type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->name,
+                                // dit is een frontend url , niet helemaal gelijk aan backend url
+                                $urlPart.$concept->name.'/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];
+                        } else{
+                            $info[]=[$type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->fieldPath,
+                                $urlPart.$concept->name.'/'.str_replace('_','/',$set->fields[$i]->fieldPath)
+                                .'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];
+                        }
                     }
                 }
             }
