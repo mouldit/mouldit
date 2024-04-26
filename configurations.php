@@ -64,31 +64,33 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['concepts'] = getConcepts($fileAsStr);
     $_SESSION['actions'] = [];
     $selected = false;
-    function getActionNames($concept,$type):array{
-        if($type==='Get_all') return [$type. '_' . $concept->name . 's'];
-        switch ($type){
-            case 'Remove_one':
-                // todo de actionname is remove_one_from_conceptPath
-                return [];
-            case 'Add_one':
-                return [];
+    function getActionInfo($concept,$type,$urlPart):array{
+        if($type==='Get_all') return [[$type. '_' . $concept->name . 's',$urlPart.$concept->name]];
+        if($type==='Remove_one'||$type==='Add_one'){
+            $sets = [$concept->fields->fields];
+            $info = [];
+            while(sizeof($sets)>0){
+                $set = array_shift($sets);
+                for ($i=0;$i<sizeof($set);$i++){
+                    if($set[$i]->hasSubFields()){
+                        $sets[]=$set[$i]->subfields;
+                    }
+                    if($set[$i]->multi){
+                        $info[]=[$type.'_from_'.$concept->name.'_'.$set[$i]->fieldPath,$urlPart.$concept->name.'/'
+                            .str_replace('_','/',$set[$i]->fieldPath)];
+                    }
+                }
+            }
+            return $info;
         }
         return [];
-    }
-    function getActionUrl($urlPart,$conceptName):string{
-        if($urlPart==='/get/all/')return $urlPart.$conceptName;
-        return '';
     }
     foreach ($_SESSION['concepts'] as $concept) {
         foreach ($implementedTypesOfActions as $actionType) {
             $cpt = clone $concept;
-            // todo de essentie is dat alle remove one en zo nu moeten worden bepaald => dit is een algo!
-            //      de twee foreachen zorgen dat je voor alle mogelijke acties per concept iets hebt,
-            //      maar dit kan best meerdere acties genereren per ronde
-            $names = getActionNames($cpt,$actionType[0]);
-            foreach ($names as $name){
-                // todo clientUrl moet ook aangevuld worden
-                $action = new Action($name, $actionType[1], $actionType[0], getActionUrl($actionType[2] , $cpt->name), $cpt->name);
+            $info = getActionInfo($cpt,$actionType[0],$actionType[2]);
+            foreach ($info as $inf){
+                $action = new Action($inf[0], $actionType[1], $actionType[0], $inf[1], $cpt->name);
                 if (!$selected) {
                     $action->selected = true;
                     $selected = true;
