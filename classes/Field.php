@@ -7,12 +7,14 @@ class Field
     public bool $checked;
     public string $conceptName;
     public string $fieldPath;
+    public bool $multi;
     public SubFieldSet $subfields;
-    public function __construct($name,$type,$concept)
+    public function __construct($name,$type,$concept,$multi=false)
     {
         $this->name=$name;
         $this->type=$type;
         $this->conceptName=$concept;
+        $this->multi=$multi;
     }
     public function __clone(){
         if(isset($this->subfields)){

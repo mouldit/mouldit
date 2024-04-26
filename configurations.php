@@ -55,68 +55,88 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['effectCounter'] = 0;
     global $implementedTypesOfActions;
     $implementedTypesOfActions = [
-        ['Get_all', 'get', '/get/all/']
+        ['Get_all', 'get', '/get/all/'],['Remove_one','patch','/remove/:concept/:item'],['Add_one','patch','/add/:concept/:item']
     ];
     $fileAsStr = file_get_contents($_SESSION['pathToRootOfServer'] . '/dbschema/default.esdl');
     // todo later aanvullen met regExp die maakt dat er meer dan één spatie tussen abstract en type mag zijn
     $fileAsStr = strtolower($fileAsStr);
     include 'concepts.php';
     $_SESSION['concepts'] = getConcepts($fileAsStr);
-    //echo '<pre>'.print_r($_SESSION['concepts'], true).'</pre>';
-
     $_SESSION['actions'] = [];
     $selected = false;
+    function getActionNames($concept,$type):array{
+        if($type==='Get_all') return [$type. '_' . $concept->name . 's'];
+        switch ($type){
+            case 'Remove_one':
+                // todo de actionname is remove_one_from_conceptPath
+                return [];
+            case 'Add_one':
+                return [];
+        }
+        return [];
+    }
+    function getActionUrl($urlPart,$conceptName):string{
+        if($urlPart==='/get/all/')return $urlPart.$conceptName;
+        return '';
+    }
     foreach ($_SESSION['concepts'] as $concept) {
         foreach ($implementedTypesOfActions as $actionType) {
             $cpt = clone $concept;
-            $name = $actionType[0] . '_' . $cpt->name . 's';
-            // todo sommige verbs daar moet nog /:id achter! hetgeen dan automtisch in de Mouldit frontend een id zal krijgen via de angular generated code
-            $action = new Action($name, $actionType[1], $actionType[0], $actionType[2] . $cpt->name, $cpt->name);
-            if (!$selected) {
-                $action->selected = true;
-                $selected = true;
-            }
-            $action->setFields($cpt->fields);
-            $action->fieldset->setInclusivity(true);
-            foreach ($action->fieldset->fields as $f) {
-                $f->setChecked(true);
-            }
-            $subFieldSetsToProcess = [$action->fieldset];
-            $action->activate();
-            $newSubFieldSets = [];
-            //echo '<br><pre> dit zijn de concepts die in principe elke iteratie aan zichzelf gelijk zouden moeten blijevn<br>'.print_r($_SESSION['concepts'], true).'</pre>';
-            while (sizeof($subFieldSetsToProcess) > 0) {
-                foreach ($subFieldSetsToProcess as $set) {
-                    foreach ($set->fields as $f) {
-                        if ($set instanceof SubFieldSet) $f->fieldPath = $set->fieldPath . '_' . $f->name; else $f->fieldPath = $f->name;
-                        if ($f->isConcept()) {
-                            for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
-                                if ($_SESSION['concepts'][$i]->name === $f->type) {
-                                    // het gaat hier om een fieldset instance $fs
-                                    $fs = clone($_SESSION['concepts'][$i]->fields);
-                                    foreach ($fs->fields as $subf) {
-                                        $subf->setChecked(true);
+            // todo de essentie is dat alle remove one en zo nu moeten worden bepaald => dit is een algo!
+            //      de twee foreachen zorgen dat je voor alle mogelijke acties per concept iets hebt,
+            //      maar dit kan best meerdere acties genereren per ronde
+            $names = getActionNames($cpt,$actionType[0]);
+            foreach ($names as $name){
+                // todo clientUrl moet ook aangevuld worden
+                $action = new Action($name, $actionType[1], $actionType[0], getActionUrl($actionType[2] , $cpt->name), $cpt->name);
+                if (!$selected) {
+                    $action->selected = true;
+                    $selected = true;
+                }
+                $action->setFields($cpt->fields);
+                $action->fieldset->setInclusivity(true);
+                foreach ($action->fieldset->fields as $f) {
+                    $f->setChecked(true);
+                }
+                $subFieldSetsToProcess = [$action->fieldset];
+                $action->activate();
+                $newSubFieldSets = [];
+                //echo '<br><pre> dit zijn de concepts die in principe elke iteratie aan zichzelf gelijk zouden moeten blijevn<br>'.print_r($_SESSION['concepts'], true).'</pre>';
+                while (sizeof($subFieldSetsToProcess) > 0) {
+                    foreach ($subFieldSetsToProcess as $set) {
+                        foreach ($set->fields as $f) {
+                            if ($set instanceof SubFieldSet) $f->fieldPath = $set->fieldPath . '_' . $f->name; else $f->fieldPath = $f->name;
+                            if ($f->isConcept()) {
+                                for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
+                                    if ($_SESSION['concepts'][$i]->name === $f->type) {
+                                        // het gaat hier om een fieldset instance $fs
+                                        $fs = clone($_SESSION['concepts'][$i]->fields);
+                                        foreach ($fs->fields as $subf) {
+                                            $subf->setChecked(true);
+                                        }
+                                        $sfs = null;
+                                        if ($set instanceof SubFieldSet) {
+                                            $sfs = new SubFieldSet($fs->conceptName,
+                                                $set->conceptPath . '_' . $fs->conceptName, $set->fieldPath . '_' . $f->name);
+                                        } else {
+                                            $sfs = new SubFieldSet($fs->conceptName,
+                                                $set->conceptName . '_' . $fs->conceptName, $f->name);
+                                        }
+                                        $sfs->setSubFields($fs->fields);
+                                        $sfs->setInclusivity(true);
+                                        $f->subfields = $sfs;
+                                        $newSubFieldSets[] = $f->subfields;
+                                        break;
                                     }
-                                    $sfs = null;
-                                    if ($set instanceof SubFieldSet) {
-                                        $sfs = new SubFieldSet($fs->conceptName, $set->conceptPath . '_' . $fs->conceptName, $set->fieldPath . '_' . $f->name);
-                                    } else {
-                                        $sfs = new SubFieldSet($fs->conceptName, $set->conceptName . '_' . $fs->conceptName, $f->name);
-                                    }
-                                    $sfs->setSubFields($fs->fields);
-                                    $sfs->setInclusivity(true);
-                                    $f->subfields = $sfs;
-                                    $newSubFieldSets[] = $f->subfields;
-                                    break;
                                 }
                             }
                         }
                     }
+                    $subFieldSetsToProcess = $newSubFieldSets;
+                    $newSubFieldSets = [];
                 }
-                $subFieldSetsToProcess = $newSubFieldSets;
-                $newSubFieldSets = [];
+                $_SESSION['actions'][] = $action;
             }
-            $_SESSION['actions'][] = $action;
         }
     }
     //echo '<pre>'.print_r($_SESSION['actions'], true).'</pre>';

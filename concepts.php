@@ -69,20 +69,24 @@ function getConceptData($codeBlock): array
     $name = trim(substr(strstr($codeBlock,'{',true),strpos($codeBlock,'type')+4));
     $fields = [];
     $block = trim(substr($codeBlock,strpos($codeBlock,'{')+1,strpos($codeBlock,'}')-strpos($codeBlock,'{')));
-    $props = explode(';',$block);
+    $props = explode(';',$block);// pas op voor bijkomende bepalingen
     array_pop($props);
     //echo '<pre>props as strings => '.print_r($props, true).'</pre><br>';
     foreach ($props as $prop){
         $t=explode(':',trim($prop));
         $f = explode(' ',trim($t[0]));
         if(is_array($f)){
+            $multi=false;
+            if(sizeof($f)>1 && trim($f[0])==='multi'){
+                $multi=true;
+            }
             $fieldName = trim(array_pop($f));
             $fieldType = trim($t[1]);
             $nameTemp = $name;
             if(str_contains($nameTemp,'extending')){
                 $nameTemp = strstr($nameTemp,'extending',true);
             }
-            $fields[]=new Field($fieldName,$fieldType,$nameTemp);
+            $fields[]=new Field($fieldName,$fieldType,$nameTemp,$multi);
         }
     }
     return [$name,$fields];
