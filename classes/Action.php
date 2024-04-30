@@ -4,6 +4,7 @@ class Action
 {
     public string $name;
     public string $verb;
+
     public string $type;
     public string $concept;
     public bool $active;
@@ -19,7 +20,7 @@ class Action
         $this->active = true;
         $this->selected = false;
         $this->clientURL = $clientURL;
-        $this->concept = $concept; // todo zoals hier is een id veel beter
+        $this->concept = $concept; // todo zoals hier is een id veel beter!!!
     }
     public function getVariable(){
         // todo meer specifiek per type actie ipv altijd dit
