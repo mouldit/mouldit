@@ -98,6 +98,7 @@ class Action
     public function getAsJavaScript(bool $id,Effect $e){
         return
             'this.http.'.$this->verb.'(\'http://localhost:5000/'
+            // todo replace :id's!
             .$this->serverURL.'\').subscribe(res => {'
             .'this.triggerService.'.lcfirst($e->trigger->name)
             .ucfirst($e->source->name).($id?'_'.$e->source->id:'').'.emit('
@@ -106,6 +107,7 @@ class Action
     }
     public function getAction(){
         return   'this.http.'.$this->verb.'(\'http://localhost:5000/'
+            // todo replace :id's!
             .$this->serverURL.'\').subscribe(res => {'
             .'this.'.$this->getVariable().'=res'."\n});";
     }
