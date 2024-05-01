@@ -144,6 +144,14 @@ function generateBackend($concepts, $actions, $path): bool
                                         }
                                         return $fields;
                                     }
+                                    function sendResult(){
+                                        return  'if (result) {
+            res.status(200).send(result)
+        } else res.status(400)' . "\t" . '} catch(err){' . "\t" . '
+           res.status(500).json({' . "\t\t" . '
+               error: err
+           })';
+                                    }
                                     if($actions[$j]->type==='Get_all'){
                                         $api1 = 'router.' . $actions[$j]->verb . '(\''
                                             // todo getActionUrl method of bewaar die onmiddellijk in de actie
@@ -155,31 +163,39 @@ function generateBackend($concepts, $actions, $path): bool
                                             . ', () => ({' . "\t" .
 //                   ...e.' . ucfirst($_SESSION['concepts'][$i]) . '[\'*\']
                                             $fields.
-                                            '})).run(client);' . "\n" . '        if (result) {
-            res.status(200).send(result)
-        } else res.status(400)' . "\t" . '} catch(err){' . "\t" . '
-           res.status(500).json({' . "\t\t" . '
-               error: err
-           })';
+                                            '})).run(client);' . "\n" . sendResult();
                                         fwrite($fp, $body, strlen($body));
                                         fwrite($fp, $api2, strlen($api2));
                                     } else if($actions[$j]->type==='Remove_one'||$actions[$j]->type==='Add_one'){
                                         $api1 = 'router.' . $actions[$j]->verb . '(\''
                                             . '/';
                                         $replaceWith = 'add';
+                                        $crudAction = '+=';
                                         if($actions[$j]->type==='Remove_one'){
                                             $replaceWith .= 'from';
+                                            $crudAction = '-=';
                                         }
                                         $api1.=str_replace($_SESSION['concepts'][$i]->name,$replaceWith,$actions[$j]->clientUrl);
-                                        // $urlPart.
-                                        //$concept->name. => dees moet er tussenuit en from of to moet er dan tussen
-                                        //'/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];
+                                        /* $urlPart.
+                                        $concept->name. => dees moet er tussenuit en from of to moet er dan tussen
+                                        '/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];*/
                                         $api1 .=  '\', async (req:any,res:any,next:any)=>{' . "\n\t";
                                         $api2 = "\n" . '}});' . "\n";
                                         fwrite($fp, $api1, strlen($api1));
-                                        $fields = getFields($actions[$j]->fieldset);
                                         $body = 'try {'."\n";
-                                        // todo
+                                        $getRecord = 'const '.$actions[$j]->fieldType.' = e.select(e.'.ucfirst($actions[$j]->fieldType).', () => ({';
+                                        $getRecord.="\n".'filter_single: {id: req.params.'.$actions[$j]->fieldType.'Id}';
+                                        $getRecord.="\n".'}))';
+                                        $updateList = 'e.update(e.'.ucfirst($actions[$j]->concept).', (acc) => ({';
+                                        $updateList.="\n".'filter_single: {id: req.params.'.$actions[$j]->concept.'Id},';
+                                        $updateList.="\n".'set: {';
+                                        $updateList.="\n\t".$actions[$j]->fieldName.': {"'.$crudAction.'":'.$actions[$j]->fieldType.'}';
+                                        $updateList.="\n".' } })).run(client)';
+                                        // todo where does this fit in?
+                                        $fields = getFields($actions[$j]->fieldset);
+                                        $returnValue = '';
+                                        $sendReturnValue= sendResult();
+                                        $body.=$getRecord."\n".$updateList."\n".$returnValue."\n".$sendReturnValue."\n";
                                         fwrite($fp, $body, strlen($body));
                                         fwrite($fp, $api2, strlen($api2));
                                     }

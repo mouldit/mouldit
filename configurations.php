@@ -64,8 +64,9 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $_SESSION['concepts'] = getConcepts($fileAsStr);
     $_SESSION['actions'] = [];
     $selected = false;
+    // todo het veld in kwestie alsook het concept moeten hoe dan ook aanwezig zijn
     function getActionInfo($concept,$type,$urlPart):array{
-        if($type==='Get_all') return [[$type. '_' . $concept->name . 's',$urlPart.$concept->name]];
+        if($type==='Get_all') return [[$type. '_' . $concept->name . 's',$urlPart.$concept->name,NULL,NULL]];
         if($type==='Remove_one'||$type==='Add_one'){
             $sets = [$concept->fields];
             $info = [];
@@ -79,13 +80,16 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                     }
                     if($set->fields[$i]->multi){
                         if($set instanceof FieldSet){
-                            $info[]=[$type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->name,
+                            $info[]=[
+                                    $type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->name,
                                 // dit is een frontend url , niet helemaal gelijk aan backend url
-                                $urlPart.$concept->name.'/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];
+                                $urlPart.$concept->name.'/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id',
+                                $set->fields[$i]->name,$set->fields[$i]->type];
                         } else{
                             $info[]=[$type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->fieldPath,
                                 $urlPart.$concept->name.'/'.str_replace('_','/',$set->fields[$i]->fieldPath)
-                                .'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];
+                                .'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id',
+                                $set->fields[$i]->name,$set->fields[$i]->type];
                         }
                     }
                 }
@@ -99,7 +103,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $cpt = clone $concept;
             $info = getActionInfo($cpt,$actionType[0],$actionType[2]);
             foreach ($info as $inf){
-                $action = new Action($inf[0], $actionType[1], $actionType[0], $inf[1], $cpt->name);
+                $action = new Action($inf[0], $actionType[1], $actionType[0], $inf[1], $cpt->name, $inf[2], $inf[3]);
                 if (!$selected) {
                     $action->selected = true;
                     $selected = true;

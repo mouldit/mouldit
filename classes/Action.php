@@ -7,12 +7,14 @@ class Action
 
     public string $type;
     public string $concept;
+    public string $fieldName;
+    public string $fieldType;
     public bool $active;
     public bool $selected;
     public string $clientURL;
     public FieldSet $fieldset; // de conceptnaam komt voor als attribuut in de fieldset property
 
-    function __construct($name, $verb, $type, $clientURL, $concept)
+    function __construct($name, $verb, $type, $clientURL, $concept,$fieldName=NULL,$fieldType=NULL)
     {
         $this->name = $name;
         $this->verb = $verb;
@@ -21,6 +23,8 @@ class Action
         $this->selected = false;
         $this->clientURL = $clientURL;
         $this->concept = $concept; // todo zoals hier is een id veel beter!!!
+        if(isset($fieldName))$this->fieldName = $fieldName;
+        if(isset($fieldType))$this->fieldType = $fieldType;
     }
     public function getVariable(){
         // todo meer specifiek per type actie ipv altijd dit
