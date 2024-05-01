@@ -30,6 +30,7 @@ class Page implements IPage
         if (isset($main)) $this->main = $main; else $this->main = false;
     }
     public function createViewController(&$data, array $effects, array $pages){
+        // todo aanpassen naar de verschillende soorten acties
         $effectOnInit = '';
         $effectMethods = '';
         $effectCstr = '';

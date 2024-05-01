@@ -12,6 +12,7 @@ class Action
     public bool $active;
     public bool $selected;
     public string $clientURL;
+    public string $serverURL;
     public FieldSet $fieldset; // de conceptnaam komt voor als attribuut in de fieldset property
 
     function __construct($name, $verb, $type, $clientURL, $concept,$fieldName=NULL,$fieldType=NULL)
@@ -97,7 +98,7 @@ class Action
     public function getAsJavaScript(bool $id,Effect $e){
         return
             'this.http.'.$this->verb.'(\'http://localhost:5000/'
-            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {'
+            .$this->serverURL.'\').subscribe(res => {'
             .'this.triggerService.'.lcfirst($e->trigger->name)
             .ucfirst($e->source->name).($id?'_'.$e->source->id:'').'.emit('
             .'res'
@@ -105,7 +106,7 @@ class Action
     }
     public function getAction(){
         return   'this.http.'.$this->verb.'(\'http://localhost:5000/'
-            .$this->concept.'/'.$this->concept.'s\').subscribe(res => {'
+            .$this->serverURL.'\').subscribe(res => {'
             .'this.'.$this->getVariable().'=res'."\n});";
     }
 }

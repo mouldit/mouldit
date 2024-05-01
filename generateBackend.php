@@ -155,6 +155,7 @@ function generateBackend($concepts, $actions, $path): bool
                                     //      anders kan er concept verwarring zijn doordat twee concepten het één bestaat als voorvoegsel bij het andere
                                     //      bv product en productmanager
                                     if($actions[$j]->type==='Get_all'){
+                                        $actions[$j]->serverURL = $_SESSION['concepts'][$i]->name.'/'.$_SESSION['concepts'][$i]->name.'s';
                                         $api1 = 'router.' . $actions[$j]->verb . '(\''
                                             // todo getActionUrl method of bewaar die onmiddellijk in de actie
                                             . '/' . $_SESSION['concepts'][$i]->name . 's\', async (req:any,res:any,next:any)=>{' . "\n\t";
@@ -180,6 +181,7 @@ function generateBackend($concepts, $actions, $path): bool
                                         $api1A=strstr($api1,':',true);
                                         $api1B=substr($api1,strpos($api1,'Id')+2);
                                         $api1=$api1A.':'.$_SESSION['concepts'][$i]->name.'Id'.$api1B;
+                                        $actions[$j]->serverURL = $_SESSION['concepts'][$i]->name.'/'.$api1;
                                         /* $urlPart.
                                         $concept->name. => dees moet er tussenuit en from of to moet er dan tussen
                                         '/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];*/
