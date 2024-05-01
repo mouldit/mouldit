@@ -36,9 +36,39 @@ function printSubFields(SubFieldSet $sfs){
     }
     return $printedSubFields;
 }
+function getFields(FieldSet $fs){
+    $fields='';
+    // dit blokje kan een aparte functie worden
+    // op te roepen voor elk concept blok
+    // en dit soms op de true/false plaats
+    for ($k=0;$k<sizeof($fs->fields);$k++){
+        // fieldname
+        if($k+1==sizeof($fs->fields)){
+            $fields.=printField($fs->fields[$k],$fs->inclusivity,true);
+        } else{
+            $fields.=printField($fs->fields[$k],$fs->inclusivity,false);
+        }
+        /*                                        $fields.=$actions[$j]->fieldset->fields[$k]->name.':';
+                                                if(($actions[$j]->fieldset->inclusivity&&$actions[$j]->fieldset->fields[$k]->checked)
+                                                ||(!$actions[$j]->fieldset->inclusivity&&!$actions[$j]->fieldset->fields[$k]->checked)){
+                                                    $fields.='true,'."\n";
+                                                } else{
+                                                    $fields.='false,'."\n";
+                                                }*/
+    }
+    return $fields;
+}
+function sendResult(){
+    return  'if (result) {
+            res.status(200).send(result)
+        } else res.status(400)' . "\t" . '} catch(err){' . "\t" . '
+           res.status(500).json({' . "\t\t" . '
+               error: err
+           })';
+}
 function generateBackend($concepts, $actions, $path): bool
 {
-    // todo aanpassen naar nieuwe acties
+    // todo fix probleem: enkel content wordt geprint
     /*
      * router.patch('remove/from/watchlist/:accountId/:contentId', async (req: any, res: any, next: any) => {
     try {
@@ -81,7 +111,7 @@ function generateBackend($concepts, $actions, $path): bool
  */
     if ($success = touch($path . '/app.ts')) {
         $fp = fopen($path . '/app.ts', 'w');
-        $fileAsStr = file_get_contents('./app.txt');
+        $fileAsStr = file_get_contents('./text-files/app.txt');
         $app1 = strstr($fileAsStr, '***add route imports***', true);
         $app3 = substr(strstr($fileAsStr, '***use routes***'), strlen('***use routes***'));
         $app2 = substr($fileAsStr, strlen($app1) + strlen('***add route imports***'),
@@ -107,10 +137,12 @@ function generateBackend($concepts, $actions, $path): bool
         if (!file_exists($path . '/routes')) {
             if ($success = mkdir($path . '/routes')) {
                 for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
+                    echo 'creating '.$_SESSION['concepts'][$i]->name;
                     if (touch($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts')) {
+                        echo 'touched '. $_SESSION['concepts'][$i]->name;
                         // per concept de nodige routes
                         if ($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts', 'ab')) {
-                            $fileAsStr = file_get_contents('./route.txt');
+                            $fileAsStr = file_get_contents('./text-files/route.txt');
                             $p1 = strstr($fileAsStr, '***route handlers***', true) . "\n";
                             $p2 = "\n" . trim(substr(strstr($fileAsStr, '***route handlers***'),
                                     strlen('***route handlers***')));
@@ -122,36 +154,6 @@ function generateBackend($concepts, $actions, $path): bool
                                     // todo acties voorzien van een link met het desbetreffende concept namelijk via een id
                                     //      anders kan er concept verwarring zijn doordat twee concepten het één bestaat als voorvoegsel bij het andere
                                     //      bv product en productmanager
-                                    function getFields(FieldSet $fs){
-                                        $fields='';
-                                        // dit blokje kan een aparte functie worden
-                                        // op te roepen voor elk concept blok
-                                        // en dit soms op de true/false plaats
-                                        for ($k=0;$k<sizeof($fs->fields);$k++){
-                                            // fieldname
-                                            if($k+1==sizeof($fs->fields)){
-                                                $fields.=printField($fs->fields[$k],$fs->inclusivity,true);
-                                            } else{
-                                                $fields.=printField($fs->fields[$k],$fs->inclusivity,false);
-                                            }
-                                            /*                                        $fields.=$actions[$j]->fieldset->fields[$k]->name.':';
-                                                                                    if(($actions[$j]->fieldset->inclusivity&&$actions[$j]->fieldset->fields[$k]->checked)
-                                                                                    ||(!$actions[$j]->fieldset->inclusivity&&!$actions[$j]->fieldset->fields[$k]->checked)){
-                                                                                        $fields.='true,'."\n";
-                                                                                    } else{
-                                                                                        $fields.='false,'."\n";
-                                                                                    }*/
-                                        }
-                                        return $fields;
-                                    }
-                                    function sendResult(){
-                                        return  'if (result) {
-            res.status(200).send(result)
-        } else res.status(400)' . "\t" . '} catch(err){' . "\t" . '
-           res.status(500).json({' . "\t\t" . '
-               error: err
-           })';
-                                    }
                                     if($actions[$j]->type==='Get_all'){
                                         $api1 = 'router.' . $actions[$j]->verb . '(\''
                                             // todo getActionUrl method of bewaar die onmiddellijk in de actie
@@ -167,15 +169,17 @@ function generateBackend($concepts, $actions, $path): bool
                                         fwrite($fp, $body, strlen($body));
                                         fwrite($fp, $api2, strlen($api2));
                                     } else if($actions[$j]->type==='Remove_one'||$actions[$j]->type==='Add_one'){
-                                        $api1 = 'router.' . $actions[$j]->verb . '(\''
-                                            . '/';
-                                        $replaceWith = 'add';
+                                        $api1 = 'router.' . $actions[$j]->verb . '(\'';
+                                        $replaceWith = 'to';
                                         $crudAction = '+=';
                                         if($actions[$j]->type==='Remove_one'){
-                                            $replaceWith .= 'from';
+                                            $replaceWith = 'from';
                                             $crudAction = '-=';
                                         }
-                                        $api1.=str_replace($_SESSION['concepts'][$i]->name,$replaceWith,$actions[$j]->clientUrl);
+                                        $api1.= str_replace($_SESSION['concepts'][$i]->name,$replaceWith,$actions[$j]->clientURL);
+                                        $api1A=strstr($api1,':',true);
+                                        $api1B=substr($api1,strpos($api1,'Id')+2);
+                                        $api1=$api1A.':'.$_SESSION['concepts'][$i]->name.'Id'.$api1B;
                                         /* $urlPart.
                                         $concept->name. => dees moet er tussenuit en from of to moet er dan tussen
                                         '/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id'];*/
@@ -191,9 +195,13 @@ function generateBackend($concepts, $actions, $path): bool
                                         $updateList.="\n".'set: {';
                                         $updateList.="\n\t".$actions[$j]->fieldName.': {"'.$crudAction.'":'.$actions[$j]->fieldType.'}';
                                         $updateList.="\n".' } })).run(client)';
-                                        // todo where does this fit in?
                                         $fields = getFields($actions[$j]->fieldset);
-                                        $returnValue = '';
+                                        $returnValue = 'const result = await e.select(e.';
+                                        $returnValue.=ucfirst($actions[$j]->concept).',() => ( {';
+                                        $returnValue.= "\n".  ' filter_single: {id: req.params.';
+                                        $returnValue.=$actions[$j]->concept.'Id},';
+                                        $returnValue.= "\n".$fields;
+                                        $returnValue.= "\n".' } ) ).run(client);';
                                         $sendReturnValue= sendResult();
                                         $body.=$getRecord."\n".$updateList."\n".$returnValue."\n".$sendReturnValue."\n";
                                         fwrite($fp, $body, strlen($body));
