@@ -15,7 +15,7 @@ class Action
     public string $serverURL;
     public FieldSet $fieldset; // de conceptnaam komt voor als attribuut in de fieldset property
 
-    function __construct($name, $verb, $type, $clientURL, $concept,$fieldName=NULL,$fieldType=NULL)
+    function __construct($name, $verb, $type, $clientURL, $concept,$url,$fieldName=NULL,$fieldType=NULL)
     {
         $this->name = $name;
         $this->verb = $verb;
@@ -23,6 +23,7 @@ class Action
         $this->active = true;
         $this->selected = false;
         $this->clientURL = $clientURL;
+        $this->serverURL=$url;
         $this->concept = $concept; // todo zoals hier is een id veel beter!!!
         if(isset($fieldName))$this->fieldName = $fieldName;
         if(isset($fieldType))$this->fieldType = $fieldType;
@@ -108,6 +109,17 @@ class Action
     public function getAction(){
         return   'this.http.'.$this->verb.'(\'http://localhost:5000/'
             // todo replace :id's!
+            // 'http://localhost:5000/account/remove/form/watchlist/'+this.accountId+'/'+contentId
+            // de id's komen als params in de method
+            /*
+             *       <p-button
+        (click)="onClickGet_all_contents_page_button_component_1(accountId,content.id)" label="get movies" icon="pi pi-filter-slash"
+        iconPos="left">
+      </p-button>
+            HOE weet de engine dat er parameters nodig zijn uberhaupt? aan de hand van de actie: bij add or remove of aan de hand van de url :contentId
+            todo: return value voor nested components
+             * */
+            // todo fix bug: serverURL wordt pas ingevuld bij generate backend ... wat als je eerst de frontend wil doen?
             .$this->serverURL.'\').subscribe(res => {'
             .'this.'.$this->getVariable().'=res'."\n});";
     }

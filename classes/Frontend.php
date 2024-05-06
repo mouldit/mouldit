@@ -43,8 +43,6 @@ export class AppComponent {
         $f = fopen($dir . '/app.module.ts', 'wb');
         $data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/text-files/app-module.txt');
         if ($f && $data) {
-            // todo we krijgen een dubbele import als de import van een module op twee niveaus bestaat:
-            //      een top en een nested level
             $data = str_replace(['COMPONENT_IMPORT_STATEMENT','MODULE_IMPORTS_STATEMENT', 'MODULE_PROVIDER_STATEMENT'],
                 ["\nimport { HttpClientModule } from '@angular/common/http';
                 \nimport {TriggerService} from \"./services/trigger-service\";\nCOMPONENT_IMPORT_STATEMENT",
@@ -52,7 +50,8 @@ export class AppComponent {
             $import = [];
             $imports=[];
             foreach ($this->pages as $p) {
-                // todo test dit om te zien over er over pagina's heen geen dubbeleme imports en zo gebeuren
+                echo $p->name;
+                // todo fix double imports
                 $data = str_replace(['COMPONENT_IMPORT_STATEMENT', 'COMPONENT_DECLARATIONS_STATEMENT','MODULE_PROVIDER_STATEMENT'],
                     [$p->getImportStatement('.'.$this->getPath($this->pages,$p->id)) . "\nCOMPONENT_IMPORT_STATEMENT",
                        $p->getDeclarationsStatement() . "\nCOMPONENT_DECLARATIONS_STATEMENT",""], $data);
@@ -146,6 +145,7 @@ export class AppComponent {
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 // HTML bestand = ComponentView
+                // todo fix: de add en remove pâges worden niet aangemaakt slechts één soort wordt aangemaakt!
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
                 if($f){

@@ -99,6 +99,9 @@ class Card extends \components\Component implements IComponent
                     }
                 }
                 // todo ng for for a nested component based on an action=>is list!! and datamapping
+
+                // todo indien de action === remove or add => dit in de parameters (triggersCi)
+                // een andere actie aanduiden als return waarde van een actie als remove from list
                 $html .= '    <ng-template pTemplate="footer">
         ' . $this->ci->contentInjection['footer']->getHTML($triggersCi) . '
     </ng-template>';

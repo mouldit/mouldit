@@ -66,12 +66,36 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $selected = false;
     // todo het veld in kwestie alsook het concept moeten hoe dan ook aanwezig zijn
     function getActionInfo($concept,$type,$urlPart):array{
-        if($type==='Get_all') return [[$type. '_' . $concept->name . 's',$urlPart.$concept->name,NULL,NULL]];
-        if($type==='Remove_one'||$type==='Add_one'){
+        /*
+         * if($actions[$j]->type==='Get_all'){
+                                        $actions[$j]->serverURL = $_SESSION['concepts'][$i]->name.'/'.$_SESSION['concepts'][$i]->name.'s';
+
+                                                $api1 = 'router.' . $actions[$j]->verb . '(\'';
+                                        $replaceWith = 'to';
+                                        $crudAction = '+=';
+                                        if($actions[$j]->type==='Remove_one'){
+                                            $replaceWith = 'from';
+                                            $crudAction = '-=';
+                                        }
+                                        $api1.= str_replace($_SESSION['concepts'][$i]->name,$replaceWith,$actions[$j]->clientURL);
+                                        $api1A=strstr($api1,':',true);
+                                        $api1B=substr($api1,strpos($api1,'Id')+2);
+                                        $api1=$api1A.':'.$_SESSION['concepts'][$i]->name.'Id'.$api1B;
+                                        $actions[$j]->serverURL = $_SESSION['concepts'][$i]->name.'/'.$api1;
+         * */
+        if($type==='Get_all'){
+            $url = $concept->name.'/'.$concept->name.'s';
+            return [[
+                    $type. '_' . $concept->name . 's',
+                $urlPart.$concept->name,
+                $url,
+                NULL,
+                NULL]];
+        } else if($type==='Remove_one'||$type==='Add_one'){
             $sets = [$concept->fields];
             $info = [];
-            $bind=null;
-            if($type==='Remove_one')$bind='from'; else $bind='to';
+            //$bind=null;
+            //if($type==='Remove_one')$bind='from'; else $bind='to';
             while(sizeof($sets)>0){
                 $set = array_shift($sets);
                 for ($i=0;$i<sizeof($set->fields);$i++){
@@ -79,17 +103,39 @@ if (isset($_SESSION['pathToRootOfServer']) &&
                         $sets[]=$set[$i]->subfields;
                     }
                     if($set->fields[$i]->multi){
+                        $replaceWith = 'to';
+                        if($type==='Remove_one'){
+                            $replaceWith = 'from';
+                        }
                         if($set instanceof FieldSet){
+                            $clientUrl = $urlPart.$concept->name.'/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id';
+                            //$api1 = 'router.' . $actions[$j]->verb . '(\'';
+                            $api1= str_replace($concept->name,$replaceWith,$clientUrl);
+                            $api1A=strstr($api1,':',true);
+                            $api1B=substr($api1,strpos($api1,'Id')+2);
+                            $api1=$api1A.':'.$concept->name.'Id'.$api1B;
+                            $url = $concept->name.'/'.$api1;
                             $info[]=[
-                                    $type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->name,
+                                    $type.'_'.$replaceWith.'_'.$concept->name.'_'.$set->fields[$i]->name,
                                 // dit is een frontend url , niet helemaal gelijk aan backend url
-                                $urlPart.$concept->name.'/'.$set->fields[$i]->name.'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id',
-                                $set->fields[$i]->name,$set->fields[$i]->type];
+                                $clientUrl,
+                                $url,
+                                $set->fields[$i]->name,
+                                $set->fields[$i]->type];
                         } else{
-                            $info[]=[$type.'_'.$bind.'_'.$concept->name.'_'.$set->fields[$i]->fieldPath,
-                                $urlPart.$concept->name.'/'.str_replace('_','/',$set->fields[$i]->fieldPath)
-                                .'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id',
-                                $set->fields[$i]->name,$set->fields[$i]->type];
+                            $clientUrl =$urlPart.$concept->name.'/'.str_replace('_','/',$set->fields[$i]->fieldPath)
+                                .'/:'.$concept->name.'Id/:'.$set->fields[$i]->type.'Id';
+                            //$api1 = 'router.' . $actions[$j]->verb . '(\'';
+                            $api1= str_replace($concept->name,$replaceWith,$clientUrl);
+                            $api1A=strstr($api1,':',true);
+                            $api1B=substr($api1,strpos($api1,'Id')+2);
+                            $api1=$api1A.':'.$concept->name.'Id'.$api1B;
+                            $url = $concept->name.'/'.$api1;
+                            $info[]=[$type.'_'.$replaceWith.'_'.$concept->name.'_'.$set->fields[$i]->fieldPath,
+                                $clientUrl,
+                                $url,
+                                $set->fields[$i]->name,
+                                $set->fields[$i]->type];
                         }
                     }
                 }
@@ -103,7 +149,7 @@ if (isset($_SESSION['pathToRootOfServer']) &&
             $cpt = clone $concept;
             $info = getActionInfo($cpt,$actionType[0],$actionType[2]);
             foreach ($info as $inf){
-                $action = new Action($inf[0], $actionType[1], $actionType[0], $inf[1], $cpt->name, $inf[2], $inf[3]);
+                $action = new Action($inf[0], $actionType[1], $actionType[0], $inf[1], $cpt->name,$inf[2], $inf[3], $inf[4]);
                 if (!$selected) {
                     $action->selected = true;
                     $selected = true;
@@ -159,7 +205,6 @@ if (isset($_SESSION['pathToRootOfServer']) &&
     $selected = false;
     $main = new Page($_SESSION['pageCounter']++, 'main_page', '', true);
     $main->select();
-    // todo add a router outlet component by default
     $_SESSION['frontend']->pages[] = $main;
     foreach ($_SESSION['actions'] as $a) {
         $p = new Page($_SESSION['pageCounter']++, $a->name . '_page', $a->clientURL);
