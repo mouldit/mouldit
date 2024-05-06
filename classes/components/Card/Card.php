@@ -76,6 +76,7 @@ class Card extends \components\Component implements IComponent
     {
         // todo het mogelijk maken dat hier meerdere acties naar toe kunnen
         if (isset($action) && $action->getReturnType() === 'list') {
+            // todo dit is het probleem, het return type is geen list!!
             $html = '<ng-container *ngFor="let ' . $action->concept . ' of ' . $action->concept . 's' . '; let i = index">
             <p-card ' . $triggers . ' ';
             if (isset($this->mapping[$action->name]['header'])) {
@@ -108,6 +109,8 @@ class Card extends \components\Component implements IComponent
             }
             $html .= '</p-card></ng-container>';
             return $html;
+        } else if(isset($action) && $action->getReturnType() === 'record'){
+            // todo
         } else {
             return '';
         }

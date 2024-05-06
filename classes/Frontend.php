@@ -145,9 +145,9 @@ export class AppComponent {
         foreach ($this->pages as $p) {
             if ($this->isResourcePage($this->pages,$p)||$this->isMainPage($this->pages,$p)) {
                 // HTML bestand = ComponentView
-                // todo fix: de add en remove pâges worden niet aangemaakt slechts één soort wordt aangemaakt!
                 if(!file_exists($dir . $this->getPath($this->pages,$p->id)))mkdir($dir . $this->getPath($this->pages,$p->id));
                 $f = fopen($dir . $this->getPath($this->pages,$p->id).'/' . $p->getPageFolderName() . '.component.html', 'wb');
+                // todo fix een component die de target is van een remove one action wordt niet gerendered
                 if($f){
                     $data = '';
                     foreach ($p->components as $c){

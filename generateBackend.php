@@ -137,9 +137,7 @@ function generateBackend($concepts, $actions, $path): bool
         if (!file_exists($path . '/routes')) {
             if ($success = mkdir($path . '/routes')) {
                 for ($i = 0; $i < sizeof($_SESSION['concepts']); $i++) {
-                    echo 'creating '.$_SESSION['concepts'][$i]->name;
                     if (touch($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts')) {
-                        echo 'touched '. $_SESSION['concepts'][$i]->name;
                         // per concept de nodige routes
                         if ($fp = fopen($path . '/routes/' . $_SESSION['concepts'][$i]->name . '.ts', 'ab')) {
                             $fileAsStr = file_get_contents('./text-files/route.txt');

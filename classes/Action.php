@@ -29,12 +29,13 @@ class Action
         if(isset($fieldType))$this->fieldType = $fieldType;
     }
     public function getVariable(){
-        // todo meer specifiek per type actie ipv altijd dit
-        return $this->concept.'s';
+        if($this->getReturnType()==='list')return $this->concept.'s';
+        if($this->getReturnType()==='record')return $this->concept;
     }
     function getReturnType()
     {
         if ($this->type === 'Get_all') return 'list';
+        if($this->type=== 'Remove_one' || $this->type=== 'Add_one') return 'record';
     }
 
     function getFullQualifiedFieldNames(): array
@@ -119,7 +120,6 @@ class Action
             HOE weet de engine dat er parameters nodig zijn uberhaupt? aan de hand van de actie: bij add or remove of aan de hand van de url :contentId
             todo: return value voor nested components
              * */
-            // todo fix bug: serverURL wordt pas ingevuld bij generate backend ... wat als je eerst de frontend wil doen?
             .$this->serverURL.'\').subscribe(res => {'
             .'this.'.$this->getVariable().'=res'."\n});";
     }
