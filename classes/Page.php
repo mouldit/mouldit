@@ -160,22 +160,17 @@ class Page implements IPage
 
     function getPageComponentName()
     {
-        // todo => fullname!
-        echo 'hier gebeurt de fout?';
         $componentName = explode('_', $this->name);
-        //$componentName = array_slice($componentName, -2);
         array_walk($componentName, function (&$el, $index) {
             $el = ucfirst($el);
         });
-        echo '<pre> '.print_r($componentName, true).'</pre>';
+        //echo '<pre> '.print_r($componentName, true).'</pre>';
         return implode('', $componentName) . 'Component';
     }
 
     function getPageFolderName(): string
     {
-        // todo hetzelfde met de folder => fullname!
         $folderName = explode('_', $this->name);
-        //$folderName = array_slice($folderName, -2);
         return implode('-', $folderName);
     }
 
